@@ -17,4 +17,4 @@ Route::get('/home', function () {
     return view('home');
 });
 Route::get('/page/{page?}', [\App\Http\Controllers\HomeController::class, 'Page']);
-Route::resource('posts', 'PostController');
+//Route::resource('posts', 'PostController');
