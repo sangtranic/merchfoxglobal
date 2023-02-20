@@ -23,7 +23,8 @@ class Users extends Model
      * @var string
      */
     protected $table = 'users';
-
+    const CREATED_AT = 'createDate';
+    const UPDATED_AT = 'updateDate';
     /**
      * The primary key for the model.
      *
@@ -46,7 +47,7 @@ class Users extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -77,6 +78,10 @@ class Users extends Model
     // Scopes...
 
     // Functions ...
-
+    public function role()
+    {
+        return $this->hasOne('App\Models\Roles');
+    }
     // Relations ...
 }
+

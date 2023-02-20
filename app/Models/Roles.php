@@ -17,7 +17,6 @@ class Roles extends Model
      * @var string
      */
     protected $table = 'roles';
-
     /**
      * The primary key for the model.
      *
@@ -40,7 +39,7 @@ class Roles extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -58,7 +57,7 @@ class Roles extends Model
      * @var array
      */
     protected $dates = [
-        
+
     ];
 
     /**
@@ -66,7 +65,7 @@ class Roles extends Model
      *
      * @var boolean
      */
-    public $timestamps = true;
+    public $timestamps = false;
 
     // Scopes...
 
