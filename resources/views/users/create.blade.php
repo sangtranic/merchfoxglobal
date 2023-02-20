@@ -41,29 +41,7 @@
             {{ Form::select('roleId', $listRole, null, ['class' => 'form-control']) }}
 {{--			{{ Form::string('roleId', null, array('class' => 'form-control')) }}--}}
 		</div>
-{{--        <label for="image"><?php echo \Common\Languages::news()['imageNews'] ?>--}}
-{{--            <a data-toggle="tooltip"--}}
-{{--               title="<?php echo \Common\Languages::news()['uploadAvatar']; ?>"--}}
-{{--               href="javascript:void(0)"--}}
-{{--               onclick="news.openUpload()"--}}
-{{--               style="margin-left: 10px;font-size: 22px;"><i--}}
-{{--                    class="fa fa-file-image-o"></i></i>--}}
-{{--            </a>--}}
-{{--        </label>--}}
-{{--        <div class="image" style="position: relative;text-align: center" data-width="200" data-height="150">--}}
-{{--            <?php if (isset($data['image']) && !empty($data['image'])): ?>--}}
-{{--            <img src="<?php echo IMG_URL . $data['image']; ?>" width="200px"--}}
-{{--                 height="150px"/>--}}
-{{--            <div class="avatar-remove-ico"><a title="Xóa"--}}
-{{--                                              href="javascript:void(0)"--}}
-{{--                                              onclick="news.removeAvatar(document.getElementById('image'))"><i--}}
-{{--                        class="pointer fa fa-trash"></i> </a></div>--}}
-{{--            <?php endif; ?>--}}
-{{--        </div>--}}
-{{--        <input type="text" style="width: 100%" id="image" name="image" value="<?php if (isset($data['image'])): echo $data['image']; endif; ?>">--}}
-{{--        <?php if (isset($valid) && $valid->filter("image")) : ?>--}}
-{{--        <span class="parsley-error"><?php echo $valid->filter("image")[0] ?></span>--}}
-{{--        <?php endif; ?>--}}
+
 
 		{{ Form::submit('Create', array('class' => 'btn btn-primary')) }}
 

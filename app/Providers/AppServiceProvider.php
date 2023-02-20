@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Role\RoleRepositoryInterface::class,
             \App\Repositories\Role\RoleRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Media\MediaRepositoryInterface::class,
+            \App\Repositories\Media\MediaRepository::class
+        );
     }
 
     /**
