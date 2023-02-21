@@ -11,17 +11,18 @@
 
         <div class="panel-body">
 
-            @if ($message = Session::get('success'))
-                <div class="alert alert-success alert-block">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
-                    <strong>{{ $message }}</strong>
-                </div>
-                <img src="upload/original/{{ Session::get('image') }}">
-            @endif
+
 
             <form action="{{ route('image.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
+                @if ($message = Session::get('success'))
+                    <div class="alert alert-success alert-block">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>{{ $message }}</strong>
+                    </div>
+                    <img src="upload/original/{{ Session::get('image') }}" style="max-width: 500px">
+                    {{ Form::text('mobile', 'upload/original/'.Session::get('image'), array('class' => 'form-control')) }}
+                @endif
                 <div class="mb-3">
                     <label class="form-label" for="inputImage">Image:</label>
                     <input
