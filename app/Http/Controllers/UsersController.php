@@ -25,14 +25,34 @@ class UsersController extends Controller
     public function index()
     {
         $users= $this->UserRepo->getAll();
+        $statusFilter = request('status');
+        if($statusFilter>0)
+        {
+            $users = $users->where('statusId', '=', $statusFilter);
+        }
+        $roleFilter = request('role');
+        if($roleFilter>0)
+        {
+            $users = $users->where('roleId', '=', $roleFilter);
+        }
         $listStatus = collect([
-            ['id' => '0',  'name' => 'Chờ duyệt'],
-            ['id' => '1', 'name' => 'Tạm dừng'],
-            ['id' => '2',  'name' => 'Đang hoạt động']
+            ['id' => '1',  'name' => 'Chờ duyệt'],
+            ['id' => '2', 'name' => 'Tạm dừng'],
+            ['id' => '3',  'name' => 'Đang hoạt động']
         ]);
+        $listStatusFiter = collect([
+            ['id' => '0',  'name' => 'Chọn trạng thái...'],
+            ['id' => '1',  'name' => 'Chờ duyệt'],
+            ['id' => '2', 'name' => 'Tạm dừng'],
+            ['id' => '3',  'name' => 'Đang hoạt động']
+        ]);
+        $listStatusPluck = $listStatusFiter->pluck('name','id');
         $listRole = $this->RoleRepo->getAll();
+        $newRole = new Roles(['id' => '0',  'name' => 'Chọn quyền...']);
 
-        return view('users.index', ['users'=>$users,'listStatus' => $listStatus,'listRole' => $listRole]);
+        $listRoleAdd = $listRole->prepend($newRole);
+        $listRolePluck = $listRoleAdd->pluck('name','id');
+        return view('users.index', ['users'=>$users,'listStatus' => $listStatus,'listStatusPluck' =>$listStatusPluck,'listRole' => $listRole,'listRolePluck' =>$listRolePluck]);
     }
 
     /**
@@ -43,9 +63,9 @@ class UsersController extends Controller
     public function create()
     {
         $arrStatus = collect([
-            ['id' => '0',  'name' => 'Chờ duyệt'],
-            ['id' => '1', 'name' => 'Tạm dừng'],
-            ['id' => '2',  'name' => 'Đang hoạt động']
+            ['id' => '1',  'name' => 'Chờ duyệt'],
+            ['id' => '2', 'name' => 'Tạm dừng'],
+            ['id' => '3',  'name' => 'Đang hoạt động']
         ]);
         $listStatus = $arrStatus->pluck('name', 'id');
         $listRole = $this->RoleRepo->getAll()->pluck('name','id');
@@ -108,10 +128,11 @@ class UsersController extends Controller
     {
         $user = $this->UserRepo->find($id);
         $arrStatus = collect([
-            ['id' => '0',  'name' => 'Chờ duyệt'],
-            ['id' => '1', 'name' => 'Tạm dừng'],
-            ['id' => '2',  'name' => 'Đang hoạt động']
+            ['id' => '1',  'name' => 'Chờ duyệt'],
+            ['id' => '2', 'name' => 'Tạm dừng'],
+            ['id' => '3',  'name' => 'Đang hoạt động']
         ]);
+
         $listStatus = $arrStatus->pluck('name', 'id');
         $listRole = $this->RoleRepo->getAll()->pluck('name','id');
         return view('users.edit',['user'=>$user,'listRole' => $listRole,'listStatus' => $listStatus]);

@@ -17,7 +17,29 @@
         <section class="content">
             <!-- Default box -->
             <div class="card">
+                <div class="card-body table-responsive form-filter">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {!! Form::open(['route' => 'users.index', 'method' => 'GET','class' => 'form-group row','name'=>'myForm']) !!}
+                            {!! Form::label('status', 'Trạng thái:', ['class' => 'col-sm-2 col-form-label']) !!}
+                            <div class="col-sm-4">
+                                {!! Form::select('status', $listStatusPluck, request('status'), ['class' => 'form-control','onchange' => 'submitForm()']) !!}
+                            </div>
+                            {!! Form::label('role', 'Quyền:', ['class' => 'col-sm-2 col-form-label']) !!}
+                            <div class="col-sm-4">
+                                {!! Form::select('role', $listRolePluck, request('role'), ['class' => 'form-control','onchange' => 'submitForm()']) !!}
+                            </div>
+{{--                            <div class="col-sm-2">--}}
+{{--                                {!! Form::submit('Filter', ['class' => 'btn btn-primary']) !!}--}}
+{{--                            </div>--}}
+
+                            {!! Form::close() !!}
+                        </div>
+
+                    </div>
+                </div>
                 <div class="card-header">
+
                     <div class="card-tools">
                         <a href="{{ route('users.create') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div></a>
                     </div>
@@ -41,6 +63,20 @@
                             <?php
                             $status = $listStatus->where('id', $user->statusId)->first();
                             $statusName = $status ? $status['name'] : '';
+                            $statusClass = '';
+                            if($status)
+                            {
+                                if($status['id']==1)
+                                {
+                                    $statusClass = 'text-yellow';
+                                }else if($status['id']==2)
+                                {
+                                    $statusClass = 'text-red';
+                                }else
+                                {
+                                    $statusClass = 'text-green';
+                                }
+                            }
 
                             $role = $listRole->where('id', $user->roleId)->first();
                             $roleName = $role ? $role['name'] : '';
@@ -51,7 +87,7 @@
                                 <td>{{ $user->fullName }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->mobile }}</td>
-                                <td>{{ $statusName }}</td>
+                                <td><span class="{{ $statusClass }}">{{ $statusName }}</span></td>
                                 <td>{{ $roleName }}</td>
 
                                 <td>
@@ -142,6 +178,9 @@
             if (confirm('Bạn có chắc chắn xóa tài khoản này không?')) {
                 document.getElementById(id).submit();
             }
+        }
+        function submitForm() {
+            document.forms['myForm'].submit();
         }
     </script>
 @stop

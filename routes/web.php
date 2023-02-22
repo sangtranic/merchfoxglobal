@@ -26,6 +26,7 @@ Route::get('/forgot-password', [Controllers\AccountController::class, 'forgotPas
 
 //user
 Route::resource('users', UsersController::class );
+
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
 //role
