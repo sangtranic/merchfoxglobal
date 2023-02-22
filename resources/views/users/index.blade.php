@@ -2,54 +2,140 @@
 @section('title', 'Users')
 @section('content')
 
-	<div class="d-flex justify-content-end mb-3"><a href="{{ route('users.create') }}" class="btn btn-info">Create</a></div>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <h1 class="m-0">Danh sách Seller</h1>
+                    </div><!-- /.col -->
 
-	<table class="table table-bordered">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>UserName</th>
-				<th>Họ và tên</th>
-				<th>Email</th>
-				<th>Số điện thoại</th>
-				<th>Trạng thái</th>
-				<th>Quyền</th>
-				<th>Chức năng</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach($users as $user)
-                <?php
-                    $status = $listStatus->where('id', $user->statusId)->first();
-                    $statusName = $status ? $status['name'] : '';
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <section class="content">
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                        <a href="{{ route('users.create') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div></a>
+                    </div>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-striped projects">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>UserName</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Trạng thái</th>
+                            <th>Quyền</th>
+                            <th>Chức năng</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($users as $user)
+                            <?php
+                            $status = $listStatus->where('id', $user->statusId)->first();
+                            $statusName = $status ? $status['name'] : '';
 
-                    $role = $listRole->where('id', $user->roleId)->first();
-                    $roleName = $role ? $role['name'] : '';
-                ?>
-				<tr>
-					<td>{{ $user->id }}</td>
-					<td>{{ $user->userName }}</td>
-					<td>{{ $user->fullName }}</td>
-					<td>{{ $user->email }}</td>
-					<td>{{ $user->mobile }}</td>
-					<td>{{ $statusName }}</td>
-					<td>{{ $roleName }}</td>
+                            $role = $listRole->where('id', $user->roleId)->first();
+                            $roleName = $role ? $role['name'] : '';
+                            ?>
+                            <tr>
+                                <td>{{ $user->id }}</td>
+                                <td>{{ $user->userName }}</td>
+                                <td>{{ $user->fullName }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->mobile }}</td>
+                                <td>{{ $statusName }}</td>
+                                <td>{{ $roleName }}</td>
 
-					<td>
-						<div class="d-flex gap-2">
-                            <a href="{{ route('users.changepassword', [$user->id]) }}" class="btn btn-info">Đổi mật khẩu</a>
-                            <a href="{{ route('users.edit', [$user->id]) }}" class="btn btn-primary">Sửa</a>
-                            {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'id' => 'delete-form'.$user->id]) !!}
-                                {{ Form::submit('Xóa', ['class' => 'btn btn-danger', 'onclick' => 'return confirmDelete(event,"delete-form'.$user->id.'");']) }}
+                                <td>
+                                    <div class="d-flex gap-2">
+{{--                                        <a href="{{ route('users.changepassword', [$user->id]) }}" class="btn btn-info">Đổi mật khẩu</a>--}}
+{{--                                        <a href="{{ route('users.edit', [$user->id]) }}" class="btn btn-primary">Sửa</a>--}}
+{{--                                        {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'id' => 'delete-form'.$user->id]) !!}--}}
+{{--                                        {{ Form::submit('Xóa', ['class' => 'btn btn-danger', 'onclick' => 'return confirmDelete(event,"delete-form'.$user->id.'");']) }}--}}
+{{--                                        --}}{{--                                {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}--}}
+{{--                                        {!! Form::close() !!}--}}
+
+                                        <a class="btn btn-default btn-sm text-info" title="Đổi mật khẩu" href="{{ route('users.changepassword', [$user->id]) }}">
+                                            <i class="fas fa-user-shield"></i>
+                                        </a>
+                                        <a class="btn btn-default btn-sm text-info" title="Sửa" href="{{ route('users.edit', [$user->id]) }}">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'id' => 'delete-form'.$user->id, 'style' =>'display: inline-block;']) !!}
+                                        {{ Form::button('<i class="fas fa-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-default btn-sm text-danger', 'onclick' => 'return confirmDelete(event,"delete-form'.$user->id.'");']) }}
+                                        {!! Form::close() !!}
+                                    </div>
+                                </td>
+                            </tr>
+
+                        @endforeach
+
+                    </table>
+                </div>
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+
+
+{{--	<div class="d-flex justify-content-end mb-3"><a href="{{ route('users.create') }}" class="btn btn-info">Create</a></div>--}}
+
+{{--	<table class="table table-bordered">--}}
+{{--		<thead>--}}
+{{--			<tr>--}}
+{{--				<th>Id</th>--}}
+{{--				<th>UserName</th>--}}
+{{--				<th>Họ và tên</th>--}}
+{{--				<th>Email</th>--}}
+{{--				<th>Số điện thoại</th>--}}
+{{--				<th>Trạng thái</th>--}}
+{{--				<th>Quyền</th>--}}
+{{--				<th>Chức năng</th>--}}
+{{--			</tr>--}}
+{{--		</thead>--}}
+{{--		<tbody>--}}
+{{--			@foreach($users as $user)--}}
+{{--                <?php--}}
+{{--                    $status = $listStatus->where('id', $user->statusId)->first();--}}
+{{--                    $statusName = $status ? $status['name'] : '';--}}
+
+{{--                    $role = $listRole->where('id', $user->roleId)->first();--}}
+{{--                    $roleName = $role ? $role['name'] : '';--}}
+{{--                ?>--}}
+{{--				<tr>--}}
+{{--					<td>{{ $user->id }}</td>--}}
+{{--					<td>{{ $user->userName }}</td>--}}
+{{--					<td>{{ $user->fullName }}</td>--}}
+{{--					<td>{{ $user->email }}</td>--}}
+{{--					<td>{{ $user->mobile }}</td>--}}
+{{--					<td>{{ $statusName }}</td>--}}
+{{--					<td>{{ $roleName }}</td>--}}
+
+{{--					<td>--}}
+{{--						<div class="d-flex gap-2">--}}
+{{--                            <a href="{{ route('users.changepassword', [$user->id]) }}" class="btn btn-info">Đổi mật khẩu</a>--}}
+{{--                            <a href="{{ route('users.edit', [$user->id]) }}" class="btn btn-primary">Sửa</a>--}}
+{{--                            {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'id' => 'delete-form'.$user->id]) !!}--}}
+{{--                                {{ Form::submit('Xóa', ['class' => 'btn btn-danger', 'onclick' => 'return confirmDelete(event,"delete-form'.$user->id.'");']) }}--}}
 {{--                                {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}--}}
-                            {!! Form::close() !!}
-                        </div>
-					</td>
-				</tr>
+{{--                            {!! Form::close() !!}--}}
+{{--                        </div>--}}
+{{--					</td>--}}
+{{--				</tr>--}}
 
-			@endforeach
-		</tbody>
-	</table>
+{{--			@endforeach--}}
+{{--		</tbody>--}}
+{{--	</table>--}}
     <script>
         function confirmDelete(event,id) {
             event.preventDefault();
