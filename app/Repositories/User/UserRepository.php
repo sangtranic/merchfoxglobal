@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\User;
 
+use App\Models\Users;
 use App\Repositories\BaseRepository;
 use App\Repositories\User\UserRepositoryInterface;
 
@@ -16,8 +17,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return \App\Models\Users::all();
     }
-    public function get($id)
+    public function getByUserName($userName)
     {
-        return Post::find($id);
+        return Users::where('userName', $userName)->get();
     }
 }

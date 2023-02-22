@@ -16,7 +16,7 @@
         {{ Form::hidden('updateBy', '1') }}
 		<div class="mb-3">
 			{{ Form::label('userName', 'UserName', ['class'=>'form-label']) }}
-			{{ Form::text('userName', null, array('class' => 'form-control')) }}
+			{{ Form::text('userName', null, array('class' => 'form-control', 'readonly' => true)) }}
 		</div>
 		<div class="mb-3">
 			{{ Form::label('fullName', 'FullName', ['class'=>'form-label']) }}

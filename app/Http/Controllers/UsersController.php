@@ -31,6 +31,7 @@ class UsersController extends Controller
             ['id' => '2',  'name' => 'Đang hoạt động']
         ]);
         $listRole = $this->RoleRepo->getAll();
+
         return view('users.index', ['users'=>$users,'listStatus' => $listStatus,'listRole' => $listRole]);
     }
 
@@ -59,19 +60,30 @@ class UsersController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $password = Hash::make($request->input('password'));
-        $this->UserRepo->create([
-            'userName' => $request->input('userName'),
-            'password' => $password,
-            'fullName' => $request->input('fullName'),
-            'email' => $request->input('email'),
-            'mobile' => $request->input('mobile'),
-            'statusId' => $request->input('statusId'),
-            'roleId' => $request->input('roleId'),
-            'createBy' => $request->input('createBy'),
-            'updateBy' => $request->input('updateBy')
-        ]);
-        return redirect()->route('users.index');
+        $errors = [];
+        if ($request->has('userName')) {
+            $userExit = $this->UserRepo->getByUserName($request->input('userName'));
+            if ($userExit->count() == 0)
+            {
+                $password = Hash::make($request->input('password'));
+                $this->UserRepo->create([
+                    'userName' => $request->input('userName'),
+                    'password' => $password,
+                    'fullName' => $request->input('fullName'),
+                    'email' => $request->input('email'),
+                    'mobile' => $request->input('mobile'),
+                    'statusId' => $request->input('statusId'),
+                    'roleId' => $request->input('roleId'),
+                    'createBy' => $request->input('createBy'),
+                    'updateBy' => $request->input('updateBy')
+                ]);
+                return redirect()->route('users.index');
+            }
+        }else
+        {
+            $errors[] = 'userName đã tồn tại';
+            return back()->withErrors($errors);
+        }
     }
 
     /**
@@ -151,8 +163,7 @@ class UsersController extends Controller
     {
         $user = $this->UserRepo->find($id);
         $password = $user->password;
-        if($request->input('newpassword') != null)
-        {
+        if ($request->has('newpassword')) {
             $password = Hash::make($request->input('newpassword'));
         }
         $this->UserRepo->update($id,[
