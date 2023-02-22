@@ -12,11 +12,23 @@
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <!-- Left navbar links -->
             <ul class="navbar-nav">
-                <li class="nav-item">
+                <li class="nav-item ">
                     <a href="index.html" class="nav-link">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a href="userLists.html" class="nav-link">Users</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarUsersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Users
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
+                        <a href="users" class="dropdown-item">Danh sách người dùng</a>
+                        <a href="roles" class="dropdown-item">Danh sách quyền</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+
+
                 </li>
                 <li class="nav-item">
                     <a href="vpsLists.html" class="nav-link">Vps</a>

@@ -1,8 +1,9 @@
-@extends('default')
-
+@extends('layouts.app')
+@section('title', 'Quyền')
 @section('content')
 
-	@if($errors->any())
+
+    @if($errors->any())
 		<div class="alert alert-danger">
 			@foreach ($errors->all() as $error)
 				{{ $error }} <br>
