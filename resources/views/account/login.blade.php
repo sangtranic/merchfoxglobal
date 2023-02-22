@@ -10,7 +10,22 @@
         <div class="card">
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
-
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
+                @if ($errors)
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            @foreach ($error->getMessages() as $messages)
+                                @foreach ($messages as $message)
+                                    <li><span class="text-danger">{{ $message }}</li>
+                                @endforeach
+                            @endforeach
+                        @endforeach
+                    </ul>
+                @endif
                 <form action="{{ route('doLogin') }}" method="post">
                     @csrf
                     <div class="input-group mb-3">

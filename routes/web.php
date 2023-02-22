@@ -23,6 +23,7 @@ Route::get('/login', [Controllers\AccountController::class, 'login'] )->name('lo
 Route::post('/do-login', [Controllers\AccountController::class, 'doLogin'])->name('doLogin');
 
 Route::get('/forgot-password', [Controllers\AccountController::class, 'forgotPassword'] )->name('forgotPassword');
+Route::post('/forgot-password-sent', [Controllers\AccountController::class, 'sendResetLinkEmail'] )->name('sendResetLinkEmail');
 
 //user
 Route::resource('users', UsersController::class );
