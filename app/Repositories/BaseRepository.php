@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Repositories\RepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -30,14 +31,31 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function getAll()
     {
-        return $this->model->all();
+        $modelName = get_class($this->model);
+        $cacheKey = $modelName."CacheAll";
+        $data = Cache::get($cacheKey);
+        if (!$data) {
+            $data =  $this->model->all();
+            Cache::remember($cacheKey, 5, function () use ($data) {
+                return $data;
+            });
+        }
+        return $data;
+        //return $this->model->all();
     }
 
     public function find($id)
     {
-        $result = $this->model->find($id);
-
-        return $result;
+        $modelName = get_class($this->model);
+        $cacheKey = $modelName."ById".$id;
+        $data = Cache::get($cacheKey);
+        if (!$data) {
+            $data =  $this->model->find($id);
+            Cache::remember($cacheKey, 5, function () use ($data) {
+                return $data;
+            });
+        }
+        return $data;
     }
 
     public function create($attributes = [])

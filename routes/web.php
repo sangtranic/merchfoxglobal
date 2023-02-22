@@ -20,12 +20,15 @@ use App\Http\Controllers;
 
 Route::get('/', [UserController::class, 'index']);
 Route::resource('users', UsersController::class );
+//Route::controller(UsersController::class)->group(function(){
+//    Route::get('changepassword', 'changepassword')->name('users.changepassword');
+//    Route::post('updatepassword', 'updatepassword')->name('users.updatepassword');
+//});
+Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
+Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
 Route::resource('roles', Controllers\RolesController::class );
-Route::get('/home', function () {
-    return view('home');
-});
+Route::get('/home', function () { return view('home');});
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
-//Route::resource('posts', 'PostController');
 Route::controller(ImageController::class)->group(function(){
     Route::get('image-upload', 'index');
     Route::post('image-upload', 'store')->name('image.store');

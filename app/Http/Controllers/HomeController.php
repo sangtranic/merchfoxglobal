@@ -10,8 +10,4 @@ class HomeController extends Controller
     {
         return 'Home page';
     }
-    public function page($page = 1)
-    {
-        return "Page $page";
-    }
 }
