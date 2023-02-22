@@ -24,17 +24,17 @@ Route::post('/do-login', [Controllers\AccountController::class, 'doLogin'])->nam
 
 Route::get('/forgot-password', [Controllers\AccountController::class, 'forgotPassword'] )->name('forgotPassword');
 
-
+//user
 Route::resource('users', UsersController::class );
-//Route::controller(UsersController::class)->group(function(){
-//    Route::get('changepassword', 'changepassword')->name('users.changepassword');
-//    Route::post('updatepassword', 'updatepassword')->name('users.updatepassword');
-//});
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
+//role
 Route::resource('roles', Controllers\RolesController::class );
-Route::get('/home', function () { return view('home');});
+//VPS
+Route::resource('vps', Controllers\VpsController::class );
+//
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
+//image
 Route::controller(ImageController::class)->group(function(){
     Route::get('image-upload', 'index');
     Route::post('image-upload', 'store')->name('image.store');

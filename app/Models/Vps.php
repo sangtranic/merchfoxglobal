@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property string $name
  * @property string $description
+ * @property int $userId
  */
 class Vps extends Model
 {
@@ -30,7 +31,7 @@ class Vps extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description'
+        'name', 'description', 'userId'
     ];
 
     /**
@@ -39,7 +40,7 @@ class Vps extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -48,7 +49,7 @@ class Vps extends Model
      * @var array
      */
     protected $casts = [
-        'name' => 'string', 'description' => 'string'
+        'name' => 'string', 'description' => 'string', 'userId' => 'int'
     ];
 
     /**
@@ -57,7 +58,7 @@ class Vps extends Model
      * @var array
      */
     protected $dates = [
-        
+
     ];
 
     /**
@@ -65,7 +66,7 @@ class Vps extends Model
      *
      * @var boolean
      */
-    public $timestamps = true;
+    public $timestamps = false;
 
     // Scopes...
 

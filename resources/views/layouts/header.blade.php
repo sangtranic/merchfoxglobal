@@ -22,8 +22,8 @@
                     <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
                         <a href="users" class="dropdown-item">Danh sách người dùng</a>
                         <a href="roles" class="dropdown-item">Danh sách quyền</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
+{{--                        <div class="dropdown-divider"></div>--}}
+{{--                        <a class="dropdown-item" href="#">Something else here</a>--}}
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -31,7 +31,7 @@
 
                 </li>
                 <li class="nav-item">
-                    <a href="vpsLists.html" class="nav-link">Vps</a>
+                    <a href="vps" class="nav-link">Vps</a>
                 </li>
                 <li class="nav-item">
                     <a href="productCateLists.html" class="nav-link">Chuyên mục sản phẩm</a>

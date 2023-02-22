@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Media\MediaRepositoryInterface::class,
             \App\Repositories\Media\MediaRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Vps\VpsRepositoryInterface::class,
+            \App\Repositories\Vps\VpsRepository::class
+        );
     }
 
     /**
