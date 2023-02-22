@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * @property string $userName
@@ -14,8 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $roleId
  * @property int    $createDate
  * @property int    $updateDate
+ * @property string $remember_token
  */
-class Users extends Model
+class Users extends Authenticatable
 {
     /**
      * The database table used by the model.
@@ -38,7 +40,7 @@ class Users extends Model
      * @var array
      */
     protected $fillable = [
-        'userName', 'password', 'fullName', 'email', 'mobile', 'statusId', 'roleId', 'createDate', 'createBy', 'updateDate', 'updateBy'
+        'userName', 'password'//, 'fullName', 'email', 'mobile', 'statusId', 'roleId', 'createDate', 'createBy', 'updateDate', 'updateBy','remember_token'
     ];
 
     /**
@@ -47,7 +49,7 @@ class Users extends Model
      * @var array
      */
     protected $hidden = [
-
+        'password', 'remember_token'
     ];
 
     /**
@@ -56,7 +58,7 @@ class Users extends Model
      * @var array
      */
     protected $casts = [
-        'userName' => 'string', 'password' => 'string', 'fullName' => 'string', 'email' => 'string', 'mobile' => 'string', 'statusId' => 'int', 'roleId' => 'int', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'userName' => 'string', 'password' => 'string', 'fullName' => 'string', 'email' => 'string', 'mobile' => 'string', 'statusId' => 'int', 'roleId' => 'int', 'createDate' => 'timestamp', 'updateDate' => 'timestamp','remember_token'=>'string'
     ];
 
     /**

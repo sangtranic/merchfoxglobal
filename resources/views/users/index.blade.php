@@ -1,5 +1,5 @@
-@extends('default')
-
+@extends('layouts.app')
+@section('title', 'Users')
 @section('content')
 
 	<div class="d-flex justify-content-end mb-3"><a href="{{ route('users.create') }}" class="btn btn-info">Create</a></div>

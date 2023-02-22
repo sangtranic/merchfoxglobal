@@ -18,7 +18,13 @@ use App\Http\Controllers;
 |
 */
 
-Route::get('/', [UserController::class, 'index']);
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/login', [Controllers\AccountController::class, 'login'] )->name('login');
+Route::post('/do-login', [Controllers\AccountController::class, 'doLogin'])->name('doLogin');
+
+Route::get('/forgot-password', [Controllers\AccountController::class, 'forgotPassword'] )->name('forgotPassword');
+
+
 Route::resource('users', UsersController::class );
 //Route::controller(UsersController::class)->group(function(){
 //    Route::get('changepassword', 'changepassword')->name('users.changepassword');
