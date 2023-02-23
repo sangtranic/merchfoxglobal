@@ -11,7 +11,7 @@ var dialog_filemanager = {
     open: function () {
         var self = this;
         tinyDom = undefined;
-        self.dlog = $('<iframe src="' + web_url + '/file/dialogimg?editor=image&field_id=image&type=2&lang=&subfolder=" style="width:900px"></iframe>').dialog({
+        self.dlog = $('<iframe src="/file/dialogimg?editor=image&field_id=image&type=2&lang=&subfolder=" style="width:900px"></iframe>').dialog({
             title: 'File Manager',
             modal: true,
             classes: 'filemanager',

@@ -33,7 +33,7 @@ Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->
 //role
 Route::resource('roles', Controllers\RolesController::class );
 //VPS
-Route::get('vps', [Controllers\VpsController::class,'index'] )->name('vps');
+Route::resource('vps', Controllers\VpsController::class );
 //
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
 //image

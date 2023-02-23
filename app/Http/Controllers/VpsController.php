@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\VpsRequest;
-use App\Models\Roles;
+use App\Models\Users;
 use App\Models\Vps;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Vps\VpsRepositoryInterface;
@@ -27,7 +26,16 @@ class VpsController extends Controller
     {
         $listUser= $this->UserRepo->getAll();
         $listVps = $this->VpsRepo->getAll();
-        return view('vps.index', ['listUser'=>$listUser, 'listVps' => $listVps]);
+        $userIdFilter = request('userId');
+        if($userIdFilter>0)
+        {
+            $listVps = $listVps->where('userId', '=', $userIdFilter);
+        }
+        $newUser = new Users(['id' => '0',  'userName' => 'Chọn tài khoản...']);
+        $listUserAdd = $listUser->prepend($newUser);
+        $listUserPluck = $listUserAdd->pluck('userName','id');
+
+        return view('vps.index', ['listUser'=>$listUser, 'listVps' => $listVps,'listUserPluck' =>$listUserPluck]);
     }
 
     /**
