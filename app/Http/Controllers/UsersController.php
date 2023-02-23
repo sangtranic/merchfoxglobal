@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Http\Controllers\Controller;
 
 use App\Models\Roles;
@@ -35,21 +36,10 @@ class UsersController extends Controller
         {
             $users = $users->where('roleId', '=', $roleFilter);
         }
-        $listStatus = collect([
-            ['id' => '1',  'name' => 'Chờ duyệt'],
-            ['id' => '2', 'name' => 'Tạm dừng'],
-            ['id' => '3',  'name' => 'Đang hoạt động']
-        ]);
-        $listStatusFiter = collect([
-            ['id' => '0',  'name' => 'Chọn trạng thái...'],
-            ['id' => '1',  'name' => 'Chờ duyệt'],
-            ['id' => '2', 'name' => 'Tạm dừng'],
-            ['id' => '3',  'name' => 'Đang hoạt động']
-        ]);
-        $listStatusPluck = $listStatusFiter->pluck('name','id');
+        $listStatus = Helper::getListStatus();
+        $listStatusPluck = $listStatus->pluck('name','id');
         $listRole = $this->RoleRepo->getAll();
         $newRole = new Roles(['id' => '0',  'name' => 'Chọn quyền...']);
-
         $listRoleAdd = $listRole->prepend($newRole);
         $listRolePluck = $listRoleAdd->pluck('name','id');
         return view('users.index', ['users'=>$users,'listStatus' => $listStatus,'listStatusPluck' =>$listStatusPluck,'listRole' => $listRole,'listRolePluck' =>$listRolePluck]);
@@ -62,11 +52,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $arrStatus = collect([
-            ['id' => '1',  'name' => 'Chờ duyệt'],
-            ['id' => '2', 'name' => 'Tạm dừng'],
-            ['id' => '3',  'name' => 'Đang hoạt động']
-        ]);
+        $arrStatus = Helper::getListStatus();
         $listStatus = $arrStatus->pluck('name', 'id');
         $listRole = $this->RoleRepo->getAll()->pluck('name','id');
         return view('users.create', ['listRole' => $listRole,'listStatus' => $listStatus]);
@@ -127,11 +113,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = $this->UserRepo->find($id);
-        $arrStatus = collect([
-            ['id' => '1',  'name' => 'Chờ duyệt'],
-            ['id' => '2', 'name' => 'Tạm dừng'],
-            ['id' => '3',  'name' => 'Đang hoạt động']
-        ]);
+        $arrStatus = Helper::getListStatus();
 
         $listStatus = $arrStatus->pluck('name', 'id');
         $listRole = $this->RoleRepo->getAll()->pluck('name','id');
