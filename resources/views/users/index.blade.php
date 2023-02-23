@@ -18,14 +18,14 @@
             <!-- Default box -->
             <div class="card">
                 <div class="card-body table-responsive form-filter">
-                    <div class="row">
+                    <div class="row card-header">
                         <div class="col-md-6">
                             {!! Form::open(['route' => 'users.index', 'method' => 'GET','class' => 'form-group row','name'=>'myForm']) !!}
-                            {!! Form::label('status', 'Trạng thái:', ['class' => 'col-sm-2 col-form-label']) !!}
+                            {!! Form::label('status', 'Trạng thái:', ['class' => 'col-sm-2 col-form-label text-right']) !!}
                             <div class="col-sm-4">
                                 {!! Form::select('status', $listStatusPluck, request('status'), ['class' => 'form-control','onchange' => 'submitForm()']) !!}
                             </div>
-                            {!! Form::label('role', 'Quyền:', ['class' => 'col-sm-2 col-form-label']) !!}
+                            {!! Form::label('role', 'Quyền:', ['class' => 'col-sm-2 col-form-label text-right']) !!}
                             <div class="col-sm-4">
                                 {!! Form::select('role', $listRolePluck, request('role'), ['class' => 'form-control','onchange' => 'submitForm()']) !!}
                             </div>
@@ -35,15 +35,16 @@
 
                             {!! Form::close() !!}
                         </div>
-
+                        <div class="col-md-6">
+                            <div class="text-right">
+                                <div class="card-tools">
+                                    <a href="{{ route('users.create') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div></a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-header">
 
-                    <div class="card-tools">
-                        <a href="{{ route('users.create') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div></a>
-                    </div>
-                </div>
                 <div class="card-body table-responsive p-0">
                     <table class="table table-striped projects">
                         <thead>

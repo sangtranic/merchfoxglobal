@@ -2,6 +2,6 @@
 @section('title', 'Quyền')
 @section('content')
 
-	{{ $role->id }}
+	{{ $vps->id }}
 
 @stop
