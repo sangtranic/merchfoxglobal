@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $colors
  * @property string $styles
  * @property string $productTypes
+ * @property double $priceMin
+ * @property double $priceMax
+ * @property string $keyword
  */
 class Productcategories extends Model
 {
@@ -47,7 +50,7 @@ class Productcategories extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -56,7 +59,7 @@ class Productcategories extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'sizes' => 'string', 'colors' => 'string', 'styles' => 'string', 'productTypes' => 'string', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'id' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'sizes' => 'string', 'colors' => 'string', 'styles' => 'string', 'productTypes' => 'string','priceMin' => 'double', 'priceMax' => 'double', 'keyword' => 'string', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
     ];
 
     /**

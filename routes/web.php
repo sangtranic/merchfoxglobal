@@ -18,22 +18,22 @@ use App\Http\Controllers;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
+//account
 Route::get('/login', [Controllers\AccountController::class, 'login'] )->name('login');
 Route::post('/do-login', [Controllers\AccountController::class, 'doLogin'])->name('doLogin');
-
 Route::get('/forgot-password', [Controllers\AccountController::class, 'forgotPassword'] )->name('forgotPassword');
 Route::post('/forgot-password-sent', [Controllers\AccountController::class, 'sendResetLinkEmail'] )->name('sendResetLinkEmail');
+Route::get('/logout',  [Controllers\AccountController::class, 'logout'])->name('logout');
 
 //user
 Route::resource('users', UsersController::class );
-
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
 //role
 Route::resource('roles', Controllers\RolesController::class );
 //VPS
-Route::resource('vps', Controllers\VpsController::class );
+Route::get('vps', [Controllers\VpsController::class,'index'] )->name('vps');
 //
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
 //image
@@ -41,3 +41,8 @@ Route::controller(ImageController::class)->group(function(){
     Route::get('image-upload', 'index');
     Route::post('image-upload', 'store')->name('image.store');
 });
+//products
+Route::get('product-cates', [Controllers\ProductCategoriesController::class, 'index'] )->name('productCates');
+//orders
+Route::get('orders', [Controllers\OrderController::class, 'index'] )->name('orders');
+Route::get('orders/{id}', [Controllers\OrderController::class, 'index'] )->name('order.detail');

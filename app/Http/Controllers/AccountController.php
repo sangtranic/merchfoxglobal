@@ -71,4 +71,9 @@ class AccountController extends Controller
         }
         return back()->withErrors(['email' => 'Email không tồn tại!']);
     }
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('home');
+    }
 }
