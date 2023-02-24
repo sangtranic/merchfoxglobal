@@ -27,8 +27,14 @@
                 <li class="nav-item">
                     <a href="{{route('vps.index')}}" class="nav-link">Vps</a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{route('product-cates.index')}}" class="nav-link">Chuyên mục sản phẩm</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarProductsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sản phẩm
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
+                        <a href="{{route('product-cates.index')}}" class="dropdown-item">Chuyên mục sản phẩm</a>
+                        <a href="{{route('products.index')}}" class="dropdown-item">Danh sách sản phẩm</a>
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarOrdersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

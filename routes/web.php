@@ -44,6 +44,8 @@ Route::controller(ImageController::class)->group(function(){
 });
 //products
 Route::resource('product-cates', ProductCategoriesController::class );
+Route::resource('products', Controllers\ProductController::class) ;
+Route::get('products-search', [Controllers\ProductController::class, 'search'])->name('products.search');
 //orders
 Route::get('orders', [Controllers\OrderController::class, 'index'] )->name('orders');
 Route::get('orders/{id}', [Controllers\OrderController::class, 'index'] )->name('order.detail');

@@ -47,7 +47,7 @@ class Products extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -56,7 +56,7 @@ class Products extends Model
      * @var array
      */
     protected $casts = [
-        'categoryId' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'urlImagePreviewOne' => 'string', 'urlImagePreviewTwo' => 'string', 'urlImageDesignOne' => 'string', 'urlImageDesignTwo' => 'string', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'categoryId' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'urlImagePreviewOne' => 'string', 'urlImagePreviewTwo' => 'string', 'urlImageDesignOne' => 'string', 'urlImageDesignTwo' => 'string','isFileDesign'=>'boolean', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
     ];
 
     /**

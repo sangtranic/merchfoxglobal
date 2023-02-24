@@ -102,7 +102,7 @@
     <script>
         function confirmDelete(event, id) {
             event.preventDefault();
-            if (confirm('Bạn có chắc chắn xóa tài khoản này không?')) {
+            if (confirm('Bạn có chắc chắn xóa chuyên mục này không?')) {
                 document.getElementById(id).submit();
             }
         }

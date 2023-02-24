@@ -8,7 +8,7 @@
     .table-p5 td, .table-p5 td{
       padding: 5px !important;
      }
-     
+
    .p-0 p{
     margin-bottom: 0 !important;
    }
@@ -24,14 +24,17 @@
     margin-bottom: 2px !important;
     font-size: 13px;
    }
-   .table .form-group, .form-filter  .form-group { 
+   .table .form-group, .form-filter  .form-group {
     margin-bottom: 2px !important;
    }
    .table input.form-control , .table select.form-control , .table .form-group .btn  {
     height: 26px;
     font-size: 13px;
-   } 
+   }
    .form-filter input, .form-filter select{height: 28px;}
+.form-filter input[type="checkbox"], .form-filter input[type="radio"] {
+    height: unset;
+}
    .form-filter .form-control {
     padding: 5px;
     margin-bottom: 2px !important;
