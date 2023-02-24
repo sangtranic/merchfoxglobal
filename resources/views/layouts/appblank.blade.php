@@ -19,9 +19,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
 
-    <!-- Navbar -->
-    <x-header />
-
     <!-- /.navbar -->
     @yield('content')
     <!-- Content Wrapper. Contains page content -->
@@ -43,22 +40,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
         </div>
     </div>
-    <!-- /.modal-dialog -->
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
-
-    <!-- Main Footer -->
-    <footer class="main-footer">
-        <!-- To the right -->
-        <div class="float-right d-none d-sm-inline">
-            Anything you want
-        </div>
-        <!-- Default to the left -->
-        <strong>Copyright &copy; 2023 All rights reserved.
-    </footer>
 </div>
 <!-- ./wrapper -->
 

@@ -25,10 +25,10 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('vps')}}" class="nav-link">Vps</a>
+                    <a href="{{route('vps.index')}}" class="nav-link">Vps</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('productCates')}}" class="nav-link">Chuyên mục sản phẩm</a>
+                    <a href="{{route('product-cates.index')}}" class="nav-link">Chuyên mục sản phẩm</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarOrdersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

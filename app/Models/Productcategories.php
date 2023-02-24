@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $createDate
- * @property int    $updateDate
+ * @property int    $created_at
+ * @property int    $updated_at
  * @property string $name
  * @property string $description
  * @property string $url
@@ -41,7 +41,18 @@ class Productcategories extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'url', 'sizes', 'colors', 'styles', 'productTypes', 'createDate', 'createBy', 'updateDate', 'updateBy'
+        'name',
+        'description',
+        'url',
+        'sizes',
+        'colors',
+        'styles',
+        'productTypes',
+        'priceMin',
+        'priceMax',
+        'keyword',
+        'createBy',
+        'updateBy'
     ];
 
     /**
@@ -59,7 +70,7 @@ class Productcategories extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'sizes' => 'string', 'colors' => 'string', 'styles' => 'string', 'productTypes' => 'string','priceMin' => 'double', 'priceMax' => 'double', 'keyword' => 'string', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'id' => 'int', 'name' => 'string', 'description' => 'string', 'url' => 'string', 'sizes' => 'string', 'colors' => 'string', 'styles' => 'string', 'productTypes' => 'string','priceMin' => 'double', 'priceMax' => 'double', 'keyword' => 'string', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
     ];
 
     /**
@@ -68,7 +79,7 @@ class Productcategories extends Model
      * @var array
      */
     protected $dates = [
-        'createDate', 'updateDate'
+        'updated_at', 'updated_at'
     ];
 
     /**
