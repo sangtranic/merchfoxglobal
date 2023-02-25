@@ -20,16 +20,21 @@
                         Users
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
-                        <a href="{{route('users.index')}}" class="dropdown-item">Danh sách người dùng</a>
-                        <a href="{{route('roles.index')}}" class="dropdown-item">Danh sách quyền</a>
-                        <div class="dropdown-divider"></div>
+                        <?php if(Auth::user()->role == "admin"){ ?>
+                            <a href="{{route('users.index')}}" class="dropdown-item">Danh sách người dùng</a>
+                            <a href="{{route('roles.index')}}" class="dropdown-item">Danh sách quyền</a>
+                            <div class="dropdown-divider"></div>
+                        <?php } ?>
                         <a class="dropdown-item" href="{{ route('users.edit', [Auth::user()->id]) }}">Thông tin tài khoản</a>
                         <a class="dropdown-item" href="{{ route('users.changepassword', [Auth::user()->id]) }}">Đổi mật khẩu</a>
                     </div>
                 </li>
+                <?php if(Auth::user()->role == "admin"){ ?>
                 <li class="nav-item">
                     <a href="{{route('vps.index')}}" class="nav-link">Vps</a>
                 </li>
+                <?php } ?>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarProductsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Sản phẩm

@@ -9,6 +9,7 @@ use App\Models\Roles;
 use App\Repositories\Role\RoleRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Vps\VpsRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class RolesController extends Controller
 {
@@ -17,6 +18,12 @@ class RolesController extends Controller
     public function __construct(RoleRepositoryInterface $roleRepo)
     {
         $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (Auth::user()->role != 'admin') {
+                abort(403, 'Bạn không có quyền truy cập.');
+            }
+            return $next($request);
+        });
         $this->RoleRepo = $roleRepo;
     }
     /**

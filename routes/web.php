@@ -29,6 +29,7 @@ Route::get('/logout',  [Controllers\AccountController::class, 'logout'])->name('
 
 //user
 Route::resource('users', UsersController::class );
+Route::get('users', [Controllers\UsersController::class, 'index'] )->name('users.index')->middleware('role:admin');;
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
 //role
@@ -49,3 +50,4 @@ Route::get('products-search', [Controllers\ProductController::class, 'search'])-
 //orders
 Route::get('orders', [Controllers\OrderController::class, 'index'] )->name('orders');
 Route::get('orders/{id}', [Controllers\OrderController::class, 'index'] )->name('order.detail');
+Route::get('/export-to-csv', [UsersController::class, 'exportToCsv'])->name('export-to-csv');

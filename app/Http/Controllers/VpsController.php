@@ -7,6 +7,7 @@ use App\Models\Users;
 use App\Models\Vps;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Vps\VpsRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class VpsController extends Controller
 {
@@ -15,6 +16,12 @@ class VpsController extends Controller
     public function __construct(UserRepositoryInterface $userRepo, VpsRepositoryInterface $vpsRepo)
     {
         $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (Auth::user()->role != 'admin') {
+                abort(403, 'Bạn không có quyền truy cập.');
+            }
+            return $next($request);
+        });
         $this->UserRepo = $userRepo;
         $this->VpsRepo = $vpsRepo;
     }

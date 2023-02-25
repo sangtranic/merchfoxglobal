@@ -16,6 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property int    $createDate
  * @property int    $updateDate
  * @property string $remember_token
+ * @property string $role
  */
 class Users extends Authenticatable
 {
@@ -40,7 +41,7 @@ class Users extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'userName', 'password', 'fullName', 'email', 'mobile', 'statusId', 'roleId', 'createDate', 'createBy', 'updateDate', 'updateBy','remember_token'
+        'userName', 'password', 'fullName', 'email', 'mobile', 'statusId', 'roleId', 'createDate', 'createBy', 'updateDate', 'updateBy','remember_token', 'role'
     ];
 
     /**
@@ -58,7 +59,9 @@ class Users extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'userName' => 'string', 'password' => 'string', 'fullName' => 'string', 'email' => 'string', 'mobile' => 'string', 'statusId' => 'int', 'roleId' => 'int', 'createDate' => 'timestamp', 'updateDate' => 'timestamp','remember_token'=>'string'
+        'userName' => 'string', 'password' => 'string', 'fullName' => 'string', 'email' => 'string', 'mobile' => 'string',
+        'statusId' => 'int', 'roleId' => 'int', 'createDate' => 'timestamp', 'updateDate' => 'timestamp',
+        'remember_token' => 'string' , 'role' => 'string'
     ];
 
     /**

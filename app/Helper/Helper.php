@@ -4,6 +4,7 @@ namespace App\Helper;
 
 class Helper
 {
+    public static $RoleKey= "MerchfoxUserRole";
     public static function getListStatus()
     {
         $listStatus = collect([
@@ -13,6 +14,14 @@ class Helper
             ['id' => '3', 'name' => 'Đang hoạt động']
         ]);
         return $listStatus;
+    }
+    public static function getRoleStr()
+    {
+        return session()->get(Helper::$RoleKey,"user");
+    }
+    public static function setRoleStr($value)
+    {
+        return session()->session()->put(Helper::$RoleKey, $value);
     }
 
     public static function IsNullOrEmptyString($str)

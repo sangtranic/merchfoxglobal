@@ -13,6 +13,7 @@ use App\Repositories\Role\RoleRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use League\Csv\Writer;
 
@@ -72,6 +73,16 @@ class UsersController extends Controller
         $errors = [];
         if ($request->has('userName')) {
             $userExit = $this->UserRepo->getByUserName($request->input('userName'));
+
+            $roleName = "";
+            if ($request->has('roleId')) {
+                $listRole = $this->RoleRepo->getAll();
+                $role = $listRole->where('id', $request->input('roleId'))->first();
+                if($role!=null)
+                {
+                    $roleName = $role->code;
+                }
+            }
             if ($userExit->count() == 0)
             {
                 $password = bcrypt($request->input('password'));
@@ -84,7 +95,8 @@ class UsersController extends Controller
                     'statusId' => $request->input('statusId'),
                     'roleId' => $request->input('roleId'),
                     'createBy' => $request->input('createBy'),
-                    'updateBy' => $request->input('updateBy')
+                    'updateBy' => $request->input('updateBy'),
+                    'role' => $roleName
                 ]);
                 return redirect()->route('users.index');
             }
@@ -172,6 +184,15 @@ class UsersController extends Controller
         if ($request->has('newpassword')) {
             $password = bcrypt($request->input('newpassword'));
         }
+        $roleName = "";
+        if ($request->has('roleId')) {
+            $listRole = $this->RoleRepo->getAll();
+            $role = $listRole->where('id', $request->input('roleId'))->first();
+            if($role!=null)
+            {
+                $roleName = $role->code;
+            }
+        }
         $this->UserRepo->update($id,[
             'userName' => $request->input('userName'),
             'fullName' => $request->input('fullName'),
@@ -181,7 +202,8 @@ class UsersController extends Controller
             'statusId' => $request->input('statusId'),
             'roleId' => $request->input('roleId'),
             'createBy' => $request->input('createBy'),
-            'updateBy' => $request->input('updateBy')
+            'updateBy' => $request->input('updateBy'),
+            'role' => $roleName
         ]);
         //$user = $this->UserRepo->find($id);
 //		$user->userName = $request->input('userName');
