@@ -12,7 +12,9 @@ use App\Models\Users;
 use App\Repositories\Role\RoleRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use League\Csv\Writer;
 
 class UsersController extends Controller
 {
@@ -71,7 +73,7 @@ class UsersController extends Controller
             $userExit = $this->UserRepo->getByUserName($request->input('userName'));
             if ($userExit->count() == 0)
             {
-                $password = Hash::make($request->input('password'));
+                $password = bcrypt($request->input('password'));
                 $this->UserRepo->create([
                     'userName' => $request->input('userName'),
                     'password' => $password,
@@ -135,7 +137,7 @@ class UsersController extends Controller
     public function updatepassword(UserRequest $request, $id)
     {
         //$idEdit= $request->input('id');
-        $newPassword = Hash::make($request->input('password'));
+        $newPassword = bcrypt($request->input('password'));
         $user = $this->UserRepo->find($id);
 		$user->password = $request->input('password');
         $user->save();
@@ -167,7 +169,7 @@ class UsersController extends Controller
         $user = $this->UserRepo->find($id);
         $password = $user->password;
         if ($request->has('newpassword')) {
-            $password = Hash::make($request->input('newpassword'));
+            $password = bcrypt($request->input('newpassword'));
         }
         $this->UserRepo->update($id,[
             'userName' => $request->input('userName'),
@@ -205,5 +207,34 @@ class UsersController extends Controller
         $user->delete();
 
         return redirect()->route('users.index');
+    }
+
+    public function exportToCsv()
+    {
+        // Array data to export
+        $statusFilter = request('status');
+        $data = [
+            ['Name', 'Email'],
+            ['John Doe', 'john@example.com'],
+            ['Jane Doe', 'jane@example.com'.$statusFilter],
+            ['Bob Smith', 'bob@example.com'],
+        ];
+
+        // Create a new CSV writer
+        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+
+        // Insert the data into the CSV
+        $csv->insertAll($data);
+
+        // Set the response headers
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="export.csv"',
+        ];
+
+        // Create the HTTP response with the CSV file
+        $response = new Response($csv->__toString(), 200, $headers);
+
+        return $response;
     }
 }
