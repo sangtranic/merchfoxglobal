@@ -41,6 +41,18 @@ class ProductController extends Controller
             'isFileDesign'=>$filter_isFileDesign
         ]);
     }
+    public function searchByKey(Request $request)
+    {
+        $products = [];
+        $keyword = '';
+        if ($request->input('q')) {
+            $products = Products::where('name', 'like', "%$keyword%")
+                ->orWhere('description', 'like', "%$keyword%")
+                ->take(10)
+                ->get();
+        }
+        return response()->json($products);
+    }
     public function search(Request $request)
     {
         $query = Products::query();

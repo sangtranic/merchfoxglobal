@@ -25,6 +25,7 @@ class AccountController extends Controller
 
     public function login()
     {
+        dump(bcrypt('Ad@min*666'));
         $errors = session('errors');
         return view('account.login')->withErrors($errors);
     }
