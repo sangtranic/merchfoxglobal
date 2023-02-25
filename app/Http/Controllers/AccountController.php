@@ -36,9 +36,13 @@ class AccountController extends Controller
             'password' => 'required|min:6'
         ]);
         $remember = $request->boolean('remember');
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+        $userExit = $this->UserRepo->getByUserNameAndStatus($request->input('userName'),3);
+        if ($userExit->count() > 0)
+        {
+            if (Auth::attempt($credentials, $remember)) {
+                $request->session()->regenerate();
+                return redirect()->intended('/');
+            }
         }
         return back()->withErrors([
             'userName' => 'Hãy kiểm tra lại tài khoản hoặc mật khẩu.',

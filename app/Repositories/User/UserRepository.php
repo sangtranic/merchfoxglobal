@@ -26,4 +26,12 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return Users::where('email', $email)->get();
     }
+
+    public function getByUserNameAndStatus($userName,$statusId)
+    {
+        return Users::where([
+            ['userName', '=', $userName],
+            ['statusId', '=', $statusId]
+        ])->get();
+    }
 }
