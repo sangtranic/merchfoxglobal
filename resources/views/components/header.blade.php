@@ -22,6 +22,9 @@
                     <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
                         <a href="{{route('users.index')}}" class="dropdown-item">Danh sách người dùng</a>
                         <a href="{{route('roles.index')}}" class="dropdown-item">Danh sách quyền</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/users/{{ Auth::user()->id }}/edit">Thông tin tài khoản</a>
+                        <a class="dropdown-item" href="/users/{{ Auth::user()->id }}/changepassword">Đổi mật khẩu</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -54,11 +57,11 @@
         <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
             <!-- Messages Dropdown Menu -->
             <li class="nav-item">
-                <span class="nav-link">
+                <a href="/users/{{ Auth::user()->id }}/edit" class="nav-link">
                     @if (Auth::check())
                         <p>Hello, {{ Auth::user()->fullName }}</p>
                     @endif
-                </span>
+                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" title="Logout" href="{{route('logout')}}">
