@@ -14,6 +14,7 @@ class VpsController extends Controller
     protected $VpsRepo;
     public function __construct(UserRepositoryInterface $userRepo, VpsRepositoryInterface $vpsRepo)
     {
+        $this->middleware('auth');
         $this->UserRepo = $userRepo;
         $this->VpsRepo = $vpsRepo;
     }
@@ -115,9 +116,7 @@ class VpsController extends Controller
      */
     public function destroy($id)
     {
-        $vps = Vps::findOrFail($id);
-        $vps->delete();
-
+        $this->VpsRepo->delete($id);
         return redirect()->route('vps.index');
     }
 }

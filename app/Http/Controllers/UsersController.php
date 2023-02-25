@@ -22,6 +22,7 @@ class UsersController extends Controller
     protected $RoleRepo;
     public function __construct(UserRepositoryInterface $userRepo, RoleRepositoryInterface $roleRepo)
     {
+        $this->middleware('auth');
         $this->UserRepo = $userRepo;
         $this->RoleRepo = $roleRepo;
     }

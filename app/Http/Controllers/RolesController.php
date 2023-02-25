@@ -6,9 +6,19 @@ use App\Http\Controllers\Controller;
 
 use App\Http\Requests\RoleRequest;
 use App\Models\Roles;
+use App\Repositories\Role\RoleRepositoryInterface;
+use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\Vps\VpsRepositoryInterface;
 
 class RolesController extends Controller
 {
+    protected $UserRepo;
+    protected $RoleRepo;
+    public function __construct(RoleRepositoryInterface $roleRepo)
+    {
+        $this->middleware('auth');
+        $this->RoleRepo = $roleRepo;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +26,7 @@ class RolesController extends Controller
      */
     public function index()
     {
-        $roles= Roles::all();
+        $roles= $this->RoleRepo->getAll();
         return view('roles.index', ['roles'=>$roles]);
     }
 
@@ -38,11 +48,10 @@ class RolesController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        $role = new Roles();
-		$role->name = $request->input('name');
-		$role->code = $request->input('code');
-        $role->save();
-
+        $this->RoleRepo->create([
+            'name' => $request->input('name'),
+            'code' => $request->input('code')
+        ]);
         return redirect()->route('roles.index');
     }
 
@@ -66,7 +75,7 @@ class RolesController extends Controller
      */
     public function edit($id)
     {
-        $role = Roles::findOrFail($id);
+        $role = $this->RoleRepo->find($id);
         return view('roles.edit',['role'=>$role]);
     }
 
@@ -79,11 +88,10 @@ class RolesController extends Controller
      */
     public function update(RoleRequest $request, $id)
     {
-        $role = Roles::findOrFail($id);
-		$role->name = $request->input('name');
-		$role->code = $request->input('code');
-        $role->save();
-
+        $this->RoleRepo->update($id,[
+            'name' => $request->input('name'),
+            'code' => $request->input('code')
+        ]);
         return redirect()->route('roles.index');
     }
 
@@ -95,9 +103,7 @@ class RolesController extends Controller
      */
     public function destroy($id)
     {
-        $role = Roles::findOrFail($id);
-        $role->delete();
-
+        $this->RoleRepo->delete($id);
         return redirect()->route('roles.index');
     }
 }
