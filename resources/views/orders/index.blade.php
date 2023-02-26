@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Danh sách đơn hàng')
+@section('head')
+    <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
+@endsection
 @section('content')
     <?php $index = 1;?>
     <div class="content-wrapper">
@@ -44,11 +47,18 @@
                                 <div class="form-group row">
                                     <label for="vps" class="col-sm-2 col-form-label">Vps</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control select2" id="vps" name="vps">
-                                            <option value="">Tất cả</option>
-                                            @foreach ($vpses as $itemVps)
-                                                <option value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>
-                                            @endforeach
+{{--                                        <select class="form-control select2" id="vps" name="vps">--}}
+{{--                                            <option value="">Tất cả</option>--}}
+{{--                                            @foreach ($vpses as $itemVps)--}}
+{{--                                                <option value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+                                        <select class="form-control select2-auto" data-href="{{route('api-vpses-search')}}" title="Chọn vps" id="vps" name="vps">
+                                            @if($vpses && !($vpses->isEmpty()))
+                                                @foreach ($vpses as $itemVps)
+                                                    <option value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -57,6 +67,7 @@
                                 <div class="form-group row">
                                     <label for="txtOrderNumber" class="col-sm-2 col-form-label">Số Order</label>
                                     <div class="col-sm-10">
+
                                         <input type="text" class="form-control" id="txtOrderNumber"
                                                placeholder="Số order">
                                     </div>
@@ -206,6 +217,11 @@
         </section>
         <!-- /.content -->
     </div>
+@stop
+@section('footer')
+
+    <!-- Select2 -->
+    <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
     <script>
         function confirmDelete(event, id) {
             event.preventDefault();
@@ -218,4 +234,40 @@
             document.forms['myForm'].submit();
         }
     </script>
-@stop
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $('.select2').select2();
+            if($(".select2-auto").length){
+                $(".select2-auto").each(function () {
+                    var title = $(this).attr('title');
+                    var url =  $(this).attr('data-href');
+                    $(this).select2({
+                        ajax: {
+                            delay: 250,
+                            dataType: 'json',
+                            url: url,
+                            data: function (params) {
+                                return {
+                                    q: params.term
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data
+                                };
+                            },
+                        },
+                        placeholder: title,
+                        minimumInputLength: 2
+                    });
+                });
+            }
+
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+        });
+    </script>
+@endsection

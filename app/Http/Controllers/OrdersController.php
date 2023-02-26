@@ -21,14 +21,13 @@ class OrdersController extends Controller
     {
         $productCates = Productcategories::all();
         $users = Users::all();
-        $vpses = Vps::all();
         $orders = Orders::paginate(1);
 
         $filter_dateFrom = '';
         $filter_dateTo = '';
         $filter_productCateId = 0;
         $filter_user = 0;
-        $filter_vps = 0;
+        $filter_vps = 1;
         $filter_orderNumber = '';
         $filter_product = '';
         $filter_customer = '';
@@ -36,6 +35,7 @@ class OrdersController extends Controller
         $filter_orderid = 0;
         $filter_ebay = 0;
         $showProducts = [];
+        $vpses = Vps::where('id',$filter_vps)->get();
         if (!($orders->isEmpty())) {
             $productIds = $orders->pluck('productId')->toArray();
             $showProducts = Products::whereIn('id', $productIds)->get();
@@ -114,16 +114,5 @@ class OrdersController extends Controller
             'orderid'=>$filter_orderid,
             'ebay'=>$filter_ebay
         ]);
-    }
-    public function searchByKey(Request $request)
-    {
-        $orders = [];
-        $keyword = '';
-        if ($request->input('q')) {
-            $orders = Orders::where('orderNumber', 'like', "%$keyword%")
-                ->take(10)
-                ->get();
-        }
-        return response()->json($orders);
     }
 }

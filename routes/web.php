@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProductCategoriesController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
@@ -54,6 +55,7 @@ Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->na
 
 Route::get('/export-to-csv', [UsersController::class, 'exportToCsv'])->name('export-to-csv');
 //api
-Route::get('api-orders-search', 'OrdersController@searchByKey')->name("api-orders-search");
-Route::get('api-products-search', 'ProductController@searchByKey')->name("api-products-search");
+Route::get('api-orders-search', 'ApiController@ordersSearch')->name("api-orders-search");
+Route::get('api-vpses-search', [ApiController::class,'vpsSearch'])->name("api-vpses-search");
+Route::get('api-products-search', [ApiController::class,'productsSearch'])->name("api-products-search");
 
