@@ -16,6 +16,7 @@
             {{ Form::hidden('password', $user->password) }}
             {{ Form::hidden('createBy', '1') }}
             {{ Form::hidden('updateBy', '1') }}
+
             <div class="mb-3">
                 {{ Form::label('userName', 'UserName', ['class'=>'form-label']) }}
                 {{ Form::text('userName', null, array('class' => 'form-control', 'readonly' => true)) }}
@@ -36,10 +37,16 @@
                 {{ Form::label('statusId', 'Trạng thái', ['class'=>'form-label']) }}
                 {{ Form::select('statusId', $listStatus, null, ['class' => 'form-control']) }}
             </div>
-            <div class="mb-3">
-                {{ Form::label('roleId', 'Quyền', ['class'=>'form-label']) }}
-                {{ Form::select('roleId', $listRole, null, ['class' => 'form-control']) }}
-            </div>
+            <?php if(Auth::user()->role == "admin"){ ?>
+                <div class="mb-3">
+                    {{ Form::label('roleId', 'Quyền', ['class'=>'form-label']) }}
+                    {{ Form::select('roleId', $listRole, null, ['class' => 'form-control']) }}
+                </div>
+            <?php }else{ ?>
+                {{ Form::hidden('roleId', $user->roleId) }}
+            <?php } ?>
+
+
 
 
             {{ Form::submit('Edit', array('class' => 'btn btn-primary')) }}
