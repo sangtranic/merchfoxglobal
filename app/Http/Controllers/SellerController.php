@@ -15,13 +15,13 @@ class SellerController extends Controller
     protected $SellerRepo;
     public function __construct(UserRepositoryInterface $userRepo, SellerRepositoryInterface $sellerRepo)
     {
-        $this->middleware('auth');
-        $this->middleware(function ($request, $next) {
-            if (Auth::user()->role != 'admin') {
-                abort(403, 'Bạn không có quyền truy cập.');
-            }
-            return $next($request);
-        });
+//        $this->middleware('auth');
+//        $this->middleware(function ($request, $next) {
+//            if (Auth::user()->role != 'admin') {
+//                abort(403, 'Bạn không có quyền truy cập.');
+//            }
+//            return $next($request);
+//        });
         $this->UserRepo = $userRepo;
         $this->SellerRepo = $sellerRepo;
     }
@@ -33,7 +33,13 @@ class SellerController extends Controller
     public function index()
     {
         $listUser= $this->UserRepo->getAll();
+
         $listSeller = $this->SellerRepo->getAll();
+        if(Auth::user()->role != "admin")
+        {
+            $listUser = $listUser->where('id', '=', Auth::user()->id);
+            $listSeller = $listSeller->where('userId', '=', Auth::user()->id);
+        }
         $userIdFilter = request('userId');
         if($userIdFilter>0)
         {
@@ -53,8 +59,13 @@ class SellerController extends Controller
      */
     public function create()
     {
-        $listUser = $this->UserRepo->getAll()->pluck('userName','id');
-        return view('seller.create', ['listUser' => $listUser]);
+        $listUser = $this->UserRepo->getAll();
+        if(Auth::user()->role != "admin")
+        {
+            $listUser = $listUser->where('id', '=', Auth::user()->id);
+        }
+        $listUserPluck = $listUser->pluck('userName','id');
+        return view('seller.create', ['listUser' => $listUserPluck]);
     }
 
     /**
@@ -94,6 +105,10 @@ class SellerController extends Controller
     {
         $seller = $this->SellerRepo->find($id);
         $listUser = $this->UserRepo->getAll()->pluck('userName','id');
+        if(Auth::user()->role != "admin")
+        {
+            $listUser = $listUser->where('id', '=', Auth::user()->id);
+        }
         return view('seller.edit',['seller'=>$seller,'listUser' => $listUser]);
     }
 
