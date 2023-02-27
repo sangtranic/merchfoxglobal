@@ -30,13 +30,18 @@ Route::get('/logout',  [Controllers\AccountController::class, 'logout'])->name('
 
 //user
 Route::resource('users', UsersController::class );
-Route::get('users', [Controllers\UsersController::class, 'index'] )->name('users.index')->middleware('role:admin');;
+Route::get('users', [Controllers\UsersController::class, 'index'] )->name('users.index')->middleware('role:admin');
+Route::get('users/create', [Controllers\UsersController::class, 'create'] )->name('users.create')->middleware('role:admin');
+Route::get('users/store', [Controllers\UsersController::class, 'store'] )->name('users.store')->middleware('role:admin');
+Route::get('users/destroy', [Controllers\UsersController::class, 'store'] )->name('users.destroy')->middleware('role:admin');
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
 //role
 Route::resource('roles', Controllers\RolesController::class );
 //VPS
 Route::resource('vps', Controllers\VpsController::class );
+//Seller
+Route::resource('seller', Controllers\SellerController::class );
 //
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
 //image

@@ -23,6 +23,7 @@
                         <?php if(Auth::user()->role == "admin"){ ?>
                             <a href="{{route('users.index')}}" class="dropdown-item">Danh sách người dùng</a>
                             <a href="{{route('roles.index')}}" class="dropdown-item">Danh sách quyền</a>
+                            <a href="{{route('seller.index')}}" class="dropdown-item">Danh sách Seller</a>
                             <div class="dropdown-divider"></div>
                         <?php } ?>
                         <a class="dropdown-item" href="{{ route('users.edit', [Auth::user()->id]) }}">Thông tin tài khoản</a>

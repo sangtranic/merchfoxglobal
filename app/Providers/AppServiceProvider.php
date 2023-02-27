@@ -33,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Vps\VpsRepositoryInterface::class,
             \App\Repositories\Vps\VpsRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Seller\SellerRepositoryInterface::class,
+            \App\Repositories\Seller\SellerRepository::class
+        );
     }
 
     /**
