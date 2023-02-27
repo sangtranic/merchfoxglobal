@@ -104,12 +104,13 @@ class SellerController extends Controller
     public function edit($id)
     {
         $seller = $this->SellerRepo->find($id);
-        $listUser = $this->UserRepo->getAll()->pluck('userName','id');
+        $listUser = $this->UserRepo->getAll();
         if(Auth::user()->role != "admin")
         {
             $listUser = $listUser->where('id', '=', Auth::user()->id);
         }
-        return view('seller.edit',['seller'=>$seller,'listUser' => $listUser]);
+        $listUserPluck = $listUser->pluck('userName','id');
+        return view('seller.edit',['seller'=>$seller,'listUser' => $listUserPluck]);
     }
 
     /**

@@ -11,7 +11,7 @@
 		</div>
 	@endif
     <div class="bg-light p-4 rounded">
-        <h2>Sửa Seller "<strong>{{$seller['name']}}</strong>"</h2>
+        <h2>Sửa Seller "<strong>{{$seller['sellerName']}}</strong>"</h2>
         <div class="container mt-4">
             {{ Form::model($seller, array('route' => array('seller.update', $seller->id), 'method' => 'PUT')) }}
 
