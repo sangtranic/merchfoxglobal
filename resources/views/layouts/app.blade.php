@@ -7,7 +7,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminSELLER | Home</title>
+    <title>@yield('title')</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -15,6 +15,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
+    @yield('head')
+    <link rel="stylesheet" href="{{asset('dist/css/custom.css')}}">
 </head>
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
@@ -68,8 +70,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
 <!-- Bootstrap 4 -->
 <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{asset('plugins/bs-custom-file-input/bs-custom-file-input.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('dist/js/adminlte.min.js')}}"></script>
+<script>
+    $(function () {
+        bsCustomFileInput.init();
+    });
+</script>
 <script src="{{asset('dist/js/seller.js')}}"></script>
 @yield('footer')
 </body>

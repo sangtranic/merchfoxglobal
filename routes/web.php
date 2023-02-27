@@ -3,7 +3,8 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProductCategoriesController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
@@ -48,6 +49,13 @@ Route::resource('product-cates', ProductCategoriesController::class );
 Route::resource('products', Controllers\ProductController::class) ;
 Route::get('products-search', [Controllers\ProductController::class, 'search'])->name('products.search');
 //orders
-Route::get('orders', [Controllers\OrderController::class, 'index'] )->name('orders');
-Route::get('orders/{id}', [Controllers\OrderController::class, 'index'] )->name('order.detail');
+Route::resource('orders', Controllers\OrdersController::class );
+Route::get('orders/{id}', [Controllers\OrdersController::class, 'detail'])->name("orders.detail");
+Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->name('orders.search');
+
 Route::get('/export-to-csv', [UsersController::class, 'exportToCsv'])->name('export-to-csv');
+//api
+Route::get('api-orders-search', 'ApiController@ordersSearch')->name("api-orders-search");
+Route::get('api-vpses-search', [ApiController::class,'vpsSearch'])->name("api-vpses-search");
+Route::get('api-products-search', [ApiController::class,'productsSearch'])->name("api-products-search");
+
