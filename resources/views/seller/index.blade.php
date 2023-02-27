@@ -56,7 +56,6 @@
                             <?php
                             $user = $listUser->where('id', $seller->userId)->first();
                             $userName = $user ? $user['userName'] : '';
-
                             ?>
                             <tr>
                                 <td>{{ $seller->id }}</td>
