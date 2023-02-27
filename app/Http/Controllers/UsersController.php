@@ -179,32 +179,35 @@ class UsersController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-        $user = $this->UserRepo->find($id);
-        $password = $user->password;
-        if ($request->has('newpassword')) {
-            $password = bcrypt($request->input('newpassword'));
-        }
-        $roleName = "";
-        if ($request->has('roleId')) {
-            $listRole = $this->RoleRepo->getAll();
-            $role = $listRole->where('id', $request->input('roleId'))->first();
-            if($role!=null)
-            {
-                $roleName = $role->code;
+        if(Auth::user()->role == "admin" || $id == Auth::user()->id)
+        {
+            $user = $this->UserRepo->find($id);
+            $password = $user->password;
+            if ($request->has('newpassword')) {
+                $password = bcrypt($request->input('newpassword'));
             }
+            $roleName = "";
+            if ($request->has('roleId')) {
+                $listRole = $this->RoleRepo->getAll();
+                $role = $listRole->where('id', $request->input('roleId'))->first();
+                if($role!=null)
+                {
+                    $roleName = $role->code;
+                }
+            }
+            $this->UserRepo->update($id,[
+                'userName' => $request->input('userName'),
+                'fullName' => $request->input('fullName'),
+                'password' => $password,
+                'email' => $request->input('email'),
+                'mobile' => $request->input('mobile'),
+                'statusId' => $request->input('statusId'),
+                'roleId' => $request->input('roleId'),
+                'createBy' => $request->input('createBy'),
+                'updateBy' => $request->input('updateBy'),
+                'role' => $roleName
+            ]);
         }
-        $this->UserRepo->update($id,[
-            'userName' => $request->input('userName'),
-            'fullName' => $request->input('fullName'),
-            'password' => $password,
-            'email' => $request->input('email'),
-            'mobile' => $request->input('mobile'),
-            'statusId' => $request->input('statusId'),
-            'roleId' => $request->input('roleId'),
-            'createBy' => $request->input('createBy'),
-            'updateBy' => $request->input('updateBy'),
-            'role' => $roleName
-        ]);
         //$user = $this->UserRepo->find($id);
 //		$user->userName = $request->input('userName');
 //		$user->password = $request->input('password');
@@ -214,7 +217,10 @@ class UsersController extends Controller
 //		$user->statusId = $request->input('statusId');
 //		$user->roleId = $request->input('roleId');
 //        $user->save();
-
+        if(Auth::user()->role != "admin")
+        {
+            return redirect()->route('home');
+        }
         return redirect()->route('users.index');
     }
 
