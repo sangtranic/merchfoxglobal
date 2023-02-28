@@ -15,6 +15,7 @@
                     </div><!-- /.col -->
                     <div class="col-sm-6">
                         <a class="openPopup"
+                           id="btnAddProduct"
                            data-href="{{route('products.edit',['product'=>0,'cate'=> $order->categoryId,'callBack'=>'callBackPopop'])}}"
                            data-width="800px" title="Thêm mới sản phẩm">
                             <div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div>
@@ -42,7 +43,6 @@
             @endif
             <div class="row">
                 {{ Form::hidden('userId') }}
-                {{ Form::hidden('categoryId') }}
                 <div class="col-md-6">
                     <div class="form-group row">
                         <label for="vpsId" class="col-sm-2 col-form-label">VPS</label>
@@ -186,10 +186,10 @@
                         <div class="col-sm-4">
                             <select class="form-control" id="statusId" name="statusId">
 
-                                    @foreach ($statusList as $itemStatus)
-                                        <option
-                                            value="{{ $itemStatus->id }}" {{ $order->statusId == $itemStatus->id ? 'selected' : '' }}>{{ $itemStatus->name }}</option>
-                                    @endforeach
+                                @foreach ($statusList as $itemStatus)
+                                    <option
+                                        value="{{ $itemStatus->id }}" {{ $order->statusId == $itemStatus->id ? 'selected' : '' }}>{{ $itemStatus->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -197,6 +197,18 @@
 
                 <!-- Phải -->
                 <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="categoryId" class="col-sm-2 col-form-label">Chuyên mục</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="categoryId" name="categoryId"
+                                    onchange="onChangeProductCate()">
+                                @foreach ($productCates as $itemProductCate)
+                                    <option
+                                        value="{{ $itemProductCate->id }}" {{ $order->categoryId == $itemProductCate->id ? 'selected' : '' }}>{{ $itemProductCate->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group row">
                         <label for="productName" class="col-sm-2 col-form-label">Tên sản phẩm</label>
                         <div class="col-sm-10">
@@ -293,7 +305,7 @@
                     <div class="form-group row">
                         <label for="slOrderType" class="col-sm-2 col-form-label">Size</label>
                         <div class="col-sm-4">
-                            <div class="form-group clearfix">
+                            <div class="form-group clearfix" id="view-productSizes">
                                 @if($productSizes)
                                     @foreach($productSizes as $item_productSize)
                                         <div class="icheck-primary d-inline">
@@ -442,5 +454,44 @@
             }
         }
 
+        function onChangeProductCate() {
+            var cateId = $('#categoryId').val();
+            var data_href = $('#btnAddProduct').attr('data-href');
+            data_href = updateQueryStringParameter(data_href, 'cate', cateId);
+            $('#btnAddProduct').attr('data-href', data_href);
+            updateSizeAndColor(cateId);
+        }
+
+        function updateSizeAndColor(categoryId) {
+            if (categoryId != null && categoryId > 0) {
+                $.get('{{route('api-product-category-detail')}}?id=' + categoryId, function (data, status) {
+                    if (status == 'success' && data != null) {
+                        var html_product_sizes = '', html_product_colors='';
+                        if (data.listSizes != null && data.listSizes.length > 0) {
+                            for (var i = 0; i < data.listSizes.length; i++) {
+                                html_product_sizes += '<div class="icheck-primary d-inline">\n<input type="radio" id="size_'+data.listSizes[i]+'" name="size">\n<label for="size_'+data.listSizes[i]+'">'+data.listSizes[i]+'</label>\n</div>\n'
+                            }
+                        }
+                        if (data.listColors != null && data.listColors.length > 0) {
+                            for (var i = 0; i < data.listColors.length; i++) {
+                                html_product_colors += '<option value="'+data.listColors[i]+'">'+data.listColors[i]+'</option>'
+                            }
+                        }
+                        $('#view-productSizes').html(html_product_sizes);
+                        $('#color').html(html_product_colors);
+                    }
+                });
+            }
+        }
+
+        function updateQueryStringParameter(uri, key, value) {
+            var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+            var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + "=" + value + '$2');
+            } else {
+                return uri + separator + key + "=" + value;
+            }
+        }
     </script>
 @endsection

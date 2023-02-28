@@ -69,3 +69,4 @@ Route::get('api-orders-search', 'ApiController@ordersSearch')->name("api-orders-
 Route::get('api-vpses-search', [ApiController::class,'vpsSearch'])->name("api-vpses-search");
 Route::get('api-products-search', [ApiController::class,'productsSearch'])->name("api-products-search");
 Route::get('api-product-detail', [ApiController::class,'productDetail'])->name("api-product-detail");
+Route::get('api-product-category-detail', [ApiController::class,'productCategoryDetail'])->name("api-product-category-detail");

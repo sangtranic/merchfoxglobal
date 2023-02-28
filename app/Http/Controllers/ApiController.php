@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Orders;
+use App\Models\Productcategories;
 use App\Models\Products;
 use App\Models\Vps;
 use Illuminate\Http\Request;
@@ -109,5 +110,18 @@ class ApiController extends Controller
             $product->imageDesign2 = $product->url_img_design2;
         }
         return response()->json($product);
+    }
+    public function productCategoryDetail(Request $request)
+    {
+        $productCate = null;
+        if ($request->input('id')) {
+            $id = $request->integer('id');
+            $productCate = Productcategories::findOrFail($id);
+            if ($productCate){
+                $productCate -> listSizes = $productCate->size_list;
+                $productCate-> listColors = $productCate->color_list;
+            }
+        }
+        return response()->json($productCate);
     }
 }
