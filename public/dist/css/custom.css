@@ -31,7 +31,7 @@
     height: 26px;
     font-size: 13px;
    }
-   .form-filter input, .form-filter select{height: 28px;}
+   .form-filter input, .form-filter select, .form-filter .custom-file, .form-filter .custom-file-label{height: 28px;}
 .form-filter input[type="checkbox"], .form-filter input[type="radio"] {
     height: unset;
 }

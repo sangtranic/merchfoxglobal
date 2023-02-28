@@ -134,8 +134,7 @@
                 </div>
                 <div class="card-header">
                     <div class="card-tools">
-                        <a class="openPopup" data-href="{{route('orders.edit',['order'=>0])}}" data-width="800px"
-                           title="Thêm mới đơn hàng">
+                        <a href="{{route('orders.editForm',['productCate'=>$productCate,'id'=>0])}}" title="Thêm mới đơn hàng">
                             <div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div>
                         </a>
                     </div>

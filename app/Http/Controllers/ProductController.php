@@ -15,6 +15,7 @@ class ProductController extends Controller
 {
     protected $productRepo;
     protected $UsersRepo;
+
     public function __construct(ProductRepository $productRepo, UserRepository $userRepository)
     {
         $this->middleware('auth');
@@ -33,26 +34,15 @@ class ProductController extends Controller
         $filter_isFileDesign = false;
         return view('products.index', [
             'products' => $products,
-            'users'=> $users,
+            'users' => $users,
             'productCates' => $productCates,
-            'productCate'=>$filter_productCateId,
-            'search'=>$filter_search,
-            'user'=>$filter_user,
-            'isFileDesign'=>$filter_isFileDesign
+            'productCate' => $filter_productCateId,
+            'search' => $filter_search,
+            'user' => $filter_user,
+            'isFileDesign' => $filter_isFileDesign
         ]);
     }
-    public function searchByKey(Request $request)
-    {
-        $products = [];
-        $keyword = '';
-        if ($request->input('q')) {
-            $products = Products::where('name', 'like', "%$keyword%")
-                ->orWhere('description', 'like', "%$keyword%")
-                ->take(10)
-                ->get();
-        }
-        return response()->json($products);
-    }
+
     public function search(Request $request)
     {
         $query = Products::query();
@@ -85,26 +75,35 @@ class ProductController extends Controller
 
         return view('products.index', [
             'products' => $products,
-            'users'=> $users,
+            'users' => $users,
             'productCates' => $productCates,
-            'productCate'=>$filter_productCateId,
-            'search'=>$filter_search,
-            'user'=>$filter_user,
-            'isFileDesign'=>$filter_isFileDesign
+            'productCate' => $filter_productCateId,
+            'search' => $filter_search,
+            'user' => $filter_user,
+            'isFileDesign' => $filter_isFileDesign
         ]);
     }
-    public function edit($id)
+
+    public function edit($id, Request $request)
     {
         $product = new Products();
         $product->id = 0;
         if ($id > 0) {
             $product = $this->productRepo->find($id);
+        } else if ($request->has('cate')) {
+            $product->categoryId = $request->integer('cate');
+        }
+        $callBack = '';
+        if($request->has('callBack'))  {
+          $callBack = $request->input('callBack');
         }
         $productCates = Productcategories::pluck('name', 'id');
         return view('products.editForm', [
             'product' => $product,
-            'productCates' => $productCates]);
+            'productCates' => $productCates,
+            'callBack'=> $callBack]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -128,7 +127,7 @@ class ProductController extends Controller
         $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
         $product->save();
 
-        return back()->with('status', 'Successfully');
+        return back()->with('status', 'Successfully')->with('productId',$product->id);
     }
 
     public function update(Request $request, $id)

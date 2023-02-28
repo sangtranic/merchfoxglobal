@@ -55,8 +55,11 @@ Route::resource('products', Controllers\ProductController::class) ;
 Route::get('products-search', [Controllers\ProductController::class, 'search'])->name('products.search');
 //orders
 Route::resource('orders', Controllers\OrdersController::class );
+Route::get('orderForm', [Controllers\OrdersController::class, 'editForm'])->name("orders.editForm");
+
 Route::get('orders/{id}', [Controllers\OrdersController::class, 'detail'])->name("orders.detail");
 Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->name('orders.search');
+
 
 Route::get('/export-to-csv', [OrdersController::class, 'exportToCsv'])->name('export-to-csv');
 Route::post('/import-csv', [OrdersController::class, 'importCsv'])->name('import-csv');

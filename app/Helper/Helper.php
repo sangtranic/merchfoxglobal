@@ -28,4 +28,17 @@ class Helper
     {
         return ($str === null || trim($str) === '');
     }
+    public static function getImageUrlPath($imageName, $folder='original', $withDomain = false)
+    {
+        $basePath = public_path('upload/' . $folder);
+        if ($withDomain){
+            $baseUrl = config('app.url') . '/upload/' . $folder;
+            $url = $baseUrl . '/' . $imageName;
+        }else{
+
+            $url = $basePath . '/' . $imageName;
+        }
+        return $url;
+    }
+
 }

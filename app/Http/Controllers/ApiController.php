@@ -99,4 +99,15 @@ class ApiController extends Controller
         }
         return response()->json($products);
     }
+    public function productDetail(Request $request)
+    {
+        $product = null;
+        if ($request->input('id')) {
+            $id = $request->integer('id');
+            $product = Products::findOrFail($id);
+            $product->imageDesign1 = $product->url_img_design1;
+            $product->imageDesign2 = $product->url_img_design2;
+        }
+        return response()->json($product);
+    }
 }

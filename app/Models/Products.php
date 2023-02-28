@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helper\Helper;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -79,5 +80,17 @@ class Products extends Model
 
     // Functions ...
 
+    function getUrlImgDesign1Attribute(){
+        if(!Helper::IsNullOrEmptyString($this->urlImageDesignOne)){
+            return Helper::getImageUrlPath($this->urlImageDesignOne,'thumbnail', true);
+        }
+        return '';
+    }
+    function getUrlImgDesign2Attribute(){
+        if(!Helper::IsNullOrEmptyString($this->urlImageDesignTwo)){
+            return Helper::getImageUrlPath($this->urlImageDesignTwo,'thumbnail', true);
+        }
+        return '';
+    }
     // Relations ...
 }

@@ -5,7 +5,12 @@
         <script>
             setTimeout(function () {
                 $('#myModal .close', window.parent.document).click();
-                window.parent.document.location.reload();
+                @if(!\App\Helper\Helper::IsNullOrEmptyString($callBack))
+                window.parent.callBackPopop({{session('productId')}});
+                @endif
+                @if(\App\Helper\Helper::IsNullOrEmptyString($callBack))
+                    window.parent.document.location.reload();
+                @endif
             }, 1000);
         </script>
     @endif
@@ -18,13 +23,12 @@
     @endif
     <div class="modal-body">
         @if($product->id == 0)
-            {!! Form::open(['route' => 'products.store','enctype'=>'multipart/form-data']) !!}
+            {{ Form::model($product, array('route' => array('products.store'), 'method' => 'POST','enctype'=>'multipart/form-data')) }}
         @endif
 
         @if($product->id > 0)
             {{ Form::model($product, array('route' => array('products.update', $product->id), 'method' => 'PUT','enctype'=>'multipart/form-data')) }}
         @endif
-
         <div class="form-group row">
             {{ Form::label('name','Chuyên mục *',['class'=>'col-sm-3 col-form-label'])}}
             <div class="col-sm-9">
