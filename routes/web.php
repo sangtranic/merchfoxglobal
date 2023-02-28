@@ -63,8 +63,9 @@ Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->na
 
 Route::get('/export-to-csv', [OrdersController::class, 'exportToCsv'])->name('export-to-csv');
 Route::post('/import-csv', [OrdersController::class, 'importCsv'])->name('import-csv');
+
 //api
 Route::get('api-orders-search', 'ApiController@ordersSearch')->name("api-orders-search");
 Route::get('api-vpses-search', [ApiController::class,'vpsSearch'])->name("api-vpses-search");
 Route::get('api-products-search', [ApiController::class,'productsSearch'])->name("api-products-search");
-
+Route::get('api-product-detail', [ApiController::class,'productDetail'])->name("api-product-detail");
