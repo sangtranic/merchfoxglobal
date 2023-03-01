@@ -143,8 +143,9 @@ class ProductController extends Controller
             'urlImageDesignTwo' => 'nullable|max:255'
         ]);
         $product = Products::findOrFail($id);
-        $product->update($request->all());
+        //$product->update($request->all());
         $product->name = $request->input('name');
+        $product->itemId = $request->input('itemId');
         $product->description = $request->input('description');
         $product->url = $request->input('url');
         $product->urlImagePreviewOne = $request->input('urlImagePreviewOne');

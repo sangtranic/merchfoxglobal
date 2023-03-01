@@ -283,22 +283,22 @@
                         <label class="col-sm-6 col-form-label">Thiết kế</label>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview1" src=""/>
+                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewOne}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview1" src=""/>
+                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewTwo}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign1" src=""/>
+                                <img width="100%" id="imgDesign1" src="{{$product ? $product->imageDesign1}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign2" src=""/>
+                                <img width="100%" id="imgDesign2" src="{{$product ? $product->imageDesign1}}"/>
                             </div>
                         </div>
                     </div>
@@ -310,7 +310,7 @@
                                     @foreach($productSizes as $item_productSize)
                                         <div class="icheck-primary d-inline">
                                             <input type="radio" id="size_{{$item_productSize}}"
-                                                   name="size" {{$item_productSize == $order->size ? 'checked':''}}>
+                                                   name="size" {{$item_productSize == $order->size ? 'checked':''}} value="{{$item_productSize}}">
                                             <label for="size_{{$item_productSize}}">{{$item_productSize}}</label>
                                         </div>
                                     @endforeach
@@ -351,7 +351,12 @@
                                     class="fa fa-save"></i>
                                 Lưu thông tin
                             </button>
-                            <a class="btn btn-sm btn-default" href="{{ url()->previous() }}"><i
+                            <button id="btSaveArticle" type="submit" name="SubmitButton" value="SaveBack"
+                                    class="btn btn-sm btn-primary valid" aria-invalid="false"><i
+                                    class="fa fa-save"></i>
+                                Lưu thông tin và quay lại
+                            </button>
+                            <a class="btn btn-sm btn-default" href="{{route('orders.index')}}"><i
                                     class="fa fa-times"></i> Quay lại
                             </a>
                         </div>
@@ -433,6 +438,7 @@
         function fillProductByJson(product) {
             $('#productName').val(product.name);
             $('#urlImagePreviewOne').val(product.urlImagePreviewOne);
+            $('#itemId').val(product.itemId);
             $('#urlImagePreviewTwo').val(product.urlImagePreviewTwo);
             $('#imgPreview1').attr('src', product.urlImagePreviewOne);
             $('#imgPreview2').attr('src', product.urlImagePreviewTwo);
@@ -469,7 +475,7 @@
                         var html_product_sizes = '', html_product_colors='';
                         if (data.listSizes != null && data.listSizes.length > 0) {
                             for (var i = 0; i < data.listSizes.length; i++) {
-                                html_product_sizes += '<div class="icheck-primary d-inline">\n<input type="radio" id="size_'+data.listSizes[i]+'" name="size">\n<label for="size_'+data.listSizes[i]+'">'+data.listSizes[i]+'</label>\n</div>\n'
+                                html_product_sizes += '<div class="icheck-primary d-inline">\n<input type="radio" id="size_'+data.listSizes[i]+'" name="size" value="'+data.listSizes[i]+'">\n<label for="size_'+data.listSizes[i]+'">'+data.listSizes[i]+'</label>\n</div>\n'
                             }
                         }
                         if (data.listColors != null && data.listColors.length > 0) {

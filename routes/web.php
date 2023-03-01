@@ -5,6 +5,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProductCategoriesController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\RestApiController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
@@ -59,6 +60,7 @@ Route::get('orderForm', [Controllers\OrdersController::class, 'editForm'])->name
 
 Route::get('orders/{id}', [Controllers\OrdersController::class, 'detail'])->name("orders.detail");
 Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->name('orders.search');
+Route::post('orders-index-post', [Controllers\OrdersController::class, 'indexPost'])->name('orders.indexPost');
 
 
 Route::get('/export-to-csv', [OrdersController::class, 'exportToCsv'])->name('export-to-csv');
@@ -70,3 +72,5 @@ Route::get('api-vpses-search', [ApiController::class,'vpsSearch'])->name("api-vp
 Route::get('api-products-search', [ApiController::class,'productsSearch'])->name("api-products-search");
 Route::get('api-product-detail', [ApiController::class,'productDetail'])->name("api-product-detail");
 Route::get('api-product-category-detail', [ApiController::class,'productCategoryDetail'])->name("api-product-category-detail");
+Route::get('api-orders-remove', [ApiController::class,'removeOrders'])->name("api-orders-remove");
+Route::post('api/orders-import', [RestApiController::class,'orderImport'])->name("api-orders-import");

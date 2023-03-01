@@ -41,6 +41,12 @@
                 {{ Form::text('name', null, array('class' => 'form-control')) }}
             </div>
         </div>
+            <div class="form-group row">
+                {{ Form::label('itemId','itemId',['class'=>'col-sm-3 col-form-label'])}}
+                <div class="col-sm-9">
+                    {{ Form::text('itemId', null, array('class' => 'form-control')) }}
+                </div>
+            </div>
         <div class="form-group row">
             {{ Form::label('description','Mô tả',['class'=>'col-sm-3 col-form-label'])}}
             <div class="col-sm-9">

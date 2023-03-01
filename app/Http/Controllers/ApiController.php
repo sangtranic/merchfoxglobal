@@ -124,4 +124,35 @@ class ApiController extends Controller
         }
         return response()->json($productCate);
     }
+    public function removeOrders(Request $request)
+    {
+        if ($request->input('ids')) {
+            $str_ids = $request->input('ids');
+            $ids = explode(',',$str_ids );
+            $orders = Orders::wherein('id', $ids)->get();
+            if (strtolower(Auth::user()->role) == 'admin'){
+                //$orders->delete();
+                return response()->json(["status"=>'success','data'=>$ids,'message'=>'Xóa thành công các đơn hàng.']);
+            }else{
+                $userId = Auth::id();
+                $orderNotDeletes = [];
+                $orderDeletes = [];
+                foreach ($orders as $order){
+                    if ($userId != $order->createBy){
+                        array_push($orderNotDeletes, $order->orderNumber);
+                    }else{
+                        array_push($orderDeletes, $order->id);
+                        //order
+                    }
+                }
+                if (count($orderNotDeletes) > 0 &&count($orderDeletes) > 0){
+                    return response()->json(["status"=>'success','data'=>$orderDeletes,'message'=>'Các đơn hàng '.join('; ',$orderDeletes). ' đã được xóa và các đơn hàng '.join('; ',$orderNotDeletes). ' bạn không có quyền xóa.']);
+                }else if (count($orderNotDeletes) > 0){
+                    return response()->json(["status"=>'false','data'=>null,'message'=>'Các đơn hàng '.join('; ',$orderNotDeletes). ' bạn không có quyền xóa.']);
+                }
+                return response()->json(["status"=>'success','data'=>$orderDeletes,'message'=>'Xóa thành công các đơn hàng.']);
+            }
+        }
+        return response()->json(["status"=>'false','data'=>null,'message'=>'Xóa đơn hàng xảy ra lỗi.']);
+    }
 }
