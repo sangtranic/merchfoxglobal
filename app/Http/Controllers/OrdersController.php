@@ -13,6 +13,7 @@ use App\Models\Users;
 use App\Models\Vps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use League\Csv\Reader;
 use const http\Client\Curl\AUTH_ANY;
 
 class OrdersController extends Controller
@@ -23,7 +24,7 @@ class OrdersController extends Controller
         $this->middleware('auth');
     }
 
-        public function index()
+    public function index()
     {
         $productCates = Productcategories::all();
         $users = Users::all();
@@ -43,45 +44,48 @@ class OrdersController extends Controller
         $filter_orderid = 0;
         $filter_ebay = 0;
         $showProducts = null;
-        $vpses = Vps::where('id',$filter_vps)->get();
+        $vpses = Vps::where('id', $filter_vps)->get();
         if (!($orders->isEmpty())) {
             $productIds = $orders->pluck('productId')->toArray();
             $showProducts = Products::whereIn('id', $productIds)->get();
         }
         return view('orders.index', [
             'orders' => $orders,
-            'users'=> $users,
-            'vpses'=> $vpses,
-            'sellers'=>$sellers,
+            'users' => $users,
+            'vpses' => $vpses,
+            'sellers' => $sellers,
             'productCates' => $productCates,
-            'showProducts'=>$showProducts,
-            'counter'=>$counter,
-            'dateFrom'=>$filter_dateFrom,
-            'dateTo'=>$filter_dateTo,
-            'productCate'=>$filter_productCateId,
-            'user'=>$filter_user,
-            'vps'=>$filter_vps,
-            'orderNumber'=>$filter_orderNumber,
-            'product'=>$filter_product,
-            'customer'=>$filter_customer,
-            'track'=>$filter_track,
-            'carrie'=>$filter_carrie,
-            'orderid'=>$filter_orderid,
-            'ebay'=>$filter_ebay
+            'showProducts' => $showProducts,
+            'counter' => $counter,
+            'dateFrom' => $filter_dateFrom,
+            'dateTo' => $filter_dateTo,
+            'productCate' => $filter_productCateId,
+            'user' => $filter_user,
+            'vps' => $filter_vps,
+            'orderNumber' => $filter_orderNumber,
+            'product' => $filter_product,
+            'customer' => $filter_customer,
+            'track' => $filter_track,
+            'carrie' => $filter_carrie,
+            'orderid' => $filter_orderid,
+            'ebay' => $filter_ebay
         ]);
     }
-    public function indexPost(Request $request){
+
+    public function indexPost(Request $request)
+    {
         dump($request);
     }
+
     public function search(Request $request)
     {
         $productCates = Productcategories::all();
         $users = Users::all();
         $vpses = Vps::all();
-        $sellers =null;
-        if (Auth::user()->role == 'admin'){
+        $sellers = null;
+        if (Auth::user()->role == 'admin') {
             $sellers = Seller::all();
-        }else{
+        } else {
             $sellers = Seller::where('userId', Auth::id())->get();
         }
         $query = Orders::query();
@@ -108,9 +112,9 @@ class OrdersController extends Controller
         }
         if ($filter_dateFrom && $filter_dateTo) {
             $query->whereBetween('created_at', [$filter_dateFrom, $filter_dateTo]);
-        }else if ($filter_dateFrom){
+        } else if ($filter_dateFrom) {
             $query->whereDate('created_at', '>=', $filter_dateFrom);
-        }else if ($filter_dateTo){
+        } else if ($filter_dateTo) {
             $query->whereDate('created_at', '<=', $filter_dateTo);
         }
         $counter = $query->count();
@@ -123,32 +127,34 @@ class OrdersController extends Controller
         }
         return view('orders.index', [
             'orders' => $orders,
-            'users'=> $users,
-            'vpses'=> $vpses,
-            'sellers'=>$sellers,
-            'counter'=>$counter,
+            'users' => $users,
+            'vpses' => $vpses,
+            'sellers' => $sellers,
+            'counter' => $counter,
             'productCates' => $productCates,
-            'showProducts'=>$showProducts,
-            'dateFrom'=>$filter_dateFrom,
-            'dateTo'=>$filter_dateTo,
-            'productCate'=>$filter_productCateId,
-            'user'=>$filter_user,
-            'vps'=>$filter_vps,
-            'orderNumber'=>$filter_orderNumber,
-            'product'=>$filter_product,
-            'customer'=>$filter_customer,
-            'track'=>$filter_track,
-            'carrie'=>$filter_carrie,
-            'orderid'=>$filter_orderid,
-            'ebay'=>$filter_ebay
+            'showProducts' => $showProducts,
+            'dateFrom' => $filter_dateFrom,
+            'dateTo' => $filter_dateTo,
+            'productCate' => $filter_productCateId,
+            'user' => $filter_user,
+            'vps' => $filter_vps,
+            'orderNumber' => $filter_orderNumber,
+            'product' => $filter_product,
+            'customer' => $filter_customer,
+            'track' => $filter_track,
+            'carrie' => $filter_carrie,
+            'orderid' => $filter_orderid,
+            'ebay' => $filter_ebay
         ]);
     }
-    public function editForm(Request $request){
+
+    public function editForm(Request $request)
+    {
         $productCates = Productcategories::all();
         $vpses = null;
         $sellers = null;
         $product = null;
-        $statusList = Objectstatus::where('tableName','products')->get();
+        $statusList = Objectstatus::where('tableName', 'products')->get();
         $order = new Orders();
         $productCategory = null;
         $productCate = 0;
@@ -158,31 +164,31 @@ class OrdersController extends Controller
         if ($request->input('productCate')) {
             $productCate = $request->integer('productCate');
         }
-        if ($productCate == 0){
+        if ($productCate == 0) {
             $productCategory = $productCates->first();
             $productCate = $productCategory->id;
-        }else{
-            $productCategory = $productCates->where('id',$productCate)->first();
+        } else {
+            $productCategory = $productCates->where('id', $productCate)->first();
         }
-        if ($productCategory){
+        if ($productCategory) {
             $productSizes = $productCategory->size_list;
             $productColors = $productCategory->color_list;
         }
         if ($request->input('id')) {
             $id = $request->integer('id');
         }
-        if ($id > 0){
+        if ($id > 0) {
             $order = Orders::findOrFail($id);
-            if ($order == null){
+            if ($order == null) {
                 $order = new Orders();
-            }else{
+            } else {
                 $product = Products::findOrFail($order->productId);
                 $product->imageDesign1 = $product->url_img_design1;
                 $product->imageDesign2 = $product->url_img_design2;
                 $vpses = Vps::where('userId', $order->userId)->get();
                 $sellers = Seller::where('userId', $order->userId)->get();
             }
-        }else{
+        } else {
             $order->userId = Auth::id();
             $order->categoryId = $productCate;
             $order->statusId = $statusList->first()->statusId;
@@ -190,18 +196,18 @@ class OrdersController extends Controller
         if ($vpses == null) {
             $vpses = Vps::where('userId', Auth::id())->get();
         }
-        if ($sellers == null){
+        if ($sellers == null) {
             $sellers = Seller::where('userId', Auth::id())->get();
         }
-        return view('orders.editForm',[
+        return view('orders.editForm', [
             'order' => $order,
-            'vpses'=> $vpses,
-            'sellers'=> $sellers,
+            'vpses' => $vpses,
+            'sellers' => $sellers,
             'productCates' => $productCates,
-            'product'=>$product,
-            'productSizes'=>$productSizes,
-            'productColors'=>$productColors,
-            'statusList'=>$statusList
+            'product' => $product,
+            'productSizes' => $productSizes,
+            'productColors' => $productColors,
+            'statusList' => $statusList
         ]);
     }
 
@@ -213,8 +219,8 @@ class OrdersController extends Controller
             'userId' => 'required'
         ]);
         $order = new Orders($request->all());
-        if ($order->productId == 0){
-            if ($request->has('productName') &&  Helper::IsNullOrEmptyString($request->input('productName'))){
+        if ($order->productId == 0) {
+            if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
                 $product->name = $request->input('productName');
                 if ($request->has('imageDesignOne')) {
@@ -228,7 +234,7 @@ class OrdersController extends Controller
                 $product->save();
                 $order->productId = $product->id;
             }
-        }else {
+        } else {
             $new_product = Products::findOrFail($order->productId);
             if ($request->has('itemId')) {
                 $new_product->itemId = $request->input('itemId');
@@ -256,9 +262,9 @@ class OrdersController extends Controller
         $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 : 1;
         $order->save();
         $SubmitButton = $request->input('SubmitButton');
-        if ($SubmitButton == 'Save'){
+        if ($SubmitButton == 'Save') {
             return back()->with('status', 'Successfully');
-        }else{
+        } else {
             return redirect()->route('orders.search', ['productCate' => $order->categoryId]);
         }
     }
@@ -273,8 +279,8 @@ class OrdersController extends Controller
         ]);
         $order = Orders::findOrFail($id);
         $order->update($request->all());
-        if ($order->productId == 0){
-            if ($request->has('productName') &&  Helper::IsNullOrEmptyString($request->input('productName'))){
+        if ($order->productId == 0) {
+            if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
                 $product->name = $request->input('productName');
                 if ($request->has('imageDesignOne')) {
@@ -288,7 +294,7 @@ class OrdersController extends Controller
                 $product->save();
                 $order->productId = $product->id;
             }
-        }else {
+        } else {
             $new_product = Products::findOrFail($order->productId);
             $new_product->update($request->all());
             $new_product->updateBy = Auth::id();
@@ -309,15 +315,55 @@ class OrdersController extends Controller
         $order->save();
         return back()->with('status', 'Successfully');
     }
+
     public function destroy($id)
     {
         $orders = Orders::findOrFail($id);
-        if ($orders){
-            if (Auth::id() != $orders->createBy && strtolower(Auth::user()->role) == 'user'){
-                return back()->with('status', 'Error')->with('message','Bạn không có quyền xóa đơn hàng này.');
+        if ($orders) {
+            if (Auth::id() != $orders->createBy && strtolower(Auth::user()->role) == 'user') {
+                return back()->with('status', 'Error')->with('message', 'Bạn không có quyền xóa đơn hàng này.');
             }
         }
         $orders->delete();
-        return back()->with('status', 'Successfully')->with('message','Xóa đơn hàng thành công.');
+        return back()->with('status', 'Successfully')->with('message', 'Xóa đơn hàng thành công.');
+    }
+
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            //'file' => 'required|mimes:xlsx,xls,csv,ods'
+            'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ]);
+
+        $file = $request->file('file');
+        $csv = Reader::createFromPath($file->getRealPath(), 'r');
+        $header = $csv->fetchOne();
+        $results = $csv->getRecords();
+        $index = 0;
+        $numberOrderUpdate= 0;
+        $orderNumberError = [];
+        if (count($header) == 6){
+
+            foreach ($results as $row) {
+                if ($index++ > 0){
+                    $order = Orders::where('orderNumber',$row[0])->get()->first();
+                    if ($order){
+                        $order->fulfillCode = $row[1];
+                        $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 :1;
+                        $order->trackingCode = $row[2];
+                        $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 :1;
+                        $order->carrier = $row[3];
+                        $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 :1;
+                        $order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4],'yes') ? 1 :0;
+                        $order->note =  $row[5];
+                        $order->save();
+                        $numberOrderUpdate++;
+                    } else{
+                        array_push($orderNumberError,$row[0] );
+                    }
+                }
+            };
+        }
+        return back()->with('status', 'Successfully')->with('message', 'Cập nhật '.$numberOrderUpdate.' đơn hàng');
     }
 }

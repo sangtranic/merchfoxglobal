@@ -171,7 +171,11 @@
                         </div>
                     </div>
                 </form>
-
+                    <form method="POST" action="{{ route('import-csv') }}" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="file" required>
+                        <button type="submit">Import</button>
+                    </form>
                 <div class="card-body table-responsive p-0">
                     <table class="table  projects table-p2">
                         <thead>
