@@ -6,8 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $orderNumber
- * @property string $channekId
- * @property string $customerInfor
+ * @property string $channelId
+ * @property string $shipToAddressID
+ * @property string $shipToAddressName
+ * @property string $shipToAddressPhone
+ * @property string $shipToAddressLine1
+ * @property string $shipToAddressLine2
+ * @property string $shipToAddressCity
+ * @property string $shipToAddressCounty
+ * @property string $shipToAddressStateOrProvince
+ * @property string $shipToAddressPostalCode
+ * @property string $shipToAddressCountry
  * @property string $note
  * @property string $itemId
  * @property string $sku
@@ -16,18 +25,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $color
  * @property string $productType
  * @property string $fulfillCode
- * @property string $fullfillUserFullName
+ * @property string $fulfillUserFullName
  * @property string $trackingCode
  * @property string $carrier
- * @property string $jsonData
  * @property int    $vpsId
+ * @property int    $sellerId
  * @property int    $statusId
+ * @property int    $categoryId
  * @property int    $quantity
  * @property int    $fulfillStatusId
  * @property int    $trackingStatusId
+ * @property int    $carrierStatusId
  * @property int    $syncStoreStatusId
- * @property int    $createDate
- * @property int    $updateDate
+ * @property int    $created_at
+ * @property int    $createBy
+ * @property int    $updated_at
+ * @property int    $updateBy
  * @property float  $price
  * @property float  $cost
  * @property float  $profit
@@ -54,7 +67,7 @@ class Orders extends Model
      * @var array
      */
     protected $fillable = [
-        'orderNumber', 'channekId', 'vpsId', 'userId', 'customerInfor', 'statusId', 'note', 'productId', 'itemId', 'sku', 'style', 'size', 'color', 'productType', 'quantity', 'price', 'cost', 'profit', 'fulfillStatusId', 'fulfillCode', 'fullfillUserFullName', 'trackingStatusId', 'trackingCode', 'carrier', 'syncStoreStatusId', 'jsonData', 'createDate', 'createBy', 'updateDate', 'updateBy'
+        'orderNumber', 'channelId', 'vpsId', 'sellerId', 'shipToAddressID', 'shipToAddressName', 'shipToAddressPhone', 'shipToAddressLine1', 'shipToAddressLine2', 'shipToAddressCity', 'shipToAddressCounty', 'shipToAddressStateOrProvince', 'shipToAddressPostalCode', 'shipToAddressCountry', 'statusId', 'note', 'categoryId', 'productId', 'itemId', 'sku', 'style', 'size', 'color', 'productType', 'quantity', 'price', 'cost', 'profit', 'isFB', 'fulfillStatusId', 'fulfillCode', 'fulfillUserFullName', 'trackingStatusId', 'trackingCode', 'carrier', 'carrierStatusId', 'syncStoreStatusId', 'created_at', 'createBy', 'updated_at', 'updateBy'
     ];
 
     /**
@@ -72,7 +85,7 @@ class Orders extends Model
      * @var array
      */
     protected $casts = [
-        'orderNumber' => 'string', 'channekId' => 'string', 'vpsId' => 'int', 'customerInfor' => 'string', 'statusId' => 'int', 'note' => 'string', 'itemId' => 'string', 'sku' => 'string', 'style' => 'string', 'size' => 'string', 'color' => 'string', 'productType' => 'string', 'quantity' => 'int', 'price' => 'double', 'cost' => 'double', 'profit' => 'double', 'fulfillStatusId' => 'int', 'fulfillCode' => 'string', 'fullfillUserFullName' => 'string', 'trackingStatusId' => 'int', 'trackingCode' => 'string', 'carrier' => 'string', 'syncStoreStatusId' => 'int', 'jsonData' => 'string', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'orderNumber' => 'string', 'channelId' => 'string', 'vpsId' => 'int', 'sellerId' => 'int', 'shipToAddressID' => 'string', 'shipToAddressName' => 'string', 'shipToAddressPhone' => 'string', 'shipToAddressLine1' => 'string', 'shipToAddressLine2' => 'string', 'shipToAddressCity' => 'string', 'shipToAddressCounty' => 'string', 'shipToAddressStateOrProvince' => 'string', 'shipToAddressPostalCode' => 'string', 'shipToAddressCountry' => 'string', 'statusId' => 'int', 'note' => 'string', 'categoryId' => 'int', 'itemId' => 'string', 'sku' => 'string', 'style' => 'string', 'size' => 'string', 'color' => 'string', 'productType' => 'string', 'quantity' => 'int', 'price' => 'double', 'cost' => 'double', 'profit' => 'double', 'fulfillStatusId' => 'int', 'fulfillCode' => 'string', 'fulfillUserFullName' => 'string', 'trackingStatusId' => 'int', 'trackingCode' => 'string', 'carrier' => 'string', 'carrierStatusId' => 'int', 'syncStoreStatusId' => 'int', 'created_at' => 'timestamp', 'createBy' => 'int', 'updated_at' => 'timestamp', 'updateBy' => 'int'
     ];
 
     /**
@@ -81,7 +94,7 @@ class Orders extends Model
      * @var array
      */
     protected $dates = [
-        'createDate', 'updateDate'
+        'created_at', 'updated_at'
     ];
 
     /**

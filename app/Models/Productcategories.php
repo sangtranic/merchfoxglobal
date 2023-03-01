@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helper\Helper;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -92,6 +93,25 @@ class Productcategories extends Model
     // Scopes...
 
     // Functions ...
+    function getSizeListAttribute(){
+        if(!Helper::IsNullOrEmptyString($this->sizes)){
+            return explode(",",$this->sizes);
+        }
+        return [];
+    }
+    function getColorListAttribute(){
+        if(!Helper::IsNullOrEmptyString($this->colors)){
+            return explode(",",$this->colors);
+        }
+        return [];
+    }
+    function getKeywordListAttribute(){
+        if(!Helper::IsNullOrEmptyString($this->keyword)){
+            return explode(",",$this->keyword);
+        }
+        return [];
+    }
+
 
     // Relations ...
 }

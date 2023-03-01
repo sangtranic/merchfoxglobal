@@ -112,6 +112,7 @@
                             </td>
                             <td>
                                 <a href="{{$product->url}}" title="{{$product->name}}">{{$product->name}}</a>
+                                <p><b>{{$product->itemId}}</b></p>
                             </td>
                             <td>
                                 <p>{{$cate->name}}</b></p>

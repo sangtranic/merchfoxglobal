@@ -52,7 +52,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarOrdersDropdown">
                         <a href="{{route('orders.index')}}" class="dropdown-item">Orders</a>
                         @foreach ($productCates as $category)
-                            <a href="{{route('orders.detail', ['id' => $category->id])}}" class="dropdown-item">{{$category->name}}</a>
+                            <a href="{{route('orders.search', ['productCate' => $category->id])}}" class="dropdown-item">{{$category->name}}</a>
                         @endforeach
                     </div>
                 </li>
