@@ -157,7 +157,7 @@
                             <button class="btn btn-sm btn-default"><i class="fas fa-file-export"></i> Up
                                 Track Ebay
                             </button>
-                            <a href="javascript:void(0);">
+                            <a href="javascript:void(0);" onclick="exprort()">
                                 <div class="btn btn-sm btn-default"><i class="fas fa-file-export"></i> Xuất CSV</div>
                             </a>
 
@@ -369,7 +369,48 @@
 
     <!-- Select2 -->
     <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
+
     <script>
+        function exprort()
+        {
+            var dateFrom = $('#dateFrom').val();
+            var dateTo = $('#dateTo').val();
+            var productCate = $('select[name="productCate"]').val();
+            var userId = $('select[name="user"]').val();
+            var vps = $('select[name="vps"]').val();
+            var orderNumber =$('input[id="txtOrderNumber"]').val();
+            var productName =$('input[id="txtProduct"]').val();
+            var keyword =$('input[id="txtKeyword"]').val();
+            var customer =$('input[id="txtCustomer"]').val();
+            var slTrack = $('select[id="slTrack"]').val();
+            var slVps = $('select[id="slVps"]').val();
+            var slEbayStatus = $('select[id="slEbayStatus"]').val();
+            $.ajax({
+                url: "/export-to-csv",
+                type: "get",
+                data: {
+                    'dateFrom': dateFrom,
+                    'dateTo': dateTo,
+                    'productCate': productCate,
+                    'userId' : userId,
+                    'vps' : vps,
+                    'orderNumber' : orderNumber,
+                    'productName' : productName,
+                    'keyword' : keyword,
+                    'customer' : customer,
+                    'slTrack' : slTrack,
+                    'slVps' : slVps,
+                    'slEbayStatus' : slEbayStatus
+                },
+                success: function (response) {
+
+                    // You will get response from your PHP page (what you echo or print)
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        }
         function confirmDelete(event, id) {
             event.preventDefault();
             if (confirm('Bạn có chắc chắn xóa đơn này không?')) {
@@ -380,8 +421,6 @@
         function submitForm() {
             document.forms['myForm'].submit();
         }
-    </script>
-    <script>
         $(function () {
             //Initialize Select2 Elements
             $('.select2').select2();

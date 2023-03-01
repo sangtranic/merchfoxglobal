@@ -14,6 +14,8 @@ use App\Models\Vps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use League\Csv\Reader;
+use Illuminate\Http\Response;
+use League\Csv\Writer;
 use const http\Client\Curl\AUTH_ANY;
 
 class OrdersController extends Controller
@@ -327,7 +329,65 @@ class OrdersController extends Controller
         $orders->delete();
         return back()->with('status', 'Successfully')->with('message', 'Xóa đơn hàng thành công.');
     }
+    //
 
+    public function exportToCsv()
+    {
+        //$dateFrom, $dateTo, $productCate, $userId, $vps, $orderNumber, $productName, $keyword,
+        //                                       $customer, $slTrack, $slVps, $slEbayStatus
+        // Array data to export
+        $query = Orders::query();
+        $filter_dateFrom = request('dateFrom') ? request('dateFrom') : "";
+        $filter_dateTo = request('dateTo')?request('dateTo'):"";
+        $filter_productCateId = request('productCate')?request('productCate'):0;
+        $filter_user = request('userId')?request('userId'):0;
+        $filter_vps = request('vps')?request('vps'):0;
+        $filter_orderNumber = request('orderNumber')?request('orderNumber'):'';
+        $filter_product = request('productName')?request('productName'):'';
+        $filter_customer = request('customer')?request('customer'):'';
+        $filter_track = request('slTrack')?request('slTrack'):0;
+        //$filter_carrie = request('dateTo')?request('dateTo'):0;
+        $filter_orderid = 0;
+        $filter_ebay = request('slEbayStatus')?request('slEbayStatus'):0;
+        $statusFilter = request('status');
+        $data = [
+            ['order_number', 'fullfi_number','track_code','carrier','update_ebay','note']
+        ];
+        if (request('productCate')) {
+            $filter_productCateId = request('productCate');
+        }
+
+        if ($filter_dateFrom && $filter_dateTo) {
+            $query->whereBetween('created_at', [$filter_dateFrom, $filter_dateTo]);
+        } else if ($filter_dateFrom) {
+            $query->whereDate('created_at', '>=', $filter_dateFrom);
+        } else if ($filter_dateTo) {
+            $query->whereDate('created_at', '<=', $filter_dateTo);
+        }
+        $counter = $query->count();
+        $orders = $query->get();
+        $listOrderPluck = $orders->pluck(['orderNumber','fulfillCode','trackingCode','carrier','syncStoreStatusId','note']);
+        foreach ($listOrderPluck as $row) {
+            $row->syncStoreStatusId = $row->syncStoreStatusId==1?"yes":"no";
+            array_push($data,$row);
+        }
+        // Create a new CSV writer
+        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+
+        // Insert the data into the CSV
+        $csv->insertAll($data);
+
+        // Set the response headers
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+        ];
+
+        // Create the HTTP response with the CSV file
+        $response = new Response($csv->__toString(), 200, $headers);
+
+        return $response;
+    }
     public function importCsv(Request $request)
     {
         $request->validate([
