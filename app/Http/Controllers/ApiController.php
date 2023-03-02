@@ -77,8 +77,10 @@ class ApiController extends Controller
             $keyword = $request->input('q');
             if (Str::length($keyword) > 1){
                 $role = Auth::user()->role;
-                $query =  Products::where('name', 'like', "%$keyword%")
-                    ->orWhere('description', 'like', "%$keyword%");
+                $query =  Products::where(function ($_q) use ($keyword) {
+                    $_q->where( 'name', 'like', '%'.$keyword.'%')->orWhere('description', 'like', '%'.$keyword.'%');
+                });
+
                 if ($role == 'user'){
                     $query->where('createBy', Auth::id());
                 }

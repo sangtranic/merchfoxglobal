@@ -155,19 +155,19 @@
                     <div class="form-group row">
                         {{ Form::label('quantity','Quantity',['class'=>'col-sm-1 col-form-label'])}}
                         <div class="col-sm-2">
-                            {{ Form::text('quantity', null, array('class' => 'form-control')) }}
+                            {{ Form::number('quantity', null, array('class' => 'form-control')) }}
                         </div>
                         {{ Form::label('price','Price',['class'=>'col-sm-1 col-form-label'])}}
                         <div class="col-sm-2">
-                            {{ Form::text('price', null, array('class' => 'form-control')) }}
+                            {{ Form::number('price', null, array('class' => 'form-control','step' => 'any')) }}
                         </div>
                         {{ Form::label('cost','Cost',['class'=>'col-sm-1 col-form-label'])}}
                         <div class="col-sm-2">
-                            {{ Form::text('cost', null, array('class' => 'form-control')) }}
+                            {{ Form::number('cost', null, array('class' => 'form-control','step' => 'any')) }}
                         </div>
                         {{ Form::label('profit','Profit',['class'=>'col-sm-1 col-form-label'])}}
                         <div class="col-sm-2">
-                            {{ Form::text('profit', null, array('class' => 'form-control')) }}
+                            {{ Form::number('profit', null, array('class' => 'form-control','step' => 'any')) }}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -283,22 +283,22 @@
                         <label class="col-sm-6 col-form-label">Thiết kế</label>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewOne}}"/>
+                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewOne :""}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewTwo}}"/>
+                                <img width="100%" id="imgPreview2" src="{{$product ? $product->urlImagePreviewTwo :""}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign1" src="{{$product ? $product->imageDesign1}}"/>
+                                <img width="100%" id="imgDesign1" src="{{$product ? $product->imageDesign1 :""}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign2" src="{{$product ? $product->imageDesign1}}"/>
+                                <img width="100%" id="imgDesign2" src="{{$product ? $product->imageDesign2 :""}}"/>
                             </div>
                         </div>
                     </div>

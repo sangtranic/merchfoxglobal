@@ -62,6 +62,8 @@ Route::get('orders/{id}', [Controllers\OrdersController::class, 'detail'])->name
 Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->name('orders.search');
 Route::post('orders-index-post', [Controllers\OrdersController::class, 'indexPost'])->name('orders.indexPost');
 
+Route::get('/export-csv', [OrdersController::class, 'exportCSV'])->name('export-csv');
+Route::get('/export-up-ebay', [OrdersController::class, 'exportUpToEbay'])->name('export-up-ebay');
 
 Route::get('/export-to-csv', [OrdersController::class, 'exportToCsv'])->name('export-to-csv');
 Route::post('/import-csv', [OrdersController::class, 'importCsv'])->name('import-csv');

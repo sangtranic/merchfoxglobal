@@ -28,50 +28,8 @@ class OrdersController extends Controller
 
     public function index()
     {
-        $productCates = Productcategories::all();
-        $users = Users::all();
-        $orders = Orders::paginate(2);
-        $sellers = Seller::all();
-        $counter = Orders::count();
-        $filter_dateFrom = '';
-        $filter_dateTo = '';
-        $filter_productCateId = 0;
-        $filter_user = 0;
-        $filter_vps = 1;
-        $filter_orderNumber = '';
-        $filter_product = '';
-        $filter_customer = '';
-        $filter_track = 0;
-        $filter_carrie = 0;
-        $filter_orderid = 0;
-        $filter_ebay = 0;
-        $showProducts = null;
-        $vpses = Vps::where('id', $filter_vps)->get();
-        if (!($orders->isEmpty())) {
-            $productIds = $orders->pluck('productId')->toArray();
-            $showProducts = Products::whereIn('id', $productIds)->get();
-        }
-        return view('orders.index', [
-            'orders' => $orders,
-            'users' => $users,
-            'vpses' => $vpses,
-            'sellers' => $sellers,
-            'productCates' => $productCates,
-            'showProducts' => $showProducts,
-            'counter' => $counter,
-            'dateFrom' => $filter_dateFrom,
-            'dateTo' => $filter_dateTo,
-            'productCate' => $filter_productCateId,
-            'user' => $filter_user,
-            'vps' => $filter_vps,
-            'orderNumber' => $filter_orderNumber,
-            'product' => $filter_product,
-            'customer' => $filter_customer,
-            'track' => $filter_track,
-            'carrie' => $filter_carrie,
-            'orderid' => $filter_orderid,
-            'ebay' => $filter_ebay
-        ]);
+        $model = $this->getIndexModel();
+        return view('orders.index', $model);
     }
 
     public function indexPost(Request $request)
@@ -81,36 +39,87 @@ class OrdersController extends Controller
 
     public function search(Request $request)
     {
+        $model = $this->getIndexModel($request);
+        return view('orders.index', $model);
+    }
+
+    private function getIndexModel(Request $request = null)
+    {
+
         $productCates = Productcategories::all();
         $users = Users::all();
-        $vpses = Vps::all();
+        $vpses = null;
         $sellers = null;
-        if (Auth::user()->role == 'admin') {
-            $sellers = Seller::all();
-        } else {
-            $sellers = Seller::where('userId', Auth::id())->get();
-        }
         $query = Orders::query();
+        $products = null;
         $filter_dateFrom = '';
         $filter_dateTo = '';
         $filter_productCateId = 0;
-        $filter_user = 0;
+        $filter_seller = 0;
         $filter_vps = 0;
         $filter_orderNumber = '';
         $filter_product = '';
+        $filter_keyword = '';
         $filter_customer = '';
-        $filter_track = 0;
-        $filter_carrie = 0;
-        $filter_orderid = 0;
-        $filter_ebay = 0;
-        if ($request->input('productCate')) {
-            $filter_productCateId = $request->integer('productCate');
+        $filter_trackStatusId = 0;
+        $filter_carrieStatusId = 0;
+        $filter_orderId = 0;
+        $filter_syncStoreStatusId =0;
+        $filter_isFB = 0;
+        $filter_sellerIds = [];
+        $filter_vpsIds = [];
+        if (Auth::user()->role == 'admin') {
+            $sellers = Seller::all();
+            $vpses = Vps::all();
+        } else {
+            $sellers = Seller::where('userId', Auth::id())->get();
+            $vpses = Vps::where('userId', Auth::id())->get();
+            $filter_sellerIds = $sellers->pluck('id')->toArray();
+            $filter_vpsIds = $vpses->pluck('id')->toArray();
         }
-        if ($request->input('dateFrom')) {
-            $filter_dateFrom = $request->input('dateFrom');
-        }
-        if ($request->input('dateTo')) {
-            $filter_dateTo = $request->input('dateTo');
+        if ($request != null) {
+            if ($request->input('productCate')) {
+                $filter_productCateId = $request->integer('productCate');
+            }
+            if ($request->input('dateFrom')) {
+                $filter_dateFrom = $request->input('dateFrom');
+            }
+            if ($request->input('dateTo')) {
+                $filter_dateTo = $request->input('dateTo');
+            }
+            if ($request->input('vps')) {
+                $filter_vps = $request->integer('vps');
+            }
+            if ($request->input('seller')) {
+                $filter_seller = $request->integer('seller');
+            }
+            if ($request->input('orderNumber')) {
+                $filter_orderNumber = $request->input('orderNumber');
+            }
+            if ($request->input('product')) {
+                $filter_product = $request->integer('product');
+            }
+            if ($request->input('keyword')) {
+                $filter_keyword = $request->input('keyword');
+            }
+            if ($request->input('customer')) {
+                $filter_customer = $request->input('customer');
+            }
+            if ($request->input('trackingStatus')) {
+                $filter_trackStatusId = $request->integer('trackingStatus');
+            }
+            if ($request->input('carrieStatus')) {
+                $filter_carrieStatusId = $request->integer('carrieStatus');
+            }
+            if ($request->input('syncStoreStatus')) {
+                $filter_syncStoreStatusId = $request->integer('syncStoreStatus');
+            }
+            if ($request->input('isFB')) {
+                $filter_isFB = $request->integer('isFB');
+            }
+            if ($request->input('orderId')) {
+                $filter_orderId = $request->integer('orderId');
+            }
         }
         if ($filter_dateFrom && $filter_dateTo) {
             $query->whereBetween('created_at', [$filter_dateFrom, $filter_dateTo]);
@@ -119,6 +128,62 @@ class OrdersController extends Controller
         } else if ($filter_dateTo) {
             $query->whereDate('created_at', '<=', $filter_dateTo);
         }
+        if ($filter_productCateId > 0) {
+            $query->where('categoryId', $filter_productCateId);
+        }
+        if ($filter_seller == 0 && count($filter_sellerIds) > 0) {
+            $query->whereIn('sellerId', $filter_sellerIds);
+        } else if ($filter_seller > 0) {
+            $query->where('sellerId', $filter_seller);
+        }
+
+        if ($filter_vps == 0 && count($filter_vpsIds) > 0) {
+            $query->whereIn('vpsId', $filter_vpsIds);
+        } else if ($filter_vps > 0) {
+            $query->where('vpsId', $filter_vps);
+        }
+        if (strlen($filter_orderNumber)) {
+            $query->where('orderNumber', 'like', '%' . $filter_orderNumber . '%');
+        }
+        if ($filter_product > 0) {
+            $query->where('productId', $filter_product);
+        }
+        if (strlen($filter_keyword)) {
+            $query->where(function ($_query) use ($filter_keyword) {
+                $_query->where('fulfillCode', 'like', '%' . $filter_keyword . '%')
+                    ->orWhere('trackingCode', 'like', '%' . $filter_keyword . '%')
+                    ->orWhere('carrier', 'like', '%' . $filter_keyword . '%');
+            });
+        }
+
+        if (strlen($filter_customer)) {
+            $query->where(function ($_query) use ($filter_customer) {
+                $_query->where('shipToAddressID', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressName', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressPhone', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressLine1', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressLine2', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressCity', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressCounty', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressStateOrProvince', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressPostalCode', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToAddressCountry', 'like', '%' . $filter_customer . '%');
+            });
+        }
+        if ($filter_trackStatusId > 0) {
+            $query->where('trackingStatusId', $filter_trackStatusId == 2 ? 0 : $filter_trackStatusId);
+        }
+        if ($filter_carrieStatusId > 0) {
+            $query->where('carrierStatusId', $filter_carrieStatusId == 2 ? 0 : $filter_carrieStatusId);
+        }
+        if ($filter_syncStoreStatusId > 0) {
+            $query->where('syncStoreStatusId', $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
+        }
+        if ($filter_isFB > 0) {
+            $query->where('isFB', $filter_isFB == 2 ? 0 : $filter_isFB);
+        }
+
+
         $counter = $query->count();
         $orders = $query->paginate(2);
 
@@ -127,7 +192,7 @@ class OrdersController extends Controller
             $productIds = $orders->pluck('productId')->toArray();
             $showProducts = Products::whereIn('id', $productIds)->get();
         }
-        return view('orders.index', [
+        return [
             'orders' => $orders,
             'users' => $users,
             'vpses' => $vpses,
@@ -138,17 +203,20 @@ class OrdersController extends Controller
             'dateFrom' => $filter_dateFrom,
             'dateTo' => $filter_dateTo,
             'productCate' => $filter_productCateId,
-            'user' => $filter_user,
+            'seller' => $filter_seller,
             'vps' => $filter_vps,
             'orderNumber' => $filter_orderNumber,
             'product' => $filter_product,
+            'keyword'=>$filter_keyword,
             'customer' => $filter_customer,
-            'track' => $filter_track,
-            'carrie' => $filter_carrie,
-            'orderid' => $filter_orderid,
-            'ebay' => $filter_ebay
-        ]);
+            'track' => $filter_trackStatusId,
+            'carrie' => $filter_carrieStatusId,
+            'orderId' => $filter_orderId,
+            'ebay' => $filter_syncStoreStatusId,
+            'isFB'=>$filter_isFB
+        ];
     }
+
 
     public function editForm(Request $request)
     {
@@ -329,7 +397,66 @@ class OrdersController extends Controller
         $orders->delete();
         return back()->with('status', 'Successfully')->with('message', 'Xóa đơn hàng thành công.');
     }
+
     //
+    public function exportCSV(Request $request)
+    {
+        $model = $this->getIndexModel($request);
+        //dump($model);
+        $data = [
+            ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note']
+        ];
+        $listOrderPluck = $model['orders']->map(function ($user) {
+            return collect($user->toArray())
+                ->only(['orderNumber', 'fulfillCode', 'trackingCode', 'carrier', 'syncStoreStatusId', 'note'])
+                ->all();
+        });
+        foreach ($listOrderPluck as $row) {
+            $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
+            array_push($data, $row);
+        }
+
+        // Create a new CSV writer
+        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+        // Insert the data into the CSV
+        $csv->insertAll($data);
+
+        return response((string)$csv, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Content-Encoding' => 'UTF-8',
+            'Content-Transfer-Encoding' => 'binary',
+            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+        ]);
+    }
+    public function exportUpToEbay(Request $request)
+    {
+        $model = $this->getIndexModel($request);
+        //dump($model);
+        $data = [
+            ['Order ID', 'Line Item ID', 'Logistics Status', 'Shipment Carrier', 'Shipment Tracking', 'Remove this column']
+        ];
+        $listOrderPluck = $model['orders']->map(function ($user) {
+            return collect($user->toArray())
+                ->only(['orderNumber', 'itemId', 'carrier', 'trackingCode'])
+                ->all();
+        });
+        foreach ($listOrderPluck as $row) {
+            $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
+            array_push($data, [$row['orderNumber'], $row['itemId'], '', $row['carrier'], $row['trackingCode'],'' ]);
+        }
+
+        // Create a new CSV writer
+        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+        // Insert the data into the CSV
+        $csv->insertAll($data);
+
+        return response((string)$csv, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Content-Encoding' => 'UTF-8',
+            'Content-Transfer-Encoding' => 'binary',
+            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+        ]);
+    }
 
     public function exportToCsv()
     {
@@ -338,20 +465,20 @@ class OrdersController extends Controller
         // Array data to export
         $query = Orders::query();
         $filter_dateFrom = request('dateFrom') ? request('dateFrom') : "";
-        $filter_dateTo = request('dateTo')?request('dateTo'):"";
-        $filter_productCateId = request('productCate')?request('productCate'):0;
-        $filter_user = request('userId')?request('userId'):0;
-        $filter_vps = request('vps')?request('vps'):0;
-        $filter_orderNumber = request('orderNumber')?request('orderNumber'):'';
-        $filter_product = request('productName')?request('productName'):'';
-        $filter_customer = request('customer')?request('customer'):'';
-        $filter_track = request('slTrack')?request('slTrack'):0;
+        $filter_dateTo = request('dateTo') ? request('dateTo') : "";
+        $filter_productCateId = request('productCate') ? request('productCate') : 0;
+        $filter_user = request('userId') ? request('userId') : 0;
+        $filter_vps = request('vps') ? request('vps') : 0;
+        $filter_orderNumber = request('orderNumber') ? request('orderNumber') : '';
+        $filter_product = request('productName') ? request('productName') : '';
+        $filter_customer = request('customer') ? request('customer') : '';
+        $filter_track = request('slTrack') ? request('slTrack') : 0;
         //$filter_carrie = request('dateTo')?request('dateTo'):0;
         $filter_orderid = 0;
-        $filter_ebay = request('slEbayStatus')?request('slEbayStatus'):0;
+        $filter_ebay = request('slEbayStatus') ? request('slEbayStatus') : 0;
         $statusFilter = request('status');
         $data = [
-            ['order_number', 'fullfi_number','track_code','carrier','update_ebay','note']
+            ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note']
         ];
         if (request('productCate')) {
             $filter_productCateId = request('productCate');
@@ -366,10 +493,10 @@ class OrdersController extends Controller
         }
         $counter = $query->count();
         $orders = $query->get();
-        $listOrderPluck = $orders->pluck(['orderNumber','fulfillCode','trackingCode','carrier','syncStoreStatusId','note']);
+        $listOrderPluck = $orders->pluck(['orderNumber', 'fulfillCode', 'trackingCode', 'carrier', 'syncStoreStatusId', 'note']);
         foreach ($listOrderPluck as $row) {
-            $row->syncStoreStatusId = $row->syncStoreStatusId==1?"yes":"no";
-            array_push($data,$row);
+            $row->syncStoreStatusId = $row->syncStoreStatusId == 1 ? "yes" : "no";
+            array_push($data, $row);
         }
         // Create a new CSV writer
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
@@ -388,6 +515,7 @@ class OrdersController extends Controller
 
         return $response;
     }
+
     public function importCsv(Request $request)
     {
         $request->validate([
@@ -400,30 +528,30 @@ class OrdersController extends Controller
         $header = $csv->fetchOne();
         $results = $csv->getRecords();
         $index = 0;
-        $numberOrderUpdate= 0;
+        $numberOrderUpdate = 0;
         $orderNumberError = [];
-        if (count($header) == 6){
+        if (count($header) == 6) {
 
             foreach ($results as $row) {
-                if ($index++ > 0){
-                    $order = Orders::where('orderNumber',$row[0])->get()->first();
-                    if ($order){
+                if ($index++ > 0) {
+                    $order = Orders::where('orderNumber', $row[0])->get()->first();
+                    if ($order) {
                         $order->fulfillCode = $row[1];
-                        $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 :1;
+                        $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 : 1;
                         $order->trackingCode = $row[2];
-                        $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 :1;
+                        $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 : 1;
                         $order->carrier = $row[3];
-                        $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 :1;
-                        $order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4],'yes') ? 1 :0;
-                        $order->note =  $row[5];
+                        $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 : 1;
+                        $order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4], 'yes') ? 1 : 0;
+                        $order->note = $row[5];
                         $order->save();
                         $numberOrderUpdate++;
-                    } else{
-                        array_push($orderNumberError,$row[0] );
+                    } else {
+                        array_push($orderNumberError, $row[0]);
                     }
                 }
             };
         }
-        return back()->with('status', 'Successfully')->with('message', 'Cập nhật '.$numberOrderUpdate.' đơn hàng');
+        return back()->with('status', 'Successfully')->with('message', 'Cập nhật ' . $numberOrderUpdate . ' đơn hàng');
     }
 }
