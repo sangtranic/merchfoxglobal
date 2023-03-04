@@ -227,8 +227,8 @@
                         <label for="productId" class="col-sm-2 col-form-label">Tên sản phẩm</label>
                         <div class="col-sm-10">
                             <select class="form-control select2-auto"
-                                    data-href="{{route('api-products-search')}}"
-                                    data-url="{{route('api-product-detail')}}"
+                                    data-href="{{secure_url('api-products-search')}}"
+                                    data-url="{{secure_url('api-product-detail')}}"
                                     id="productId"
                                     name="productId"
                                     tyle="width: 100%;">

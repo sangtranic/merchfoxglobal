@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Collection;?>
             <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <h1 class="m-0"> Thống kê đơn hàng <?php echo (count($listOrder))?></h1>
+                        <h1 class="m-0">Thống kê đơn hàng</h1>
                     </div><!-- /.col -->
 
                 </div><!-- /.row -->
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Collection;?>
                         <!-- LINE CHART -->
                         <div class="card card-info">
                             <div class="card-header">
-                                <h3 class="card-title">Đơn T-Shirt</h3>
+                                <h3 class="card-title">Đơn hàng</h3>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" data-offset="-52" aria-expanded="false">
                                         chọn user
