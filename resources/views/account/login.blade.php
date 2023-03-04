@@ -4,12 +4,14 @@
 
     <div class="login-box">
         <div class="login-logo">
-            <a href="index.html"><b>Admin</b>SELLER</a>
+            <a href="{{route('home')}}" title="Home" class="navbar-brand" style="max-width: 100%; margin: 0px">
+                <img src="{{asset('dist/img/logo.png')}}" alt="AdminSELLER Logo" class="brand-image" style="max-width: 100%;">
+            </a>
         </div>
         <!-- /.login-logo -->
         <div class="card">
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">Merchfox Global</p>
                 @if (session('status'))
                     <div class="alert alert-success">
                         {{ session('status') }}
