@@ -5,7 +5,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 -->
 <html lang="en">
 <head>
-    <meta charset="utf-8">s
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title')</title>
     <link href="{{asset('dist/img/favicon.ico')}}" rel="shortcut icon" type=image/x-icon>
@@ -18,9 +18,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     @yield('head')
     <link rel="stylesheet" href="{{asset('dist/css/custom.css')}}">
 </head>
-<body class="hold-transition layout-top-nav">
-<div class="wrapper">
-
+<body class="hold-transition layout-top-nav"><div class="wrapper">
     <!-- Navbar -->
     <x-header />
 

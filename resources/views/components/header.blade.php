@@ -2,7 +2,7 @@
     <div class="container">
         <a href="{{route('home')}}" title="Home" class="navbar-brand">
             <img src="{{asset('dist/img/logo1.png')}}" alt="AdminSELLER Logo" class="brand-image" style="opacity: .8">
-            <span class="brand-text font-weight-light">Merchfox Global</span>
+            <span class="brand-text" style="font-size: 30px;font-weight: bold">Merchfox Global</span>
         </a>
 
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
