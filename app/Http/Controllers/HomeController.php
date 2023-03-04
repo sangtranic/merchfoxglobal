@@ -30,27 +30,32 @@ class HomeController extends Controller
     {
         $dateTo = Carbon::now();
         $dateFrom = Carbon::now()->addDays(-30);
-        $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'));
+
         $listUser= $this->UserRepo->getAll();
         $listUser = $listUser->where('statusId', '=', 3);
-        $listUserAdd = $listUser;
         if(Auth::user()->role != "admin")
         {
             $listUserAdd = $listUser->where('id', '=', Auth::user()->id);
+            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),Auth::user()->id);
+        }else{
+            $listUserAdd = $listUser;
+            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),0);
         }
 
-
-        $dateOrders = $listOrder->map(function ($order) {
-            return [
-                'id' => $order->id,
-                'orderNumber' => $order->orderNumber,
-                'vpsId' => $order->vpsId,
-                'userId' => $order->userId,
-                'userName' => $order->userName,
-                'created_at' => date('Y-m-d', strtotime($order->created_at))
-            ];
-        });
-        //dump($dateOrders);
+        $dateOrders = collect([]);
+        if(isset($listOrder) && count($listOrder)>0)
+        {
+            $dateOrders = $listOrder->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'orderNumber' => $order->orderNumber,
+                    'vpsId' => $order->vpsId,
+                    'userId' => $order->userId,
+                    'userName' => $order->userName,
+                    'created_at' => date('Y-m-d', strtotime($order->created_at))
+                ];
+            });
+        }
         return view('home.index', ['listUser'=>$listUserAdd,'listOrder'=>$dateOrders,'arrOrder'=>$listOrder->toArray()]);
     }
 }

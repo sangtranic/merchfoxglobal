@@ -18,7 +18,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         return \App\Models\Orders::find($id);
     }
 
-    public function search($dateFrom, $dateTo)
+    public function search($dateFrom, $dateTo,$userId)
     {
         $query = DB::table('orders')
             ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
@@ -30,6 +30,10 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             $query->whereDate('created_at', '>=', $dateFrom);
         } else if ($dateTo) {
             $query->whereDate('created_at', '<=', $dateTo);
+        }
+        if($userId>0)
+        {
+            $query->where('users.id', '=', $userId);
         }
         $query->where('users.statusId', '=', 3);
         //$sql = $query->toSql();

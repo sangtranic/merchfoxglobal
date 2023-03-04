@@ -38,7 +38,6 @@
                         <div class="col-md-6">
                             <div class="text-right">
                                 <div class="card-tools">
-                                    <a href="{{ route('export-to-csv') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Xuất Exel</div></a>
                                     <a href="{{ route('users.create') }}" class="btn btn-info"><div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div></a>
                                 </div>
                             </div>

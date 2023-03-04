@@ -6,5 +6,5 @@ use App\Repositories\RepositoryInterface;
 interface OrderRepositoryInterface extends RepositoryInterface
 {
     public function get($id);
-    public function search($dateFrom, $dateTo);
+    public function search($dateFrom, $dateTo,$userId);
 }

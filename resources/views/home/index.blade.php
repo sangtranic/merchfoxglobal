@@ -183,11 +183,17 @@ use Illuminate\Support\Facades\Collection;?>
         $arrDateStr = "";
         for ($index=30; $index>=0;$index--) {
             $date = Carbon::now()->addDays(-$index)->format('Y-m-d');
-            $listOrderByDate = $listOrder->filter(function ($item) use ($date) {
-                return $item['created_at'] === $date;
-            });
+            $count = 0;
+            if(isset($listOrder)&& count($listOrder)>0)
+            {
+                $listOrderByDate = $listOrder->filter(function ($item) use ($date) {
+                    return $item['created_at'] === $date;
+                });
+                $count =count($listOrderByDate);
+            }
+
             $arrDateStr =$arrDateStr.'"'.$date.'"'.($index==0?"":",");
-            $obj = (object) ['date' => $date, 'count' => count($listOrderByDate)];
+            $obj = (object) ['date' => $date, 'count' => $count];
             array_push($arrDate, $obj);
         }
         //$listUser
@@ -216,19 +222,27 @@ use Illuminate\Support\Facades\Collection;?>
                     echo( '['.$arrDateStr.']'.($index==count($listUser)-1?"":","));
                 } ?>],
             "arrUserY":[<?php
-                for ($index=0; $index< count($listUser);$index++)
-                {
-                    $userId = $listUser[$index]->id;
+                $intdexUser = 0;
+                foreach ($listUser as $user) {
+                    $userId = $user->id;
                     $strValue = "[";
                     for ($indexDay=30; $indexDay>=0;$indexDay--) {
                         $date = Carbon::now()->addDays(-$indexDay)->format('Y-m-d');
-                        $listOrderByDate = $listOrder->filter(function ($item) use ($date,$userId) {
-                            return $item['created_at'] === $date && $item['userId']==$userId;
-                        });
-                        $strValue =$strValue.count($listOrderByDate).($indexDay==0?"":",");
+
+                        $count = 0;
+                        if(isset($listOrder)&& count($listOrder)>0)
+                        {
+                            $listOrderByDate = $listOrder->filter(function ($item) use ($date,$userId) {
+                                return $item['created_at'] === $date && $item['userId']==$userId;
+                            });
+                            $count =count($listOrderByDate);
+                        }
+                        $strValue =$strValue.$count.($indexDay==0?"":",");
                     }
-                    echo( $strValue.']'.($index==count($listUser)-1?"":","));
-                } ?>]};
+                    echo( $strValue.']'.($intdexUser==count($listUser)-1?"":","));
+                    $intdexUser++;
+                    // Code xử lý thêm ở đây
+                }?>]};
         var updateChart = function() {
 
             myChartCustom.data.labels = response.arrX;
