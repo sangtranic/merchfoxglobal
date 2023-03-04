@@ -4,6 +4,7 @@ namespace App\Helper;
 
 class Helper
 {
+    public static $IMG_DEFAULT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
     public static $RoleKey= "MerchfoxUserRole";
     public static function getListStatus()
     {

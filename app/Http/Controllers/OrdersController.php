@@ -11,8 +11,11 @@ use App\Models\Products;
 use App\Models\Seller;
 use App\Models\Users;
 use App\Models\Vps;
+use Carbon\Carbon;
+use Faker\Core\DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 use Illuminate\Http\Response;
 use League\Csv\Writer;
@@ -43,7 +46,7 @@ class OrdersController extends Controller
         return view('orders.index', $model);
     }
 
-    private function getIndexModel(Request $request = null)
+    private function getIndexModel(Request $request = null, $isAll = false)
     {
 
         $productCates = Productcategories::all();
@@ -129,24 +132,24 @@ class OrdersController extends Controller
             $query->whereDate('created_at', '<=', $filter_dateTo);
         }
         if ($filter_productCateId > 0) {
-            $query->where('categoryId', $filter_productCateId);
+            $query->where('categoryId',"=", $filter_productCateId);
         }
         if ($filter_seller == 0 && count($filter_sellerIds) > 0) {
-            $query->whereIn('sellerId', $filter_sellerIds);
+            $query->whereIn('sellerId',"=", $filter_sellerIds);
         } else if ($filter_seller > 0) {
-            $query->where('sellerId', $filter_seller);
+            $query->where('sellerId',"=", $filter_seller);
         }
 
         if ($filter_vps == 0 && count($filter_vpsIds) > 0) {
-            $query->whereIn('vpsId', $filter_vpsIds);
+            $query->whereIn('vpsId',"=", $filter_vpsIds);
         } else if ($filter_vps > 0) {
-            $query->where('vpsId', $filter_vps);
+            $query->where('vpsId',"=", $filter_vps);
         }
         if (strlen($filter_orderNumber)) {
             $query->where('orderNumber', 'like', '%' . $filter_orderNumber . '%');
         }
         if ($filter_product > 0) {
-            $query->where('productId', $filter_product);
+            $query->where('productId',"=", $filter_product);
         }
         if (strlen($filter_keyword)) {
             $query->where(function ($_query) use ($filter_keyword) {
@@ -171,21 +174,25 @@ class OrdersController extends Controller
             });
         }
         if ($filter_trackStatusId > 0) {
-            $query->where('trackingStatusId', $filter_trackStatusId == 2 ? 0 : $filter_trackStatusId);
+            $query->where('trackingStatusId',"=", $filter_trackStatusId == 2 ? 0 : $filter_trackStatusId);
         }
         if ($filter_carrieStatusId > 0) {
-            $query->where('carrierStatusId', $filter_carrieStatusId == 2 ? 0 : $filter_carrieStatusId);
+            $query->where('carrierStatusId',"=", $filter_carrieStatusId == 2 ? 0 : $filter_carrieStatusId);
         }
         if ($filter_syncStoreStatusId > 0) {
-            $query->where('syncStoreStatusId', $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
+            $query->where('syncStoreStatusId',"=", $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
         }
         if ($filter_isFB > 0) {
-            $query->where('isFB', $filter_isFB == 2 ? 0 : $filter_isFB);
+            $query->where('isFB',"=", $filter_isFB == 2 ? 0 : $filter_isFB);
+        }
+        $counter = $query->count();
+
+        if ($isAll){
+            $orders = $query->get();
+        }else{
+            $orders = $query->paginate(2);
         }
 
-
-        $counter = $query->count();
-        $orders = $query->paginate(2);
 
         $showProducts = [];
         if (!($orders->isEmpty())) {
@@ -231,7 +238,7 @@ class OrdersController extends Controller
         $productSizes = [];
         $productColors = [];
         $id = 0;
-        if ($request->input('productCate')) {
+        if ($request->has('productCate')) {
             $productCate = $request->integer('productCate');
         }
         if ($productCate == 0) {
@@ -244,7 +251,7 @@ class OrdersController extends Controller
             $productSizes = $productCategory->size_list;
             $productColors = $productCategory->color_list;
         }
-        if ($request->input('id')) {
+        if ($request->has('id')) {
             $id = $request->integer('id');
         }
         if ($id > 0) {
@@ -252,11 +259,16 @@ class OrdersController extends Controller
             if ($order == null) {
                 $order = new Orders();
             } else {
-                $product = Products::findOrFail($order->productId);
-                $product->imageDesign1 = $product->url_img_design1;
-                $product->imageDesign2 = $product->url_img_design2;
-                $vpses = Vps::where('userId', $order->userId)->get();
-                $sellers = Seller::where('userId', $order->userId)->get();
+                if ($order->productId && $order->productId > 0){
+                    $product = Products::findOrFail($order->productId);
+                }
+                if ($product){
+                    $product->imageDesign1 = $product->url_img_design1;
+                    $product->imageDesign2 = $product->url_img_design2;
+                }
+                $userId_seller = Seller::where('id', $order->sellerId)->pluck('userId')->first();
+                $vpses = Vps::where('userId', $userId_seller)->get();
+                $sellers = Seller::where('userId', $userId_seller)->get();
             }
         } else {
             $order->userId = Auth::id();
@@ -286,9 +298,13 @@ class OrdersController extends Controller
         $request->validate([
             'categoryId' => 'required',
             'sellerId' => 'required',
-            'userId' => 'required'
-        ]);
+            'vpsId' => 'required',
+            'orderNumber' => 'required|unique:orders,orderNumber'
+        ],['orderNumber.unique' => 'Đơn hàng đã tồn tại']);
         $order = new Orders($request->all());
+        if (Orders::where('orderNumber',$request->input('orderNumber'))->get()->count() > 0){
+            return back()->withErrors(["Đơn hàng ".$request->input('orderNumber').' đã tồn tại.']);
+        }
         if ($order->productId == 0) {
             if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
@@ -326,6 +342,7 @@ class OrdersController extends Controller
             $new_product->save();
         }
         $order->isFB = $request->has('isFB') ? 1 : 0;
+        $order->syncStoreStatusId = 0;
         $order->createBy = Auth::id();
         $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 : 1;
         $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 : 1;
@@ -345,10 +362,102 @@ class OrdersController extends Controller
         $request->validate([
             'categoryId' => 'required',
             'sellerId' => 'required',
-            'userId' => 'required'
+            'vpsId' => 'required',
+            'orderNumber' => 'required'
         ]);
         $order = Orders::findOrFail($id);
-        $order->update($request->all());
+        if ($request->has('orderNumber')){
+            $order->orderNumber = $request->input('orderNumber');
+        }
+        if ($request->has('vpsId')){
+            $order->vpsId = $request->integer('vpsId');
+        }
+        if ($request->has('sellerId')){
+            $order->sellerId = $request->integer('sellerId');
+        }
+        if ($request->has('shipToAddressName')){
+            $order->shipToAddressName = $request->input('shipToAddressName');
+        }
+        if ($request->has('shipToAddressPhone')){
+            $order->shipToAddressPhone = $request->input('shipToAddressPhone');
+        }
+        if ($request->has('shipToAddressLine1')){
+            $order->shipToAddressLine1 = $request->input('shipToAddressLine1');
+        }
+        if ($request->has('shipToAddressLine2')){
+            $order->shipToAddressLine2 = $request->input('shipToAddressLine2');
+        }
+        if ($request->has('shipToAddressCity')){
+            $order->shipToAddressCity = $request->input('shipToAddressCity');
+        }
+        if ($request->has('shipToAddressCounty')){
+            $order->shipToAddressCounty = $request->input('shipToAddressCounty');
+        }
+        if ($request->has('shipToAddressStateOrProvince')){
+            $order->shipToAddressStateOrProvince = $request->input('shipToAddressStateOrProvince');
+        }
+        if ($request->has('shipToAddressPostalCode')){
+            $order->shipToAddressPostalCode = $request->input('shipToAddressPostalCode');
+        }
+        if ($request->has('shipToAddressCountry')){
+            $order->shipToAddressCountry = $request->input('shipToAddressCountry');
+        }
+        if ($request->has('statusId')){
+            $order->statusId = $request->integer('statusId');
+        }
+        if ($request->has('note')){
+            $order->note = $request->input('note');
+        }
+        if ($request->has('categoryId')){
+            $order->categoryId = $request->integer('categoryId');
+        }
+        if ($request->has('productId')){
+            $order->productId = $request->integer('productId');
+        }
+        if ($request->has('sku')){
+            $order->sku = $request->input('sku');
+        }
+        if ($request->has('size')){
+            $order->size = $request->input('size');
+        }
+        if ($request->has('color')){
+            $order->color = $request->input('color');
+        }
+
+        if ($request->has('quantity')){
+            $order->quantity = $request->integer('quantity');
+        }
+
+        if ($request->has('price')){
+            $order->price = $request->input('price');
+        }
+        if ($request->has('ship')){
+            $order->ship = $request->input('ship');
+        }
+
+        if ($request->has('cost')){
+            $order->cost = $request->input('cost');
+        }
+
+        if ($request->has('profit')){
+            $order->profit = $request->input('profit');
+        }
+
+        if ($request->has('fulfillCode')){
+            $order->fulfillCode = $request->input('fulfillCode');
+        }
+
+        if ($request->has('trackingCode')){
+            $order->trackingCode = $request->input('trackingCode');
+        }
+
+        if ($request->has('carrier')){
+            $order->carrier = $request->input('carrier');
+        }
+
+        if ($request->has('itemId')){
+            $order->itemId = $request->input('itemId');
+        }
         if ($order->productId == 0) {
             if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
@@ -383,7 +492,12 @@ class OrdersController extends Controller
         $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 : 1;
         $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 : 1;
         $order->save();
-        return back()->with('status', 'Successfully');
+        $SubmitButton = $request->input('SubmitButton');
+        if ($SubmitButton == 'Save') {
+            return back()->with('status', 'Successfully');
+        } else {
+            return redirect()->route('orders.search', ['productCate' => $order->categoryId]);
+        }
     }
 
     public function destroy($id)
@@ -401,7 +515,7 @@ class OrdersController extends Controller
     //
     public function exportCSV(Request $request)
     {
-        $model = $this->getIndexModel($request);
+        $model = $this->getIndexModel($request,true);
         //dump($model);
         $data = [
             ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note']
@@ -413,9 +527,8 @@ class OrdersController extends Controller
         });
         foreach ($listOrderPluck as $row) {
             $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
-            array_push($data, $row);
+            array_push($data, [$row['orderNumber'],$row['fulfillCode'],$row['trackingCode'],$row['carrier'],$row['syncStoreStatusId'],$row['note']]);
         }
-
         // Create a new CSV writer
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
         // Insert the data into the CSV
@@ -425,15 +538,15 @@ class OrdersController extends Controller
             'Content-Type' => 'text/plain; charset=UTF-8',
             'Content-Encoding' => 'UTF-8',
             'Content-Transfer-Encoding' => 'binary',
-            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+            'Content-Disposition' => 'attachment; filename="proposed_file_name_'. Carbon::parse(Carbon::now())->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.csv"',
         ]);
     }
     public function exportUpToEbay(Request $request)
     {
-        $model = $this->getIndexModel($request);
+        $model = $this->getIndexModel($request, true);
         //dump($model);
         $data = [
-            ['Order ID', 'Line Item ID', 'Logistics Status', 'Shipment Carrier', 'Shipment Tracking', 'Remove this column']
+            ['Order ID', 'Shipment Carrier', 'Shipment Tracking']
         ];
         $listOrderPluck = $model['orders']->map(function ($user) {
             return collect($user->toArray())
@@ -441,10 +554,9 @@ class OrdersController extends Controller
                 ->all();
         });
         foreach ($listOrderPluck as $row) {
-            $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
-            array_push($data, [$row['orderNumber'], $row['itemId'], '', $row['carrier'], $row['trackingCode'],'' ]);
+            array_push($data, [$row['orderNumber'],  $row['carrier'], $row['trackingCode'] ]);
         }
-
+        DB::table('orders')-> whereIn('id', $model['orders']-> pluck('id'))->update(['syncStoreStatusId'=>1]);
         // Create a new CSV writer
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
         // Insert the data into the CSV
@@ -454,67 +566,10 @@ class OrdersController extends Controller
             'Content-Type' => 'text/plain; charset=UTF-8',
             'Content-Encoding' => 'UTF-8',
             'Content-Transfer-Encoding' => 'binary',
-            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+            'Content-Disposition' => 'attachment; filename="order-fulfilment-'. Carbon::parse(Carbon::now())->timezone('Asia/Ho_Chi_Minh')->format('dmY-Hi').'.csv"',
         ]);
     }
 
-    public function exportToCsv()
-    {
-        //$dateFrom, $dateTo, $productCate, $userId, $vps, $orderNumber, $productName, $keyword,
-        //                                       $customer, $slTrack, $slVps, $slEbayStatus
-        // Array data to export
-        $query = Orders::query();
-        $filter_dateFrom = request('dateFrom') ? request('dateFrom') : "";
-        $filter_dateTo = request('dateTo') ? request('dateTo') : "";
-        $filter_productCateId = request('productCate') ? request('productCate') : 0;
-        $filter_user = request('userId') ? request('userId') : 0;
-        $filter_vps = request('vps') ? request('vps') : 0;
-        $filter_orderNumber = request('orderNumber') ? request('orderNumber') : '';
-        $filter_product = request('productName') ? request('productName') : '';
-        $filter_customer = request('customer') ? request('customer') : '';
-        $filter_track = request('slTrack') ? request('slTrack') : 0;
-        //$filter_carrie = request('dateTo')?request('dateTo'):0;
-        $filter_orderid = 0;
-        $filter_ebay = request('slEbayStatus') ? request('slEbayStatus') : 0;
-        $statusFilter = request('status');
-        $data = [
-            ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note']
-        ];
-        if (request('productCate')) {
-            $filter_productCateId = request('productCate');
-        }
-
-        if ($filter_dateFrom && $filter_dateTo) {
-            $query->whereBetween('created_at', [$filter_dateFrom, $filter_dateTo]);
-        } else if ($filter_dateFrom) {
-            $query->whereDate('created_at', '>=', $filter_dateFrom);
-        } else if ($filter_dateTo) {
-            $query->whereDate('created_at', '<=', $filter_dateTo);
-        }
-        $counter = $query->count();
-        $orders = $query->get();
-        $listOrderPluck = $orders->pluck(['orderNumber', 'fulfillCode', 'trackingCode', 'carrier', 'syncStoreStatusId', 'note']);
-        foreach ($listOrderPluck as $row) {
-            $row->syncStoreStatusId = $row->syncStoreStatusId == 1 ? "yes" : "no";
-            array_push($data, $row);
-        }
-        // Create a new CSV writer
-        $csv = Writer::createFromFileObject(new \SplTempFileObject());
-
-        // Insert the data into the CSV
-        $csv->insertAll($data);
-
-        // Set the response headers
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
-        ];
-
-        // Create the HTTP response with the CSV file
-        $response = new Response($csv->__toString(), 200, $headers);
-
-        return $response;
-    }
 
     public function importCsv(Request $request)
     {

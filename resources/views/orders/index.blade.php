@@ -160,10 +160,6 @@
                                 <button class="btn btn-sm btn-default" type="button" onclick="exprortCSV(this.form)">
                                     <i class="fas fa-file-export"></i> Xuất CSV
                                 </button>
-                                <a href="javascript:void(0);" onclick="exprort()">
-                                    <div class="btn btn-sm btn-default"><i class="fas fa-file-export"></i> Xuất CSV</div>
-                                </a>
-
                                 <a href="{{route('orders.editForm',['productCate'=>$productCate,'id'=>0])}}"
                                    title="Thêm mới đơn hàng">
                                     <div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div>
@@ -281,8 +277,8 @@
                                 <td>
                                     <p>Quantity: <b>{{$order->quantity}}</b></p>
                                     <p>Price: <b>{{$order->price}} $</b></p>
-                                    <p>Price: <b>{{$order->cost}} $</b></p>
-                                    <p>Price: <b>{{$order->profit}} $</b></p>
+                                    <p>Fee Ship: <b>{{$order->ship}} $</b></p>
+                                    <p>Total: <b>{{$order->cost}} $</b></p>
                                 </td>
                                 <td class="project-actions text-center" rowspan="2">
                                     <a class="btn btn-default btn-sm text-info" title="Edit" href="{{route('orders.editForm',['productCate'=>$order->categoryId,'id'=>$order->id])}}">
@@ -305,27 +301,27 @@
                                     <div class="form-group row img-product">
                                         <div class="col-sm-3">
                                             <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->urlImagePreviewOne}}"/>
+                                                <img width="100%" src="{{strlen($product->urlImagePreviewOne) > 0 ?$product->urlImagePreviewOne:\App\Helper\Helper::$IMG_DEFAULT }}"/>
                                             </div>
                                             <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewOne}}">
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->urlImagePreviewTwo}}"/>
+                                                <img width="100%" src="{{strlen($product->urlImagePreviewTwo) > 0 ?$product->urlImagePreviewTwo:\App\Helper\Helper::$IMG_DEFAULT }}"/>
                                             </div>
                                             <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewTwo}}">
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->url_img_design1}}"/>
+                                                <img width="100%" src="{{strlen($product->url_img_design1) > 0 ?$product->url_img_design1:\App\Helper\Helper::$IMG_DEFAULT }}"/>
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->url_img_design1}}">
+                                            <input type="text" class="form-control" placeholder="Path" value="{{\App\Helper\Helper::getImageUrlPath($product->url_img_design1,'original',true) }}">
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->url_img_design2}}"/>
+                                                <img width="100%" src="{{strlen($product->url_img_design2) > 0 ?$product->url_img_design2:\App\Helper\Helper::$IMG_DEFAULT }}"/>
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->url_img_design2}}">
+                                            <input type="text" class="form-control" placeholder="Path" value="{{\App\Helper\Helper::getImageUrlPath($product->url_img_design2,'original',true)}}">
                                         </div>
                                     </div>
                                     @endif
@@ -333,27 +329,27 @@
 
                                 <td colspan="3">
                                     @if($product)
-                                    <h5><b class="text-info">{{$product->name}}</b></h5>
+                                    <h5><a href="{{strlen($order->itemId) >0 ?'https://www.ebay.com/itm/'.$order->itemId:'#'}}"><b class="text-info">{{$product->name}}</b></a></h5>
                                     @endif
-                                    <div class="form-group row">
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">SKU</label>
-                                        <div class="col-sm-4">
+                                        <div class="form-group row">
+                                        <span class="col-sm-2">SKU</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->sku}}</b>
-                                        </div>
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Style</label>
-                                        <div class="col-sm-4">
+                                        </span>
+                                        <span class="col-sm-2">Style</span>
+                                        <span class="col-sm-4">
                                             <b>{{$cate->name}}</b>
-                                        </div>
+                                        </span>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Size</label>
-                                        <div class="col-sm-4">
+                                        <span  class="col-sm-2">Size</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->size}}</b>
-                                        </div>
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Color</label>
-                                        <div class="col-sm-4">
+                                        </span>
+                                        <span class="col-sm-2">Color</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->color}}</b>
-                                        </div>
+                                        </span>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-12">
@@ -427,11 +423,11 @@
             }
         }
         function exprortUpEbay(form) {
-            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '0'){
+            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '2'){
                 alert('Không có đơn hàng nào, hoặc các đơn hàng chưa phải là các đơn hàng chưa Up Ebay, vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
             }else{
                 $.ajax({
-                    url: "{{route('export-csv')}}",
+                    url: "{{route('export-up-ebay')}}",
                     type: "get",
                     data: $(form).serialize(),xhr: function () {
                         var xhr = new XMLHttpRequest();
@@ -468,60 +464,6 @@
                     }
                 });
             }
-        }
-        function exprort()
-        {
-
-            var dateFrom = $('#dateFrom').val();
-            var dateTo = $('#dateTo').val();
-            var productCate = $('select[name="productCate"]').val();
-            var userId = $('select[name="user"]').val();
-            var vps = $('select[name="vps"]').val();
-            var orderNumber =$('input[id="orderNumber"]').val();
-            var productName =$('input[id="product"]').val();
-            var keyword =$('input[id="keyword"]').val();
-            var customer =$('input[id="customer"]').val();
-            var slTrack = $('select[id="track"]').val();
-            var slVps = $('select[id="vps"]').val();
-            var slEbayStatus = $('select[id="syncStoreStatus"]').val();
-            $.ajax({
-                url: "{{route('export-to-csv')}}",
-                type: "get",
-                data: {
-                    'dateFrom': dateFrom,
-                    'dateTo': dateTo,
-                    'productCate': productCate,
-                    'userId' : userId,
-                    'vps' : vps,
-                    'orderNumber' : orderNumber,
-                    'productName' : productName,
-                    'keyword' : keyword,
-                    'customer' : customer,
-                    'slTrack' : slTrack,
-                    'slVps' : slVps,
-                    'slEbayStatus' : slEbayStatus
-                },
-                success: function (data, status, xhr) {
-                    let filename = "";
-                    let disposition = xhr.getResponseHeader('Content-Disposition');
-                    if (disposition && disposition.indexOf('attachment') !== -1) {
-                        let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                        let matches = filenameRegex.exec(disposition);
-                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-                    }
-                    let a = document.createElement('a');
-                    let url = window.URL.createObjectURL(data);
-                    a.href = url;
-                    a.download = filename.replace('UTF-8', '');;
-                    document.body.append(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus, errorThrown);
-                }
-            });
         }
         function confirmDelete(event, id) {
             event.preventDefault();

@@ -40,11 +40,14 @@
     font-size: 14px;
    }
    .img-p{
-    text-align: center;
+       text-align: center;
+       margin: auto;
+       display: table;
    }
 .img-p img{
-    max-height: 150px;
+    max-height: 130px;
     object-fit: contain;
+    max-width: 100px;
        }
    .form-filter .input-group .input-group-text {
     height: 28px;

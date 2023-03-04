@@ -42,7 +42,6 @@
                 {{ Form::model($order, array('route' => array('orders.update', $order->id), 'method' => 'PUT','enctype'=>'multipart/form-data')) }}
             @endif
             <div class="row">
-                {{ Form::hidden('userId') }}
                 <div class="col-md-6">
                     <div class="form-group row">
                         <label for="vpsId" class="col-sm-2 col-form-label">VPS</label>
@@ -171,8 +170,11 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-sm-2"></div>
-                        <div class="col-sm-4 ">
+                        {{ Form::label('ship','Fee Ship',['class'=>'col-sm-1 col-form-label'])}}
+                        <div class="col-sm-2">
+                            {{ Form::number('ship', null, array('class' => 'form-control','step' => 'any')) }}
+                        </div>
+                        <div class="col-sm-3 text-center">
                             <div class="icheck-primary d-inline">
                                 <input type="checkbox" id="isFB"
                                        name="isFB" {{$order->isFB ? 'checked' : '' }}>
@@ -233,7 +235,7 @@
                                     name="productId"
                                     tyle="width: 100%;">
                                 @if($product)
-                                    <option>{{$product->name}}</option>
+                                    <option value="{{$product->id}}">{{$product->name}}</option>
                                 @endif
                             </select>
                         </div>
@@ -242,7 +244,7 @@
                         <label for="slOrderType" class="col-sm-2 col-form-label">Ảnh mặt trước</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="urlImagePreviewOne"
-                                   name="urlImagePreviewOne" placeholder="Ảnh mặt trước">
+                                   name="urlImagePreviewOne" value="{{$product ? $product->urlImagePreviewOne :""}}" placeholder="Ảnh mặt trước">
                         </div>
                     </div>
 
@@ -250,7 +252,7 @@
                         <label for="slOrderType" class="col-sm-2 col-form-label">Ảnh mặt sau</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="urlImagePreviewTwo"
-                                   name="urlImagePreviewTwo" placeholder="Ảnh mặt sau">
+                                   name="urlImagePreviewTwo" value="{{$product ? $product->urlImagePreviewTwo :""}}" placeholder="Ảnh mặt sau">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -283,22 +285,22 @@
                         <label class="col-sm-6 col-form-label">Thiết kế</label>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewOne :""}}"/>
+                                <img width="100%" id="imgPreview1" src="{{$product ? $product->urlImagePreviewOne :\App\Helper\Helper::$IMG_DEFAULT}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgPreview2" src="{{$product ? $product->urlImagePreviewTwo :""}}"/>
+                                <img width="100%" id="imgPreview2" src="{{$product ? $product->urlImagePreviewTwo :\App\Helper\Helper::$IMG_DEFAULT}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign1" src="{{$product ? $product->imageDesign1 :""}}"/>
+                                <img width="100%" id="imgDesign1" src="{{$product ? $product->imageDesign1 :\App\Helper\Helper::$IMG_DEFAULT}}"/>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="img-p">
-                                <img width="100%" id="imgDesign2" src="{{$product ? $product->imageDesign2 :""}}"/>
+                                <img width="100%" id="imgDesign2" src="{{$product ? $product->imageDesign2 :\App\Helper\Helper::$IMG_DEFAULT}}"/>
                             </div>
                         </div>
                     </div>
@@ -310,7 +312,7 @@
                                     @foreach($productSizes as $item_productSize)
                                         <div class="icheck-primary d-inline">
                                             <input type="radio" id="size_{{$item_productSize}}"
-                                                   name="size" {{$item_productSize == $order->size ? 'checked':''}} value="{{$item_productSize}}">
+                                                       name="size" {{$item_productSize == $order->size ? 'checked':''}} value="{{$item_productSize}}">
                                             <label for="size_{{$item_productSize}}">{{$item_productSize}}</label>
                                         </div>
                                     @endforeach
