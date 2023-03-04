@@ -38,6 +38,19 @@ class HomeController extends Controller
         {
             $listUserAdd = $listUser->where('id', '=', Auth::user()->id);
         }
-        return view('home.index', ['listUser'=>$listUserAdd,'listOrder'=>$listOrder]);
+
+
+        $dateOrders = $listOrder->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'orderNumber' => $order->orderNumber,
+                'vpsId' => $order->vpsId,
+                'userId' => $order->userId,
+                'userName' => $order->userName,
+                'created_at' => date('Y-m-d', strtotime($order->created_at))
+            ];
+        });
+        //dump($dateOrders);
+        return view('home.index', ['listUser'=>$listUserAdd,'listOrder'=>$dateOrders,'arrOrder'=>$listOrder->toArray()]);
     }
 }

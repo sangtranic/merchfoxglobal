@@ -23,7 +23,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         $query = DB::table('orders')
             ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
             ->leftjoin('users', 'vps.userId', '=', 'users.id')
-            ->select('Orders.id', 'Orders.orderNumber', 'Orders.vpsId','Orders.created_at','users.id', 'users.userName');//Orders::query();
+            ->select('orders.id', 'orders.orderNumber', 'orders.vpsId','orders.created_at',  DB::raw('users.id as userId'), 'users.userName');//Orders::query();
         if ($dateFrom && $dateTo) {
             $query->whereBetween('created_at', [$dateFrom, $dateTo]);
         } else if ($dateFrom) {
@@ -35,7 +35,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
 //        dump($dateFrom);
 //        dump($dateTo);
 //        dump($sql);
-        $orders = $query->get()->toArray();
+        $orders = $query->get();
         return $orders;
         // TODO: Implement search() method.
     }
