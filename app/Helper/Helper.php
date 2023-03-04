@@ -4,6 +4,7 @@ namespace App\Helper;
 
 class Helper
 {
+    public static $IMG_DEFAULT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
     public static $RoleKey= "MerchfoxUserRole";
     public static function getListStatus()
     {
@@ -30,13 +31,28 @@ class Helper
     }
     public static function getImageUrlPath($imageName, $folder='original', $withDomain = false)
     {
-        $basePath = public_path('upload/' . $folder);
-        if ($withDomain){
-            $baseUrl = config('app.url') . '/upload/' . $folder;
-            $url = $baseUrl . '/' . $imageName;
+        if (strlen($imageName) == 0){
+            return $imageName;
+        }
+        if (str_starts_with($imageName, config('app.url'))){
+            $url = $imageName;
+            if (str_contains($imageName, $folder)){
+                return $imageName;
+            }else if (str_contains($imageName, 'thumbnail')){
+                return  str_replace('thumbnail', $folder, $imageName);
+            }else if (str_contains($imageName, 'medium')){
+                return  str_replace('medium', $folder, $imageName);
+            }
         }else{
 
-            $url = $basePath . '/' . $imageName;
+            $basePath = public_path('upload/' . $folder);
+            if ($withDomain){
+                $baseUrl = config('app.url') . '/upload/' . $folder;
+                $url = $baseUrl . '/' . $imageName;
+            }else{
+
+                $url = $basePath . '/' . $imageName;
+            }
         }
         return $url;
     }
