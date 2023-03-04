@@ -31,6 +31,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         } else if ($dateTo) {
             $query->whereDate('created_at', '<=', $dateTo);
         }
+        $query->where('users.statusId', '=', 3);
         //$sql = $query->toSql();
 //        dump($dateFrom);
 //        dump($dateTo);
