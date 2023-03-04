@@ -36,7 +36,7 @@
                                 <div class="form-group row">
                                     <label for="productCate" class="col-sm-2 col-form-label">Category</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" id="productCate" name="productCate">
+                                        <select class="form-control" id="productCate" name="productCate" onchange="this.form.submit()" >
                                             <option value="">Tất cả</option>
                                             @foreach ($productCates as $cate)
                                                 <option
@@ -46,7 +46,7 @@
                                     </div>
                                     <label for="user" class="col-sm-2 col-form-label">Seller</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control select2" id="seller" name="seller">
+                                        <select class="form-control select2" id="seller" name="seller" onchange="this.form.submit()" >
                                             <option value="">Tất cả</option>
                                             @foreach ($sellers as $itemSeller)
                                                 <option
@@ -59,7 +59,7 @@
                                 <div class="form-group row">
                                     <label for="vps" class="col-sm-2 col-form-label">Vps</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control select2" id="vps" name="vps">
+                                        <select class="form-control select2" id="vps" name="vps" onchange="this.form.submit()" >
                                             <option value="">Tất cả</option>
                                             @foreach ($vpses as $itemVps)
                                                 <option
@@ -84,7 +84,7 @@
                                         <select class="form-control select2-auto"
                                                 data-href="{{route('api-products-search',[])}}"
                                                 id="product"
-                                                name="product">
+                                                name="product" onchange="this.form.submit()" >
                                             @if($product)
                                                 <option>{{$product->name}}</option>
                                             @endif
@@ -109,7 +109,7 @@
                                 <div class="form-group row">
                                     <label for="trackingStatus" class="col-sm-2 col-form-label">Track</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="trackingStatus" name="trackingStatus">
+                                        <select class="form-control" id="trackingStatus" name="trackingStatus" onchange="this.form.submit()" >
                                             <option value="0">...</option>
                                             <option value="2" {{ $track == 2 ? 'selected' : '' }}>Không</option>
                                             <option value="1" {{ $track == 1 ? 'selected' : '' }}>Có</option>
@@ -117,7 +117,7 @@
                                     </div>
                                     <label for="carrieStatus" class="col-sm-2 col-form-label">Carrie</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="carrieStatus" name="carrieStatus">
+                                        <select class="form-control" id="carrieStatus" name="carrieStatus" onchange="this.form.submit()" >
                                             <option value="0">...</option>
                                             <option value="2" {{ $carrie == 2 ? 'selected' : '' }}>Không</option>
                                             <option value="1" {{ $carrie == 1 ? 'selected' : '' }}>Có</option>
@@ -125,7 +125,7 @@
                                     </div>
                                     <label for="isFB" class="col-sm-2 col-form-label">isFB</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="isFB" name="isFB">
+                                        <select class="form-control" id="isFB" name="isFB" onchange="this.form.submit()" >
                                             <option value="0">...</option>
                                             <option value="2"{{ $isFB == 2 ? 'selected' : '' }}>Chưa có</option>
                                             <option value="1"{{ $isFB == 1 ? 'selected' : '' }}>Đã có</option>
@@ -139,7 +139,7 @@
                                     </div>
                                     <label for="syncStoreStatus" class="col-sm-2 col-form-label">Up Ebay</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" id="syncStoreStatus" name="syncStoreStatus">
+                                        <select class="form-control" id="syncStoreStatus" name="syncStoreStatus" onchange="this.form.submit()" >
                                             <option value="0">...</option>
                                             <option value="2" {{ $ebay == 2 ? 'selected' : '' }}>Chưa</option>
                                             <option value="1" {{ $ebay == 1 ? 'selected' : '' }}>Đã up</option>
