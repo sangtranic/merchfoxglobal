@@ -44,4 +44,26 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         return $orders;
         // TODO: Implement search() method.
     }
+
+    public function searchByVps($dateFrom, $dateTo, $userId)
+    {
+        $query = DB::table('orders')
+            ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
+            ->leftjoin('users', 'vps.userId', '=', 'users.id')
+            ->select('orders.id', 'orders.orderNumber', 'orders.vpsId','orders.created_at',  DB::raw('users.id as userId'), 'users.userName');//Orders::query();
+        if ($dateFrom && $dateTo) {
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+        } else if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        } else if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+        if($userId>0)
+        {
+            $query->where('users.id', '=', $userId);
+        }
+        $query->where('users.statusId', '=', 3);
+        $orders = $query->get();
+        return $orders;
+    }
 }
