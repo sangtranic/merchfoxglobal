@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Collection;?>
                         <!-- LINE CHART -->
                         <div class="card card-info">
                             <div class="card-header">
-                                <h3 class="card-title">Đơn hàng</h3>
+                                <h3 class="card-title">Đơn hàng theo User</h3>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" data-offset="-52" aria-expanded="false">
                                         chọn user
@@ -68,7 +68,7 @@ use Illuminate\Support\Facades\Collection;?>
                         <!-- LINE CHART -->
                         <div class="card card-info">
                             <div class="card-header">
-                                <h3 class="card-title">Thống kê đơn hàng theo VPS</h3>
+                                <h3 class="card-title">Đơn hàng theo VPS</h3>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" data-offset="-52" aria-expanded="false">
                                         chọn VPS
