@@ -25,7 +25,7 @@ class ProductCategoriesController extends Controller
     public function index()
     {
         $users = $this->UsersRepo->getAll();
-        $productCates = Productcategories::paginate(1);
+        $productCates = Productcategories::paginate(20);
         return view('productcategories.index', ['productCates' => $productCates, 'users' => $users]);
     }
 
