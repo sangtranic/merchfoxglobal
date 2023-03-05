@@ -224,6 +224,7 @@
                             $userCr = $users->where('id', $order->createBy)->first();
                             $userUp = $users->where('id', $order->updateBy)->first();
                             $seller = $sellers->where('id', $order->sellerId)->first();
+                            $userSeller = $users->where('id', $seller->userId)->first();
                             $vps = $vpses->where('id', $order->vpsId)->first();
                             $cate = $productCates->where('id', $order->categoryId)->first();
                             $product = null;
@@ -237,7 +238,7 @@
                                     {{$index}}
                                 </td>
                                 <td>
-                                    <p>{{$userCr->fullName}}</p>
+                                    <p>{{$userSeller->fullName}}</p>
                                     <p><span class="badge badge-secondary">{{$seller->sellerName}}</span></p>
                                     <p>{{$vps->name}}</p>
                                 </td>
@@ -246,7 +247,7 @@
                                     <p><small>{{  \Carbon\Carbon::parse($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d-m-y')}}</small></p>
                                 </td>
                                 <td>
-                                    <p>{{$order->shipToAddressName}}<br>
+                                    <p>{{$order->shipToFirstName}} {{$order->shipToLastName}}<br>
                                         {{$order->shipToAddressLine1}}<br>
                                         {{$order->shipToAddressLine2}}<br>
                                         {{$order->shipToAddressCity}} - {{$order->shipToAddressStateOrProvince}} - {{$order->shipToAddressPostalCode}} - {{$order->shipToAddressCountry}}<br>
@@ -542,28 +543,30 @@
         }
         function submitDeleteAlls() {
             if($('[name="chkActionIds"]:checked').length){
-                var selected = [];
-                $('[name="chkActionIds"]:checked').each(function() {
-                    selected.push($(this).val());
-                });
-                $.get("{{route('api-orders-remove')}}",
-                    {
-                        ids: selected.join(',')
-                    },
-                    function(data,status){
-                        $('[name="checkedAll"]').prop('checked',false);
-                        if(data != null){
-                            alert(data.message);
-                            if(data.status == 'success' && data.data != null && data.data.length){
-                                for (var i = 0; i < data.data.length; i++) {
-                                    $('tr[data-order="'+data.data[i]+'"]').remove();
-                                }
-                            }
-                            location.reload();
-                        }else{
-                            alert('Đã có lỗi xảy ra, xin vui lòng liên hệ kỹ thuật để được hỗ trợ.');
-                        }
+                if(confirm("Bạn có chắc chắn muốn xóa nhưng đơn hàng đã chọn không?")){
+                    var selected = [];
+                    $('[name="chkActionIds"]:checked').each(function() {
+                        selected.push($(this).val());
                     });
+                    $.get("{{route('api-orders-remove')}}",
+                        {
+                            ids: selected.join(',')
+                        },
+                        function(data,status){
+                            $('[name="checkedAll"]').prop('checked',false);
+                            if(data != null){
+                                alert(data.message);
+                                if(data.status == 'success' && data.data != null && data.data.length){
+                                    for (var i = 0; i < data.data.length; i++) {
+                                        $('tr[data-order="'+data.data[i]+'"]').remove();
+                                    }
+                                }
+                                //location.reload();
+                            }else{
+                                alert('Đã có lỗi xảy ra, xin vui lòng liên hệ kỹ thuật để được hỗ trợ.');
+                            }
+                        });
+                }
             }else{
                 alert('Hãy chọn đơn hàng!');
             }

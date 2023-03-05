@@ -133,7 +133,9 @@ class ApiController extends Controller
             $ids = explode(',',$str_ids );
             $orders = Orders::wherein('id', $ids)->get();
             if (strtolower(Auth::user()->role) == 'admin'){
-                //$orders->delete();
+                foreach ($orders as $order) {
+                    $order->delete();
+                }
                 return response()->json(["status"=>'success','data'=>$ids,'message'=>'Xóa thành công các đơn hàng.']);
             }else{
                 $userId = Auth::id();
@@ -144,7 +146,7 @@ class ApiController extends Controller
                         array_push($orderNotDeletes, $order->orderNumber);
                     }else{
                         array_push($orderDeletes, $order->id);
-                        //order
+                        $order->delete();
                     }
                 }
                 if (count($orderNotDeletes) > 0 &&count($orderDeletes) > 0){

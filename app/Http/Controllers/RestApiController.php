@@ -20,7 +20,7 @@ class RestApiController extends BaseController
 
     public function orderImport(Request $request)
     {
-        $response = ["status"=>false, "message"=>"", 'data'=> null];
+        $response = ["status" => false, "message" => "", 'data' => null];
         try {
             $validatedData = $request->validate([
                 'orderId' => 'required|unique:orders,orderNumber',
@@ -28,7 +28,7 @@ class RestApiController extends BaseController
                 'userIdImport' => 'required',
                 'title' => 'required',
             ]);
-            if (!$validatedData){
+            if (!$validatedData) {
                 $response['status'] = false;
                 $response['message'] = 'Hãy kiểm tra lại thông tin đơn hàng.';
                 $response['data'] = $validatedData;
@@ -44,20 +44,20 @@ class RestApiController extends BaseController
             ) {
                 $order = new Orders();
                 $order->orderNumber = $request->input('orderId');
-                if (Orders::where('orderNumber',$request->input('orderId'))->get()->count() > 0){
+                if (Orders::where('orderNumber', $request->input('orderId'))->get()->count() > 0) {
                     $response['status'] = false;
-                    $response['message'] = 'Đơn hàng '.$order->orderNumber.' đã tồn tại.';
+                    $response['message'] = 'Đơn hàng ' . $order->orderNumber . ' đã tồn tại.';
                     $response['data'] = $order->orderNumber;
                     return response()->json($response);
 
                 }
                 $seller = DB::table('seller')->where('sellerName', $request->input('sellerID'))->first();
                 $userImport = DB::table('users')->where('id', $request->integer('userIdImport'))->first();
-                if ($seller && $seller->id > 0 && $userImport && $userImport-> id > 0) {
+                if ($seller && $seller->id > 0 && $userImport && $userImport->id > 0) {
                     $order->sellerId = $seller->id;
-                    if ($seller->userId){
-                        $vps =  Vps::where('userId', $seller->userId)->first();
-                        if ($vps){
+                    if ($seller->userId) {
+                        $vps = Vps::where('userId', $seller->userId)->first();
+                        if ($vps) {
                             $order->vpsId = $vps->id;
                         }
                     }
@@ -68,35 +68,65 @@ class RestApiController extends BaseController
                     if ($request->has('channelID')) {
                         $order->channelId = $request->input('channelID');
                     }
-                    if ($request->has('shipToAddressName')){
+                    if ($request->has('shipToAddressName')) {
                         $order->shipToAddressName = $request->input('shipToAddressName');
                     }
-                    if ($request->has('shipToAddressPhone')){
+                    if ($request->has('shipToAddressPhone')) {
                         $order->shipToAddressPhone = $request->input('shipToAddressPhone');
                     }
-                    if ($request->has('shipToAddressLine1')){
+                    if ($request->has('shipToAddressLine1')) {
                         $order->shipToAddressLine1 = $request->input('shipToAddressLine1');
                     }
-                    if ($request->has('shipToAddressLine2')){
+                    if ($request->has('shipToAddressLine2')) {
                         $order->shipToAddressLine2 = $request->input('shipToAddressLine2');
                     }
-                    if ($request->has('shipToAddressCity')){
+                    if ($request->has('shipToAddressCity')) {
                         $order->shipToAddressCity = $request->input('shipToAddressCity');
                     }
-                    if ($request->has('shipToAddressCounty')){
+                    if ($request->has('shipToAddressCounty')) {
                         $order->shipToAddressCounty = $request->input('shipToAddressCounty');
                     }
-                    if ($request->has('shipToAddressStateOrProvince')){
+                    if ($request->has('shipToAddressStateOrProvince')) {
                         $order->shipToAddressStateOrProvince = $request->input('shipToAddressStateOrProvince');
                     }
-                    if ($request->has('shipToAddressPostalCode')){
+                    if ($request->has('shipToAddressPostalCode')) {
                         $order->shipToAddressPostalCode = $request->input('shipToAddressPostalCode');
                     }
-                    if ($request->has('shipToAddressCountry')){
+                    if ($request->has('shipToAddressCountry')) {
                         $order->shipToAddressCountry = $request->input('shipToAddressCountry');
                     }
+
+                    if ($request->has('note')) {
+                        $order->note = $request->input('note');
+                    }
+                    if ($request->has('SKU')) {
+                        $order->sku = $request->input('SKU');
+                    }
+                    if ($request->has('quantity')) {
+                        $order->quantity = $request->integer('quantity');
+                    } else {
+                        $order->quantity = 0;
+                    }
+
+                    if ($request->has('unitPrice')) {
+                        $order->price = $request->input('unitPrice');
+                    } else {
+                        $order->price = 0;
+                    }
+
+                    if ($request->has('ship')) {
+                        $order->ship = $request->input('ship');
+                    } else {
+                        $order->ship = 0;
+                    }
+                    if ($request->has('orderSumTotal')) {
+                        $order->cost = $request->input('orderSumTotal');
+                    } else {
+                        $order->cost = 0;
+                    }
+
                     $product = null;
-                    if ($request->has('itemID')){
+                    if ($request->has('itemID')) {
                         $order->itemId = $request->input('itemID');
                         $product = DB::table('products')->where('itemId', $order->itemId)->first();
                     }
@@ -108,16 +138,22 @@ class RestApiController extends BaseController
                     $regex = "/(.*)\[(.*?)\](.*)/";
 
                     if (preg_match($regex, $inputString, $matches)) {
-                        if (strlen($matches[1])){
+                        if (strlen($matches[1])) {
                             $productName = $matches[1];
                         }
-                        if (strlen($matches[2])){
+                        if (strlen($matches[2])) {
                             $productSize = $matches[2];
                         }
                     }
                     $categoryId = 0;
                     $productCategories = Productcategories::all();
                     foreach ($productCategories as $category) {
+                        if ($order->price > 0
+                            && ($category->priceMin && $category->priceMin >= 0 && $category->priceMax && $category->priceMax > 0)
+                            && ($order->price >= $category->priceMin && $order->price <= $category->priceMax)) {
+                            $categoryId = $category->id;
+                            break;
+                        }
                         if (!Helper::IsNullOrEmptyString($category->keyword)) {
                             $keys = explode(',', $category->keyword);
                             if (count($keys) > 0) {
@@ -129,7 +165,7 @@ class RestApiController extends BaseController
                                 }
                             }
                         }
-                        if (!Helper::IsNullOrEmptyString($category->colors)){
+                        if (!Helper::IsNullOrEmptyString($category->colors)) {
                             $colors = explode(',', $category->colors);
                             if (count($colors) > 0) {
                                 foreach ($colors as $itemColor) {
@@ -140,7 +176,7 @@ class RestApiController extends BaseController
                                 }
                             }
                         }
-                        if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)){
+                        if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
                             break;
                         }
 
@@ -148,56 +184,27 @@ class RestApiController extends BaseController
                     $order->categoryId = $categoryId;
                     $order->size = $productSize;
                     $order->color = $productColor;
-                    if ($product){
+                    if ($product) {
                         $order->productId = $product->id;
-                    }else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0){
+                    } else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0) {
                         $product = new Products();
-                        $product->itemId =  $order->itemId;
+                        $product->itemId = $order->itemId;
                         $product->categoryId = $categoryId;
                         $product->name = $productName;
                         $product->createBy = $userImport->id;
                         $product->save();
                         $order->productId = $product->id;
                     }
-
-                    if ($request->has('note')){
-                        $order->note = $request->input('note');
-                    }
-                    if ($request->has('SKU')){
-                        $order->sku = $request->input('SKU');
-                    }
-                    if ($request->has('quantity')){
-                        $order->quantity = $request->integer('quantity');
-                    }else{
-                        $order->quantity = 0;
-                    }
-
-                    if ($request->has('unitPrice')){
-                        $order->price = $request->input('unitPrice');
-                    }else{
-                        $order->price = 0;
-                    }
-
-                    if ($request->has('ship')){
-                        $order->ship = $request->input('ship');
-                    }else{
-                        $order->ship = 0;
-                    }
-                    if ($request->has('orderSumTotal')){
-                        $order->cost = $request->input('orderSumTotal');
-                    }else{
-                        $order->cost = 0;
-                    }
                     $order->statusId = 1;
                     $order->trackingStatusId = 0;
                     $order->carrierStatusId = 0;
                     $order->syncStoreStatusId = 0;
-                    if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0){
+                    if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0) {
                         $order->save();
                         $response['status'] = true;
                         $response['message'] = 'Import thành công';
                         $response['data'] = $order;
-                    }else{
+                    } else {
 
                         $response['status'] = false;
                         $response['message'] = 'Không tìm thấy thông tin hãy kiểm tra lại Title và sellerId';
@@ -212,23 +219,24 @@ class RestApiController extends BaseController
                 $response['status'] = false;
                 $response['message'] = 'Dữ liệu orderId, sellerID không được để trống.';
             }
-        }catch (Exception $ex){
+        } catch (Exception $ex) {
 
             $response['status'] = false;
             $response['message'] = $ex->getMessage();
         }
         return response()->json($response);
     }
+
     public function orderCSVImport(Request $request)
     {
-        $response = ["status"=>false, "message"=>"", 'data'=> null];
+        $response = ["status" => false, "message" => "", 'data' => null];
         try {
             $validatedData = $request->validate([
                 'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'user' => 'required'
             ]);
 
-            if (!$validatedData){
+            if (!$validatedData) {
                 $response['status'] = false;
                 $response['message'] = 'Hãy kiểm tra lại thông tin user và file import.';
                 $response['data'] = $validatedData;
@@ -236,7 +244,7 @@ class RestApiController extends BaseController
             }
 
             $userImport = DB::table('users')->where('id', $request->integer('user'))->first();
-            if ($userImport && $userImport->id > 0){
+            if ($userImport && $userImport->id > 0) {
                 $file = $request->file('file');
                 $csv = Reader::createFromPath($file->getRealPath(), 'r');
                 $header = $csv->fetchOne();
@@ -244,88 +252,88 @@ class RestApiController extends BaseController
                 $index = 0;
                 $numberOrderUpdate = 0;
                 $orderNumberError = [];
-                if (count($header) >= 22) {
+                if (count($header) >= 103) {
                     foreach ($results as $row) {
                         if ($index++ > 0) {
-                            if (strlen($row[0]) > 0 && strlen($row[1]) > 0){
-                                if (Orders::where('orderNumber', $row[0])->get()->count() > 0){
-                                    array_push($orderNumberError,  $row[0]);
-                                }else{
-                                    $seller = DB::table('seller')->where('sellerName',  $row[1])->first();
-                                    if ($seller && $seller->id > 0){
+                            if (strlen($row[0]) > 0 && strlen($row[19]) > 0) {
+                                if (DB::table('orders')->where('orderNumber', $row[0])->exists()) {
+                                    array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Đơn hàng đã tồn tại trong hệ thống.']);
+                                } else {
+                                    $seller = DB::table('seller')->where('sellerName', $row[19])->first();
+                                    if ($seller && $seller->id > 0) {
                                         $order = new Orders();
                                         $order->orderNumber = $row[0];
                                         $order->sellerId = $seller->id;
                                         $order->createBy = $userImport->id;
-                                        if ($seller->userId){
-                                            $vps =  Vps::where('userId', $seller->userId)->first();
-                                            if ($vps){
+                                        if ($seller->userId) {
+                                            $vps = Vps::where('userId', $seller->userId)->first();
+                                            if ($vps) {
                                                 $order->vpsId = $vps->id;
                                             }
                                         }
-                                        if (strlen($row[2]) > 0 ){
-                                            $order->created_at = strtotime($row[2]);
+                                        if (strlen($row[3]) > 0) {
+                                            $order->created_at = strtotime($row[3]);
                                         }
-                                        if (strlen($row[3]) > 0){
-                                            $order->channelId = $row[3];
+                                        if (strlen($row[1]) > 0) {
+                                            $order->channelId = $row[1];
                                         }
-                                        if (strlen($row[4]) > 0){
-                                            $order->shipToAddressID = $row[4];
+                                        if (strlen($row[27]) > 0) {
+                                            $order->shipToAddressID = $row[27];
                                         }
 
-                                        if (strlen($row[5]) > 0){
-                                            $firstName = $row[5];
+                                        if (strlen($row[28]) > 0) {
+                                            $firstName = $row[28];
                                             $lastName = '';
-                                            if (str_contains($row[5], ' ')){
-                                                $nameParts = explode(' ', $row[5]);
+                                            if (str_contains($row[28], ' ')) {
+                                                $nameParts = explode(' ', $row[28]);
                                                 $firstName = $nameParts[0];
                                                 $lastName = implode(' ', array_slice($nameParts, 1));
                                             }
                                             $order->shipToFirstName = $firstName;
                                             $order->shipToLastName = $lastName;
                                         }
-                                        if (strlen($row[6]) > 0){
-                                            $order->shipToAddressPhone = $row[6];
+                                        if (strlen($row[29]) > 0) {
+                                            $order->shipToAddressPhone = $row[29];
                                         }
-                                        if (strlen($row[7]) > 0){
-                                            $order->shipToAddressLine1 = $row[7];
+                                        if (strlen($row[30]) > 0) {
+                                            $order->shipToAddressLine1 = $row[30];
                                         }
-                                        if (strlen($row[8]) > 0){
-                                            $order->shipToAddressLine2 = $row[8];
+                                        if (strlen($row[31]) > 0) {
+                                            $order->shipToAddressLine2 = $row[31];
                                         }
-                                        if (strlen($row[9]) > 0){
-                                            $order->shipToAddressCity = $row[9];
+                                        if (strlen($row[32]) > 0) {
+                                            $order->shipToAddressCity = $row[32];
                                         }
-                                        if (strlen($row[10]) > 0){
-                                            $order->shipToAddressCounty = $row[10];
+                                        if (strlen($row[33]) > 0) {
+                                            $order->shipToAddressCounty = $row[33];
                                         }
-                                        if (strlen($row[11]) > 0){
-                                            $order->shipToAddressStateOrProvince = $row[11];
+                                        if (strlen($row[34]) > 0) {
+                                            $order->shipToAddressStateOrProvince = $row[34];
                                         }
-                                        if (strlen($row[12]) > 0){
-                                            $order->shipToAddressPostalCode = $row[12];
+                                        if (strlen($row[35]) > 0) {
+                                            $order->shipToAddressPostalCode = $row[35];
                                         }
-                                        if (strlen($row[13]) > 0){
-                                            $order->shipToAddressCountry = $row[13];
+                                        if (strlen($row[36]) > 0) {
+                                            $order->shipToAddressCountry = $row[36];
                                         }
                                         $product = null;
-                                        if (strlen($row[14]) > 0){
-                                            $order->itemId = $row[14];
+                                        if (strlen($row[63]) > 0) {
+                                            $order->itemId = $row[63];
                                             $product = DB::table('products')->where('itemId', $order->itemId)->first();
                                         }
                                         $productName = '';
                                         $productSize = '';
                                         $productColor = '';
                                         $inputString = '';
-                                        if (strlen($row[15]) > 0){
-                                            $inputString = $row[15];
+                                        if (strlen($row[65]) > 0) {
+                                            $inputString = $row[65];
                                             $regex = "/(.*)\[(.*?)\](.*)/";
 
                                             if (preg_match($regex, $inputString, $matches)) {
-                                                if (strlen($matches[1])){
+                                                if (strlen($matches[1])) {
                                                     $productName = $matches[1];
                                                 }
-                                                if (strlen($matches[2])){
+                                                if (strlen($matches[2])) {
                                                     $productSize = $matches[2];
                                                 }
                                             }
@@ -345,7 +353,7 @@ class RestApiController extends BaseController
                                                     }
                                                 }
                                             }
-                                            if (!Helper::IsNullOrEmptyString($category->colors)){
+                                            if (!Helper::IsNullOrEmptyString($category->colors)) {
                                                 $colors = explode(',', $category->colors);
                                                 if (count($colors) > 0) {
                                                     foreach ($colors as $itemColor) {
@@ -356,7 +364,7 @@ class RestApiController extends BaseController
                                                     }
                                                 }
                                             }
-                                            if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)){
+                                            if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
                                                 break;
                                             }
 
@@ -364,82 +372,92 @@ class RestApiController extends BaseController
                                         $order->categoryId = $categoryId;
                                         $order->size = $productSize;
                                         $order->color = $productColor;
-                                        if ($product){
+                                        if ($product) {
                                             $order->productId = $product->id;
-                                        }else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0){
+                                        } else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0) {
                                             $product = new Products();
-                                            $product->itemId =  $order->itemId;
+                                            $product->itemId = $order->itemId;
                                             $product->categoryId = $categoryId;
                                             $product->name = $productName;
                                             $product->createBy = $userImport->id;
                                             $product->save();
                                             $order->productId = $product->id;
                                         }
-                                        if (strlen($row[16]) > 0){
-                                            $order->sku = $row[16];
+                                        if (strlen($row[64]) > 0) {
+                                            $order->sku = $row[64];
                                         }
-                                        if (strlen($row[17]) > 0){
-                                            $order->quantity = (int)$row[17];
-                                        }else{
+                                        if (strlen($row[66]) > 0) {
+                                            $order->quantity = (int)$row[66];
+                                        } else {
                                             $order->quantity = 0;
                                         }
 
-                                        if (strlen($row[18]) > 0){
-                                            $order->price = (double)$row[18];
-                                        }else{
+                                        if (strlen($row[67]) > 0) {
+                                            $order->price = (double)$row[67];
+                                        } else {
                                             $order->price = 0;
                                         }
-                                        if (strlen($row[19]) > 0){
-                                            $order->ship = (double)$row[19];
-                                        }else{
+
+                                        if (strlen($row[69]) > 0) {
+                                            try {
+                                                $priceData = json_decode($row[69]);
+                                                $order->ship = (double)$priceData[1]->amount;
+                                            } catch (\Exception $e) {
+
+                                            }
+                                        } else {
                                             $order->ship = 0;
                                         }
 
-                                        if (strlen($row[20]) > 0){
-                                            $order->cost = (double)$row[20];
-                                        }else{
+                                        if (strlen($row[70]) > 0) {
+                                            $order->cost = (double)$row[70];
+                                        } else {
                                             $order->cost = 0;
                                         }
-                                        if (strlen($row[21]) > 0){
-                                            $order->note =  $row[21];
+                                        if (strlen($row[92]) > 0) {
+                                            $order->note = $row[92];
                                         }
                                         $order->statusId = 1;
                                         $order->trackingStatusId = 0;
                                         $order->carrierStatusId = 0;
                                         $order->syncStoreStatusId = 0;
-                                        if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0){
+                                        if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0) {
                                             $order->save();
-                                            $numberOrderUpdate+=1;
-                                        }else{
-                                            array_push($orderNumberError,  $order->orderNumber . ' *');
+                                            $numberOrderUpdate += 1;
+                                        } else {
+                                            if ($order->categoryId == 0){
+                                                array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Không nhận diện được đợn hàng thuộc chuyên mục sản phẩm nào.']);
+                                            }else {
+                                                array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Seller: '.$row[19].' không nhận diện được Seller hoặc VPS trong hệ thống.']);
+                                            }
                                         }
-                                    }else{
-                                        array_push($orderNumberError,  $row[0].' '.$row[1]);
+                                    } else {
+                                        array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Seller: '.$row[19].' không tìm thấy trong hệ thống.']);
                                     }
                                 }
                             }
                         }
                     };
                 }
-                if ($numberOrderUpdate > 0){
+                if ($numberOrderUpdate > 0) {
                     $response['status'] = true;
                     $response['message'] = 'Đã thêm ' . $numberOrderUpdate . ' đơn hàng';
-                    if (array_count_values($orderNumberError) > 0){
-                        $response['message'] = $response['message']. ', Các đơn '. join("; ",$orderNumberError).' không thêm được.';
+                    if (count($orderNumberError) > 0) {
+                        $response['data'] = $orderNumberError;
                     }
-                }else{
+                } else {
                     $response['status'] = false;
                     $response['message'] = 'Đã có lỗi trong nội dung nên không thêm được.';
-                    if (array_count_values($orderNumberError) > 0){
-                        $response['message'] = 'Các đơn '. join("; ",$orderNumberError).' không thêm được.';
+                    if (count($orderNumberError) > 0) {
+                        $response['data'] = $orderNumberError;
                     }
                 }
-            } else{
+            } else {
                 $response['status'] = false;
                 $response['message'] = 'user không tồn tại.';
             }
 
-        }catch (Exception $ex){
+        } catch (\Exception $ex) {
 
             $response['status'] = false;
             $response['message'] = $ex->getMessage();
