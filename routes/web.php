@@ -59,12 +59,11 @@ Route::get('orderForm', [Controllers\OrdersController::class, 'editForm'])->name
 
 Route::get('orders/{id}', [Controllers\OrdersController::class, 'detail'])->name("orders.detail");
 Route::get('orders-search', [Controllers\OrdersController::class, 'search'])->name('orders.search');
+Route::get('api-order-row', [Controllers\OrdersController::class, 'orderRow'])->name('api-order-row');
 Route::post('orders-index-post', [Controllers\OrdersController::class, 'indexPost'])->name('orders.indexPost');
 
 Route::get('/export-csv', [OrdersController::class, 'exportCSV'])->name('export-csv');
 Route::get('/export-up-ebay', [OrdersController::class, 'exportUpToEbay'])->name('export-up-ebay');
-
-Route::get('/export-to-csv', [OrdersController::class, 'exportToCsv'])->name('export-to-csv');
 Route::post('/import-csv', [OrdersController::class, 'importCsv'])->name('import-csv');
 
 //api
@@ -75,3 +74,4 @@ Route::get('api-product-detail', [ApiController::class,'productDetail'])->name("
 Route::get('api-product-category-detail', [ApiController::class,'productCategoryDetail'])->name("api-product-category-detail");
 Route::get('api-orders-remove', [ApiController::class,'removeOrders'])->name("api-orders-remove");
 Route::post('api/orders-import', [RestApiController::class,'orderImport'])->name("api-orders-import");
+Route::post('api/orders-csv-import', [RestApiController::class,'orderCSVImport'])->name("api-orders-csv-import");

@@ -82,3 +82,6 @@
   height: 100%;
   overflow: hidden;
 }
+.table-o-v tr.odd{
+    background-color: rgba(0,0,0,.05);
+}

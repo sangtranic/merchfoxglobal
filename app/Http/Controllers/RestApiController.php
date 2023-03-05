@@ -2,37 +2,448 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
+use App\Models\Orders;
+use App\Models\Productcategories;
+use App\Models\Products;
+use App\Models\Seller;
+use App\Models\Vps;
+use http\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
+use League\Csv\Reader;
+use Nette\Utils\Html;
 
 class RestApiController extends BaseController
 {
 
     public function orderImport(Request $request)
     {
-        $data =[
-            "orderId"=>'20-09672-83912',
-            'channelID'=>'EBAY_US',
-            'createdDate' => '2023-02-07T03:56:24.000Z',
-            'sellerID'=>'cynglo-47',
-            'shipToAddressID'=>'',
-            'shipToAddressName'=>'',
-            'shipToAddressPhone'=>'',
-            'shipToAddressLine1'=>'',
-            'shipToAddressLine2'=>'',
-            'shipToAddressCity'=>'',
-            'shipToAddressStateOrProvince'=>'',
-            'shipToAddressPostalCode'=>'',
-            'shipToAddressCountry'=>'',
-            'itemID'=>'',
-            'SKU'=>'',
-            'title'=>'',
-            'quantity'=>0,
-            'unitPrice'=>0.0,
-            'lineItemSumTotal'=>0.0,
-            'note'=>''
-        ];
-        dump($request);
-        //return response()->json($request);
+        $response = ["status"=>false, "message"=>"", 'data'=> null];
+        try {
+            $validatedData = $request->validate([
+                'orderId' => 'required|unique:orders,orderNumber',
+                'sellerID' => 'required',
+                'userIdImport' => 'required',
+                'title' => 'required',
+            ]);
+            if (!$validatedData){
+                $response['status'] = false;
+                $response['message'] = 'Hãy kiểm tra lại thông tin đơn hàng.';
+                $response['data'] = $validatedData;
+                return response()->json($response);
+            }
+
+            if ($request->has('orderId')
+                && strlen($request->input('orderId'))
+                && $request->has('sellerID')
+                && strlen($request->input('sellerID')
+                    && $request->has('userIdImport')
+                    && $request->integer('userIdImport') > 0)
+            ) {
+                $order = new Orders();
+                $order->orderNumber = $request->input('orderId');
+                if (Orders::where('orderNumber',$request->input('orderId'))->get()->count() > 0){
+                    $response['status'] = false;
+                    $response['message'] = 'Đơn hàng '.$order->orderNumber.' đã tồn tại.';
+                    $response['data'] = $order->orderNumber;
+                    return response()->json($response);
+
+                }
+                $seller = DB::table('seller')->where('sellerName', $request->input('sellerID'))->first();
+                $userImport = DB::table('users')->where('id', $request->integer('userIdImport'))->first();
+                if ($seller && $seller->id > 0 && $userImport && $userImport-> id > 0) {
+                    $order->sellerId = $seller->id;
+                    if ($seller->userId){
+                        $vps =  Vps::where('userId', $seller->userId)->first();
+                        if ($vps){
+                            $order->vpsId = $vps->id;
+                        }
+                    }
+                    $order->createBy = $userImport->id;
+                    if ($request->has('createdDate')) {
+                        $order->created_at = strtotime($request->input('createdDate'));
+                    }
+                    if ($request->has('channelID')) {
+                        $order->channelId = $request->input('channelID');
+                    }
+                    if ($request->has('shipToAddressName')){
+                        $order->shipToAddressName = $request->input('shipToAddressName');
+                    }
+                    if ($request->has('shipToAddressPhone')){
+                        $order->shipToAddressPhone = $request->input('shipToAddressPhone');
+                    }
+                    if ($request->has('shipToAddressLine1')){
+                        $order->shipToAddressLine1 = $request->input('shipToAddressLine1');
+                    }
+                    if ($request->has('shipToAddressLine2')){
+                        $order->shipToAddressLine2 = $request->input('shipToAddressLine2');
+                    }
+                    if ($request->has('shipToAddressCity')){
+                        $order->shipToAddressCity = $request->input('shipToAddressCity');
+                    }
+                    if ($request->has('shipToAddressCounty')){
+                        $order->shipToAddressCounty = $request->input('shipToAddressCounty');
+                    }
+                    if ($request->has('shipToAddressStateOrProvince')){
+                        $order->shipToAddressStateOrProvince = $request->input('shipToAddressStateOrProvince');
+                    }
+                    if ($request->has('shipToAddressPostalCode')){
+                        $order->shipToAddressPostalCode = $request->input('shipToAddressPostalCode');
+                    }
+                    if ($request->has('shipToAddressCountry')){
+                        $order->shipToAddressCountry = $request->input('shipToAddressCountry');
+                    }
+                    $product = null;
+                    if ($request->has('itemID')){
+                        $order->itemId = $request->input('itemID');
+                        $product = DB::table('products')->where('itemId', $order->itemId)->first();
+                    }
+                    $productName = '';
+                    $productSize = '';
+                    $productColor = '';
+
+                    $inputString = $request->input('title');
+                    $regex = "/(.*)\[(.*?)\](.*)/";
+
+                    if (preg_match($regex, $inputString, $matches)) {
+                        if (strlen($matches[1])){
+                            $productName = $matches[1];
+                        }
+                        if (strlen($matches[2])){
+                            $productSize = $matches[2];
+                        }
+                    }
+                    $categoryId = 0;
+                    $productCategories = Productcategories::all();
+                    foreach ($productCategories as $category) {
+                        if (!Helper::IsNullOrEmptyString($category->keyword)) {
+                            $keys = explode(',', $category->keyword);
+                            if (count($keys) > 0) {
+                                foreach ($keys as $key) {
+                                    if (str_contains(strtolower($productName), strtolower($key))) {
+                                        $categoryId = $category->id;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!Helper::IsNullOrEmptyString($category->colors)){
+                            $colors = explode(',', $category->colors);
+                            if (count($colors) > 0) {
+                                foreach ($colors as $itemColor) {
+                                    if (str_contains(strtolower($productName), strtolower($itemColor))) {
+                                        $productColor = $itemColor;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)){
+                            break;
+                        }
+
+                    }
+                    $order->categoryId = $categoryId;
+                    $order->size = $productSize;
+                    $order->color = $productColor;
+                    if ($product){
+                        $order->productId = $product->id;
+                    }else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0){
+                        $product = new Products();
+                        $product->itemId =  $order->itemId;
+                        $product->categoryId = $categoryId;
+                        $product->name = $productName;
+                        $product->createBy = $userImport->id;
+                        $product->save();
+                        $order->productId = $product->id;
+                    }
+
+                    if ($request->has('note')){
+                        $order->note = $request->input('note');
+                    }
+                    if ($request->has('SKU')){
+                        $order->sku = $request->input('SKU');
+                    }
+                    if ($request->has('quantity')){
+                        $order->quantity = $request->integer('quantity');
+                    }else{
+                        $order->quantity = 0;
+                    }
+
+                    if ($request->has('unitPrice')){
+                        $order->price = $request->input('unitPrice');
+                    }else{
+                        $order->price = 0;
+                    }
+
+                    if ($request->has('ship')){
+                        $order->ship = $request->input('ship');
+                    }else{
+                        $order->ship = 0;
+                    }
+                    if ($request->has('orderSumTotal')){
+                        $order->cost = $request->input('orderSumTotal');
+                    }else{
+                        $order->cost = 0;
+                    }
+                    $order->statusId = 1;
+                    $order->trackingStatusId = 0;
+                    $order->carrierStatusId = 0;
+                    $order->syncStoreStatusId = 0;
+                    if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0){
+                        $order->save();
+                        $response['status'] = true;
+                        $response['message'] = 'Import thành công';
+                        $response['data'] = $order;
+                    }else{
+
+                        $response['status'] = false;
+                        $response['message'] = 'Không tìm thấy thông tin hãy kiểm tra lại Title và sellerId';
+                        $response['data'] = $order;
+                    }
+
+                } else {
+                    $response['status'] = false;
+                    $response['message'] = 'Hãy kiểm tra lại thông tin seller và user import hoặc thông báo quản trị viên.';
+                }
+            } else {
+                $response['status'] = false;
+                $response['message'] = 'Dữ liệu orderId, sellerID không được để trống.';
+            }
+        }catch (Exception $ex){
+
+            $response['status'] = false;
+            $response['message'] = $ex->getMessage();
+        }
+        return response()->json($response);
+    }
+    public function orderCSVImport(Request $request)
+    {
+        $response = ["status"=>false, "message"=>"", 'data'=> null];
+        try {
+            $validatedData = $request->validate([
+                'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'user' => 'required'
+            ]);
+
+            if (!$validatedData){
+                $response['status'] = false;
+                $response['message'] = 'Hãy kiểm tra lại thông tin user và file import.';
+                $response['data'] = $validatedData;
+                return response()->json($response);
+            }
+
+            $userImport = DB::table('users')->where('id', $request->integer('user'))->first();
+            if ($userImport && $userImport->id > 0){
+                $file = $request->file('file');
+                $csv = Reader::createFromPath($file->getRealPath(), 'r');
+                $header = $csv->fetchOne();
+                $results = $csv->getRecords();
+                $index = 0;
+                $numberOrderUpdate = 0;
+                $orderNumberError = [];
+                if (count($header) >= 22) {
+                    foreach ($results as $row) {
+                        if ($index++ > 0) {
+                            if (strlen($row[0]) > 0 && strlen($row[1]) > 0){
+                                if (Orders::where('orderNumber', $row[0])->get()->count() > 0){
+                                    array_push($orderNumberError,  $row[0]);
+                                }else{
+                                    $seller = DB::table('seller')->where('sellerName',  $row[1])->first();
+                                    if ($seller && $seller->id > 0){
+                                        $order = new Orders();
+                                        $order->orderNumber = $row[0];
+                                        $order->sellerId = $seller->id;
+                                        $order->createBy = $userImport->id;
+                                        if ($seller->userId){
+                                            $vps =  Vps::where('userId', $seller->userId)->first();
+                                            if ($vps){
+                                                $order->vpsId = $vps->id;
+                                            }
+                                        }
+                                        if (strlen($row[2]) > 0 ){
+                                            $order->created_at = strtotime($row[2]);
+                                        }
+                                        if (strlen($row[3]) > 0){
+                                            $order->channelId = $row[3];
+                                        }
+                                        if (strlen($row[4]) > 0){
+                                            $order->shipToAddressID = $row[4];
+                                        }
+
+                                        if (strlen($row[5]) > 0){
+                                            $firstName = $row[5];
+                                            $lastName = '';
+                                            if (str_contains($row[5], ' ')){
+                                                $nameParts = explode(' ', $row[5]);
+                                                $firstName = $nameParts[0];
+                                                $lastName = implode(' ', array_slice($nameParts, 1));
+                                            }
+                                            $order->shipToFirstName = $firstName;
+                                            $order->shipToLastName = $lastName;
+                                        }
+                                        if (strlen($row[6]) > 0){
+                                            $order->shipToAddressPhone = $row[6];
+                                        }
+                                        if (strlen($row[7]) > 0){
+                                            $order->shipToAddressLine1 = $row[7];
+                                        }
+                                        if (strlen($row[8]) > 0){
+                                            $order->shipToAddressLine2 = $row[8];
+                                        }
+                                        if (strlen($row[9]) > 0){
+                                            $order->shipToAddressCity = $row[9];
+                                        }
+                                        if (strlen($row[10]) > 0){
+                                            $order->shipToAddressCounty = $row[10];
+                                        }
+                                        if (strlen($row[11]) > 0){
+                                            $order->shipToAddressStateOrProvince = $row[11];
+                                        }
+                                        if (strlen($row[12]) > 0){
+                                            $order->shipToAddressPostalCode = $row[12];
+                                        }
+                                        if (strlen($row[13]) > 0){
+                                            $order->shipToAddressCountry = $row[13];
+                                        }
+                                        $product = null;
+                                        if (strlen($row[14]) > 0){
+                                            $order->itemId = $row[14];
+                                            $product = DB::table('products')->where('itemId', $order->itemId)->first();
+                                        }
+                                        $productName = '';
+                                        $productSize = '';
+                                        $productColor = '';
+                                        $inputString = '';
+                                        if (strlen($row[15]) > 0){
+                                            $inputString = $row[15];
+                                            $regex = "/(.*)\[(.*?)\](.*)/";
+
+                                            if (preg_match($regex, $inputString, $matches)) {
+                                                if (strlen($matches[1])){
+                                                    $productName = $matches[1];
+                                                }
+                                                if (strlen($matches[2])){
+                                                    $productSize = $matches[2];
+                                                }
+                                            }
+                                        }
+
+                                        $categoryId = 0;
+                                        $productCategories = Productcategories::all();
+                                        foreach ($productCategories as $category) {
+                                            if (!Helper::IsNullOrEmptyString($category->keyword)) {
+                                                $keys = explode(',', $category->keyword);
+                                                if (count($keys) > 0) {
+                                                    foreach ($keys as $key) {
+                                                        if (str_contains(strtolower($productName), strtolower($key))) {
+                                                            $categoryId = $category->id;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if (!Helper::IsNullOrEmptyString($category->colors)){
+                                                $colors = explode(',', $category->colors);
+                                                if (count($colors) > 0) {
+                                                    foreach ($colors as $itemColor) {
+                                                        if (str_contains(strtolower($productName), strtolower($itemColor))) {
+                                                            $productColor = $itemColor;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)){
+                                                break;
+                                            }
+
+                                        }
+                                        $order->categoryId = $categoryId;
+                                        $order->size = $productSize;
+                                        $order->color = $productColor;
+                                        if ($product){
+                                            $order->productId = $product->id;
+                                        }else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0){
+                                            $product = new Products();
+                                            $product->itemId =  $order->itemId;
+                                            $product->categoryId = $categoryId;
+                                            $product->name = $productName;
+                                            $product->createBy = $userImport->id;
+                                            $product->save();
+                                            $order->productId = $product->id;
+                                        }
+                                        if (strlen($row[16]) > 0){
+                                            $order->sku = $row[16];
+                                        }
+                                        if (strlen($row[17]) > 0){
+                                            $order->quantity = (int)$row[17];
+                                        }else{
+                                            $order->quantity = 0;
+                                        }
+
+                                        if (strlen($row[18]) > 0){
+                                            $order->price = (double)$row[18];
+                                        }else{
+                                            $order->price = 0;
+                                        }
+                                        if (strlen($row[19]) > 0){
+                                            $order->ship = (double)$row[19];
+                                        }else{
+                                            $order->ship = 0;
+                                        }
+
+                                        if (strlen($row[20]) > 0){
+                                            $order->cost = (double)$row[20];
+                                        }else{
+                                            $order->cost = 0;
+                                        }
+                                        if (strlen($row[21]) > 0){
+                                            $order->note =  $row[21];
+                                        }
+                                        $order->statusId = 1;
+                                        $order->trackingStatusId = 0;
+                                        $order->carrierStatusId = 0;
+                                        $order->syncStoreStatusId = 0;
+                                        if ($order->categoryId > 0 && $order->sellerId > 0 && $order->vpsId > 0){
+                                            $order->save();
+                                            $numberOrderUpdate+=1;
+                                        }else{
+                                            array_push($orderNumberError,  $order->orderNumber . ' *');
+                                        }
+                                    }else{
+                                        array_push($orderNumberError,  $row[0].' '.$row[1]);
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
+                if ($numberOrderUpdate > 0){
+                    $response['status'] = true;
+                    $response['message'] = 'Đã thêm ' . $numberOrderUpdate . ' đơn hàng';
+                    if (array_count_values($orderNumberError) > 0){
+                        $response['message'] = $response['message']. ', Các đơn '. join("; ",$orderNumberError).' không thêm được.';
+                    }
+                }else{
+                    $response['status'] = false;
+                    $response['message'] = 'Đã có lỗi trong nội dung nên không thêm được.';
+                    if (array_count_values($orderNumberError) > 0){
+                        $response['message'] = 'Các đơn '. join("; ",$orderNumberError).' không thêm được.';
+                    }
+                }
+            } else{
+                $response['status'] = false;
+                $response['message'] = 'user không tồn tại.';
+            }
+
+        }catch (Exception $ex){
+
+            $response['status'] = false;
+            $response['message'] = $ex->getMessage();
+        }
+        return response()->json($response);
     }
 }

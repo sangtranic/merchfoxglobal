@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $orderNumber
  * @property string $channelId
  * @property string $shipToAddressID
- * @property string $shipToAddressName
+ * @property string $shipToFirstName
+ * @property string $shipToLastName
  * @property string $shipToAddressPhone
  * @property string $shipToAddressLine1
  * @property string $shipToAddressLine2
@@ -67,7 +68,7 @@ class Orders extends Model
      * @var array
      */
     protected $fillable = [
-        'orderNumber', 'channelId', 'vpsId', 'sellerId', 'shipToAddressID', 'shipToAddressName', 'shipToAddressPhone', 'shipToAddressLine1', 'shipToAddressLine2', 'shipToAddressCity', 'shipToAddressCounty', 'shipToAddressStateOrProvince', 'shipToAddressPostalCode', 'shipToAddressCountry', 'statusId', 'note', 'categoryId', 'productId', 'itemId', 'sku', 'style', 'size', 'color', 'productType', 'quantity', 'price', 'cost', 'profit', 'isFB', 'fulfillStatusId', 'fulfillCode', 'fulfillUserFullName', 'trackingStatusId', 'trackingCode', 'carrier', 'carrierStatusId', 'syncStoreStatusId', 'created_at', 'createBy', 'updated_at', 'updateBy'
+        'orderNumber', 'channelId', 'vpsId', 'sellerId', 'shipToAddressID', 'shipToFirstName', 'shipToLastName', 'shipToAddressPhone', 'shipToAddressLine1', 'shipToAddressLine2', 'shipToAddressCity', 'shipToAddressCounty', 'shipToAddressStateOrProvince', 'shipToAddressPostalCode', 'shipToAddressCountry', 'statusId', 'note', 'categoryId', 'productId', 'itemId', 'sku', 'style', 'size', 'color', 'productType', 'quantity', 'price', 'cost', 'profit', 'isFB', 'fulfillStatusId', 'fulfillCode', 'fulfillUserFullName', 'trackingStatusId', 'trackingCode', 'carrier', 'carrierStatusId', 'syncStoreStatusId', 'created_at', 'createBy', 'updated_at', 'updateBy'
     ];
 
     /**
@@ -76,7 +77,7 @@ class Orders extends Model
      * @var array
      */
     protected $hidden = [
-        
+
     ];
 
     /**
@@ -85,7 +86,7 @@ class Orders extends Model
      * @var array
      */
     protected $casts = [
-        'orderNumber' => 'string', 'channelId' => 'string', 'vpsId' => 'int', 'sellerId' => 'int', 'shipToAddressID' => 'string', 'shipToAddressName' => 'string', 'shipToAddressPhone' => 'string', 'shipToAddressLine1' => 'string', 'shipToAddressLine2' => 'string', 'shipToAddressCity' => 'string', 'shipToAddressCounty' => 'string', 'shipToAddressStateOrProvince' => 'string', 'shipToAddressPostalCode' => 'string', 'shipToAddressCountry' => 'string', 'statusId' => 'int', 'note' => 'string', 'categoryId' => 'int', 'itemId' => 'string', 'sku' => 'string', 'style' => 'string', 'size' => 'string', 'color' => 'string', 'productType' => 'string', 'quantity' => 'int', 'price' => 'double', 'cost' => 'double', 'profit' => 'double', 'fulfillStatusId' => 'int', 'fulfillCode' => 'string', 'fulfillUserFullName' => 'string', 'trackingStatusId' => 'int', 'trackingCode' => 'string', 'carrier' => 'string', 'carrierStatusId' => 'int', 'syncStoreStatusId' => 'int', 'created_at' => 'timestamp', 'createBy' => 'int', 'updated_at' => 'timestamp', 'updateBy' => 'int'
+        'orderNumber' => 'string', 'channelId' => 'string', 'vpsId' => 'int', 'sellerId' => 'int', 'shipToAddressID' => 'string', 'shipToFirstName' => 'string', 'shipToLastName' => 'string', 'shipToAddressPhone' => 'string', 'shipToAddressLine1' => 'string', 'shipToAddressLine2' => 'string', 'shipToAddressCity' => 'string', 'shipToAddressCounty' => 'string', 'shipToAddressStateOrProvince' => 'string', 'shipToAddressPostalCode' => 'string', 'shipToAddressCountry' => 'string', 'statusId' => 'int', 'note' => 'string', 'categoryId' => 'int', 'itemId' => 'string', 'sku' => 'string', 'style' => 'string', 'size' => 'string', 'color' => 'string', 'productType' => 'string', 'quantity' => 'int', 'price' => 'double', 'cost' => 'double', 'profit' => 'double', 'fulfillStatusId' => 'int', 'fulfillCode' => 'string', 'fulfillUserFullName' => 'string', 'trackingStatusId' => 'int', 'trackingCode' => 'string', 'carrier' => 'string', 'carrierStatusId' => 'int', 'syncStoreStatusId' => 'int', 'created_at' => 'timestamp', 'createBy' => 'int', 'updated_at' => 'timestamp', 'updateBy' => 'int'
     ];
 
     /**

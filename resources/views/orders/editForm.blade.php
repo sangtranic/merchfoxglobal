@@ -1,10 +1,23 @@
-@extends('layouts.app')
+@extends($layoutName)
 @section('title', 'Thông tin sản phẩm')
 @section('head')
     <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
 @stop
 
 @section('content')
+    @if(session('statusUpdate'))
+        <script>
+            setTimeout(function () {
+                $('#myModal .close', window.parent.document).click();
+                @if(!\App\Helper\Helper::IsNullOrEmptyString($callBack))
+                    window.parent.callBackPopop({{session('orderId')}});
+                @endif
+                @if(\App\Helper\Helper::IsNullOrEmptyString($callBack))
+                window.parent.document.location.reload();
+                @endif
+            }, 1000);
+        </script>
+    @endif
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <div class="content-header">
@@ -43,6 +56,7 @@
             @endif
             <div class="row">
                 {{ Form::hidden('userId') }}
+                {{ Form::hidden('layoutName') }}
                 <div class="col-md-6">
                     <div class="form-group row">
                         <label for="vpsId" class="col-sm-2 col-form-label">VPS</label>
@@ -83,9 +97,12 @@
                         <div class="col-sm-4">
                             {{ Form::text('shipToAddressID', null, array('class' => 'form-control')) }}
                         </div>
-                        {{ Form::label('shipToAddressName','Address Name',['class'=>'col-sm-2 col-form-label'])}}
-                        <div class="col-sm-4">
-                            {{ Form::text('shipToAddressName', null, array('class' => 'form-control')) }}
+                        {{ Form::label('shipToFirstName','Address Name',['class'=>'col-sm-2 col-form-label'])}}
+                        <div class="col-sm-2">
+                            {{ Form::text('shipToFirstName', null, array('class' => 'form-control')) }}
+                        </div>
+                        <div class="col-sm-2">
+                            {{ Form::text('shipToLastName', null, array('class' => 'form-control')) }}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -227,13 +244,13 @@
                         <label for="productId" class="col-sm-2 col-form-label">Tên sản phẩm</label>
                         <div class="col-sm-10">
                             <select class="form-control select2-auto"
-                                    data-href="{{secure_url('api-products-search')}}"
-                                    data-url="{{secure_url('api-product-detail')}}"
+                                    data-href="{{route('api-products-search')}}"
+                                    data-url="{{route('api-product-detail')}}"
                                     id="productId"
                                     name="productId"
                                     tyle="width: 100%;">
                                 @if($product)
-                                    <option>{{$product->name}}</option>
+                                    <option value="{{$product->id}}">{{$product->name}}</option>
                                 @endif
                             </select>
                         </div>
@@ -351,6 +368,7 @@
                                     class="fa fa-save"></i>
                                 Lưu thông tin
                             </button>
+                            @if($order->id == null || $order->id == 0)
                             <button id="btSaveArticle" type="submit" name="SubmitButton" value="SaveBack"
                                     class="btn btn-sm btn-primary valid" aria-invalid="false"><i
                                     class="fa fa-save"></i>
@@ -358,7 +376,7 @@
                             </button>
                             <a class="btn btn-sm btn-default" href="{{route('orders.index')}}"><i
                                     class="fa fa-times"></i> Quay lại
-                            </a>
+                            </a>@endif
                         </div>
                     </div>
                 </div>

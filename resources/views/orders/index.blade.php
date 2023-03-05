@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
 @endsection
 @section('content')
-    <?php $index = 1;?>
+    <?php $index = 0;?>
     <div class="content-wrapper">
         <!-- Main content -->
         <section class="content mt-2">
@@ -13,7 +13,7 @@
 
                 @if(session('status') && session('message'))
                     <div class="alert {{session('status') == 'Error' ? 'alert-danger':'alert-success'}}">
-                         {{session('message')}}
+                        {{session('message')}}
                     </div>
                 @endif
 
@@ -36,36 +36,37 @@
                                 <div class="form-group row">
                                     <label for="productCate" class="col-sm-2 col-form-label">Category</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" id="productCate" name="productCate">
-                                            <option value="">Tất cả</option>
-                                            @foreach ($productCates as $cate)
-                                                <option
-                                                    value="{{ $cate->id }}" {{ $productCate == $cate->id ? 'selected' : '' }}>{{ $cate->name }}</option>
-                                            @endforeach
-                                        </select>
+
+                                            <select class="form-control" id="productCate" name="productCate" onchange="this.form.submit()" >
+                                                <option value="">Tất cả</option>
+                                                @foreach ($productCates as $cate)
+                                                    <option
+                                                        value="{{ $cate->id }}" {{ $productCate == $cate->id ? 'selected' : '' }}>{{ $cate->name }}</option>
+                                                @endforeach
+                                            </select>
                                     </div>
                                     <label for="user" class="col-sm-2 col-form-label">Seller</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control select2" id="seller" name="seller">
-                                            <option value="">Tất cả</option>
-                                            @foreach ($sellers as $itemSeller)
-                                                <option
-                                                    value="{{ $itemSeller->id }}" {{ $seller == $itemSeller->id ? 'selected' : '' }}>{{ $itemSeller->sellerName }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                            <select class="form-control select2" id="seller" name="seller" onchange="this.form.submit()" >
+                                                <option value="">Tất cả</option>
+                                                @foreach ($sellers as $itemSeller)
+                                                    <option
+                                                        value="{{ $itemSeller->id }}" {{ $seller == $itemSeller->id ? 'selected' : '' }}>{{ $itemSeller->sellerName }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="vps" class="col-sm-2 col-form-label">Vps</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control select2" id="vps" name="vps">
-                                            <option value="">Tất cả</option>
-                                            @foreach ($vpses as $itemVps)
-                                                <option
-                                                    value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>
-                                            @endforeach
-                                        </select>
+                                            <select class="form-control select2" id="vps" name="vps" onchange="this.form.submit()" >
+                                                <option value="">Tất cả</option>
+                                                @foreach ($vpses as $itemVps)
+                                                    <option
+                                                        value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>
+                                                @endforeach
+                                            </select>
                                     </div>
                                 </div>
                             </div>
@@ -84,9 +85,9 @@
                                         <select class="form-control select2-auto"
                                                 data-href="{{route('api-products-search',[])}}"
                                                 id="product"
-                                                name="product">
-                                            @if($product)
-                                                <option>{{$product->name}}</option>
+                                                name="product" onchange="this.form.submit()" >
+                                            @if($productSelect)
+                                                <option value="{{$productSelect->id}}">{{$productSelect->name}}</option>
                                             @endif
                                         </select>
                                     </div>
@@ -109,27 +110,27 @@
                                 <div class="form-group row">
                                     <label for="trackingStatus" class="col-sm-2 col-form-label">Track</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="trackingStatus" name="trackingStatus">
-                                            <option value="0">...</option>
-                                            <option value="2" {{ $track == 2 ? 'selected' : '' }}>Không</option>
-                                            <option value="1" {{ $track == 1 ? 'selected' : '' }}>Có</option>
-                                        </select>
+                                            <select class="form-control" id="trackingStatus" name="trackingStatus" onchange="this.form.submit()" >
+                                                <option value="0">...</option>
+                                                <option value="2" {{ $track == 2 ? 'selected' : '' }}>Không</option>
+                                                <option value="1" {{ $track == 1 ? 'selected' : '' }}>Có</option>
+                                            </select>
                                     </div>
                                     <label for="carrieStatus" class="col-sm-2 col-form-label">Carrie</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="carrieStatus" name="carrieStatus">
-                                            <option value="0">...</option>
-                                            <option value="2" {{ $carrie == 2 ? 'selected' : '' }}>Không</option>
-                                            <option value="1" {{ $carrie == 1 ? 'selected' : '' }}>Có</option>
-                                        </select>
+                                            <select class="form-control" id="carrieStatus" name="carrieStatus" onchange="this.form.submit()" >
+                                                <option value="0">...</option>
+                                                <option value="2" {{ $carrie == 2 ? 'selected' : '' }}>Không</option>
+                                                <option value="1" {{ $carrie == 1 ? 'selected' : '' }}>Có</option>
+                                            </select>
                                     </div>
                                     <label for="isFB" class="col-sm-2 col-form-label">isFB</label>
                                     <div class="col-sm-2">
-                                        <select class="form-control" id="isFB" name="isFB">
-                                            <option value="0">...</option>
-                                            <option value="2"{{ $isFB == 2 ? 'selected' : '' }}>Chưa có</option>
-                                            <option value="1"{{ $isFB == 1 ? 'selected' : '' }}>Đã có</option>
-                                        </select>
+                                            <select class="form-control" id="isFB" name="isFB" onchange="this.form.submit()" >
+                                                <option value="0">...</option>
+                                                <option value="2"{{ $isFB == 2 ? 'selected' : '' }}>Chưa có</option>
+                                                <option value="1"{{ $isFB == 1 ? 'selected' : '' }}>Đã có</option>
+                                            </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -139,11 +140,11 @@
                                     </div>
                                     <label for="syncStoreStatus" class="col-sm-2 col-form-label">Up Ebay</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" id="syncStoreStatus" name="syncStoreStatus">
-                                            <option value="0">...</option>
-                                            <option value="2" {{ $ebay == 2 ? 'selected' : '' }}>Chưa</option>
-                                            <option value="1" {{ $ebay == 1 ? 'selected' : '' }}>Đã up</option>
-                                        </select>
+                                            <select class="form-control" id="syncStoreStatus" name="syncStoreStatus" onchange="this.form.submit()" >
+                                                <option value="0">...</option>
+                                                <option value="2" {{ $ebay == 2 ? 'selected' : '' }}>Chưa</option>
+                                                <option value="1" {{ $ebay == 1 ? 'selected' : '' }}>Đã up</option>
+                                            </select>
                                     </div>
                                 </div>
                             </div>
@@ -160,10 +161,6 @@
                                 <button class="btn btn-sm btn-default" type="button" onclick="exprortCSV(this.form)">
                                     <i class="fas fa-file-export"></i> Xuất CSV
                                 </button>
-                                <a href="javascript:void(0);" onclick="exprort()">
-                                    <div class="btn btn-sm btn-default"><i class="fas fa-file-export"></i> Xuất CSV</div>
-                                </a>
-
                                 <a href="{{route('orders.editForm',['productCate'=>$productCate,'id'=>0])}}"
                                    title="Thêm mới đơn hàng">
                                     <div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div>
@@ -175,21 +172,21 @@
                         </div>
                     </div>
                 </form>
-                    <div class="card-header" style="padding-bottom: 10px; padding-top: 0px;">
-                        <h3 class="card-title">Orders</h3>&nbsp;<small><b>Tổng số {{$counter}} đơn</b></small>
-                        <div class="card-tools">
-                            <form method="POST" action="{{ route('import-csv') }}" enctype="multipart/form-data">
-                                @csrf
-                                <button class="btn btn-sm btn-default mr-2" type="button" onclick="$('[name=file]').click()">
-                                    <i class="fas fa-upload"></i> Import CSV
-                                </button>
-                                <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required style="display: none"/>
-                            </form>
-                        </div>
+                <div class="card-header" style="padding-bottom: 10px; padding-top: 0px;">
+                    <h3 class="card-title">Orders</h3>&nbsp;<small><b>Tổng số {{$counter}} đơn</b></small>
+                    <div class="card-tools">
+                        <form method="POST" action="{{ route('import-csv') }}" enctype="multipart/form-data">
+                            @csrf
+                            <button class="btn btn-sm btn-default mr-2" type="button" onclick="$('[name=file]').click()">
+                                <i class="fas fa-upload"></i> Import CSV
+                            </button>
+                            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required style="display: none"/>
+                        </form>
                     </div>
+                </div>
 
                 <div class="card-body table-responsive p-0">
-                    <table class="table  projects table-p2">
+                    <table class="table  projects table-p2 table-o-v">
                         <thead>
                         <tr>
                             <th width="4%">
@@ -230,13 +227,14 @@
                             $vps = $vpses->where('id', $order->vpsId)->first();
                             $cate = $productCates->where('id', $order->categoryId)->first();
                             $product = null;
+                            $index++;
                             if($order->productId > 0 && $showProducts && !$showProducts->isEmpty()){
                                 $product = $showProducts->where('id', $order->productId)->first();
                             }
                             ?>
-                            <tr data-order="{{$order->id}}">
+                            <tr data-order="{{$order->id}}" data-index="{{$index}}" class="{{$index % 2 == 0 ?'odd':'even'}}">
                                 <td rowspan="2" class="text-center">
-                                    {{$index++}}
+                                    {{$index}}
                                 </td>
                                 <td>
                                     <p>{{$userCr->fullName}}</p>
@@ -271,21 +269,21 @@
                                         <span class="badge badge-info">Đã Tracking</span>
                                     @endif
 
-                                        @if($order->carrierStatusId ==0)
-                                            <span class="badge badge-secondary">Chưa Carrie</span>
-                                        @else
-                                            <p>{{$order->carrier}}</p>
-                                            <span class="badge badge-info">Đã Carrie</span>
-                                        @endif
+                                    @if($order->carrierStatusId ==0)
+                                        <span class="badge badge-secondary">Chưa Carrie</span>
+                                    @else
+                                        <p>{{$order->carrier}}</p>
+                                        <span class="badge badge-info">Đã Carrie</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <p>Quantity: <b>{{$order->quantity}}</b></p>
                                     <p>Price: <b>{{$order->price}} $</b></p>
-                                    <p>Price: <b>{{$order->cost}} $</b></p>
-                                    <p>Price: <b>{{$order->profit}} $</b></p>
+                                    <p>Fee Ship: <b>{{$order->ship}} $</b></p>
+                                    <p>Total: <b>{{$order->cost}} $</b></p>
                                 </td>
                                 <td class="project-actions text-center" rowspan="2">
-                                    <a class="btn btn-default btn-sm text-info" title="Edit" href="{{route('orders.editForm',['productCate'=>$order->categoryId,'id'=>$order->id])}}">
+                                    <a class="btn btn-default btn-sm text-info openPopup" data-width="100%"  title="Edit" href="javascript:void(0)  " data-href="{{route('orders.editForm',['productCate'=>$order->categoryId,'id'=>$order->id,'layout'=>'layouts.appblank','callBack'=>'callBackPopop'])}}">
                                         <i class="fas fa-pencil-alt">
                                         </i>
                                     </a>
@@ -298,62 +296,62 @@
                                 </td>
                             </tr>
 
-                            <tr data-order="{{$order->id}}">
+                            <tr data-order="{{$order->id}}" data-index="{{$index}}" class="{{$index % 2 == 0 ?'odd':'even'}}">
                                 <td colspan="3">
                                     @if($product)
 
-                                    <div class="form-group row img-product">
-                                        <div class="col-sm-3">
-                                            <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->urlImagePreviewOne}}"/>
+                                        <div class="form-group row img-product">
+                                            <div class="col-sm-3">
+                                                <div class="img-p imp-p-list">
+                                                    <img width="100%" src="{{strlen($product->urlImagePreviewOne) > 0 ?$product->urlImagePreviewOne:\App\Helper\Helper::$IMG_DEFAULT }}"/>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewOne}}">
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewOne}}">
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->urlImagePreviewTwo}}"/>
+                                            <div class="col-sm-3">
+                                                <div class="img-p imp-p-list">
+                                                    <img width="100%" src="{{strlen($product->urlImagePreviewTwo) > 0 ?$product->urlImagePreviewTwo:\App\Helper\Helper::$IMG_DEFAULT }}"/>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewTwo}}">
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->urlImagePreviewTwo}}">
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->url_img_design1}}"/>
+                                            <div class="col-sm-3">
+                                                <div class="img-p imp-p-list">
+                                                    <img width="100%" src="{{strlen($product->url_img_design1) > 0 ?$product->url_img_design1:\App\Helper\Helper::$IMG_DEFAULT }}"/>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Path" value="{{\App\Helper\Helper::getImageUrlPath($product->url_img_design1,'original',true) }}">
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->url_img_design1}}">
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <div class="img-p imp-p-list">
-                                                <img width="100%" src="{{$product->url_img_design2}}"/>
+                                            <div class="col-sm-3">
+                                                <div class="img-p imp-p-list">
+                                                    <img width="100%" src="{{strlen($product->url_img_design2) > 0 ?$product->url_img_design2:\App\Helper\Helper::$IMG_DEFAULT }}"/>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Path" value="{{\App\Helper\Helper::getImageUrlPath($product->url_img_design2,'original',true)}}">
                                             </div>
-                                            <input type="text" class="form-control" placeholder="Path" value="{{$product->url_img_design2}}">
                                         </div>
-                                    </div>
                                     @endif
                                 </td>
 
                                 <td colspan="3">
                                     @if($product)
-                                    <h5><b class="text-info">{{$product->name}}</b></h5>
+                                        <h5><a href="{{strlen($order->itemId) >0 ?'https://www.ebay.com/itm/'.$order->itemId:'#'}}"><b class="text-info">{{$product->name}}</b></a></h5>
                                     @endif
                                     <div class="form-group row">
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">SKU</label>
-                                        <div class="col-sm-4">
+                                        <span class="col-sm-2">SKU</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->sku}}</b>
-                                        </div>
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Style</label>
-                                        <div class="col-sm-4">
+                                        </span>
+                                        <span class="col-sm-2">Style</span>
+                                        <span class="col-sm-4">
                                             <b>{{$cate->name}}</b>
-                                        </div>
+                                        </span>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Size</label>
-                                        <div class="col-sm-4">
+                                        <span  class="col-sm-2">Size</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->size}}</b>
-                                        </div>
-                                        <label for="txtKeyword" class="col-sm-2 col-form-label">Color</label>
-                                        <div class="col-sm-4">
+                                        </span>
+                                        <span class="col-sm-2">Color</span>
+                                        <span class="col-sm-4">
                                             <b>{{$order->color}}</b>
-                                        </div>
+                                        </span>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-12">
@@ -383,6 +381,20 @@
     <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
 
     <script>
+
+        function callBackPopop(orderId) {
+            if (orderId != null && orderId > 0) {
+                $.get('{{route('api-order-row')}}?id=' + orderId+'&index='+$('tr[data-order='+orderId+']:first').attr('data-index'), function (data, status) {
+                    if (data != null && data.indexOf('$$$')>0) {
+                        var dataArrs = data.split('$$$');
+                        $('tr[data-order='+orderId+']:first').focus();
+                        $('tr[data-order='+orderId+']:first').replaceWith(dataArrs[0]);
+                        $('tr[data-order='+orderId+']:last').replaceWith(dataArrs[1]);
+                    }
+                });
+            }
+        }
+
         function exprortCSV(form) {
             if($('tr[data-order]').length == 0){
                 alert('Không có đơn hàng nào, vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
@@ -427,11 +439,11 @@
             }
         }
         function exprortUpEbay(form) {
-            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '0'){
+            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '2'){
                 alert('Không có đơn hàng nào, hoặc các đơn hàng chưa phải là các đơn hàng chưa Up Ebay, vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
             }else{
                 $.ajax({
-                    url: "{{route('export-csv')}}",
+                    url: "{{route('export-up-ebay')}}",
                     type: "get",
                     data: $(form).serialize(),xhr: function () {
                         var xhr = new XMLHttpRequest();
@@ -468,60 +480,6 @@
                     }
                 });
             }
-        }
-        function exprort()
-        {
-
-            var dateFrom = $('#dateFrom').val();
-            var dateTo = $('#dateTo').val();
-            var productCate = $('select[name="productCate"]').val();
-            var userId = $('select[name="user"]').val();
-            var vps = $('select[name="vps"]').val();
-            var orderNumber =$('input[id="orderNumber"]').val();
-            var productName =$('input[id="product"]').val();
-            var keyword =$('input[id="keyword"]').val();
-            var customer =$('input[id="customer"]').val();
-            var slTrack = $('select[id="track"]').val();
-            var slVps = $('select[id="vps"]').val();
-            var slEbayStatus = $('select[id="syncStoreStatus"]').val();
-            $.ajax({
-                url: "{{route('export-to-csv')}}",
-                type: "get",
-                data: {
-                    'dateFrom': dateFrom,
-                    'dateTo': dateTo,
-                    'productCate': productCate,
-                    'userId' : userId,
-                    'vps' : vps,
-                    'orderNumber' : orderNumber,
-                    'productName' : productName,
-                    'keyword' : keyword,
-                    'customer' : customer,
-                    'slTrack' : slTrack,
-                    'slVps' : slVps,
-                    'slEbayStatus' : slEbayStatus
-                },
-                success: function (data, status, xhr) {
-                    let filename = "";
-                    let disposition = xhr.getResponseHeader('Content-Disposition');
-                    if (disposition && disposition.indexOf('attachment') !== -1) {
-                        let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                        let matches = filenameRegex.exec(disposition);
-                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-                    }
-                    let a = document.createElement('a');
-                    let url = window.URL.createObjectURL(data);
-                    a.href = url;
-                    a.download = filename.replace('UTF-8', '');;
-                    document.body.append(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus, errorThrown);
-                }
-            });
         }
         function confirmDelete(event, id) {
             event.preventDefault();
@@ -612,3 +570,4 @@
         }
     </script>
 @endsection
+
