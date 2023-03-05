@@ -53,7 +53,7 @@ use Illuminate\Support\Facades\Collection;?>
 
                                 <div class="chart">
                                     <div class="card-body table-responsive">
-                                        <canvas id="myChartCustom" style="width: 100%; min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                        <canvas id="myChartCustom" style="width: 100%; min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@ use Illuminate\Support\Facades\Collection;?>
 
                                 <div class="chart">
                                     <div class="card-body table-responsive">
-                                        <canvas id="myChartVps" style="width: 100%; min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                        <canvas id="myChartVps" style="width: 100%; min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>
