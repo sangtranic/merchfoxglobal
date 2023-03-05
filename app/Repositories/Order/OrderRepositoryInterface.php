@@ -7,5 +7,4 @@ interface OrderRepositoryInterface extends RepositoryInterface
 {
     public function get($id);
     public function search($dateFrom, $dateTo,$userId);
-    public function searchByVps($dateFrom, $dateTo,$userId);
 }

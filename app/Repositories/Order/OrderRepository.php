@@ -3,6 +3,7 @@ namespace App\Repositories\Order;
 
 use App\Models\Orders;
 use App\Repositories\BaseRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OrderRepository extends BaseRepository implements OrderRepositoryInterface
@@ -20,50 +21,32 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
 
     public function search($dateFrom, $dateTo,$userId)
     {
-        $query = DB::table('orders')
-            ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
-            ->leftjoin('users', 'vps.userId', '=', 'users.id')
-            ->select('orders.id', 'orders.orderNumber', 'orders.vpsId','orders.created_at',  DB::raw('users.id as userId'), 'users.userName');//Orders::query();
-        if ($dateFrom && $dateTo) {
-            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
-        } else if ($dateFrom) {
-            $query->whereDate('created_at', '>=', $dateFrom);
-        } else if ($dateTo) {
-            $query->whereDate('created_at', '<=', $dateTo);
-        }
-        if($userId>0)
-        {
-            $query->where('users.id', '=', $userId);
-        }
-        $query->where('users.statusId', '=', 3);
-        //$sql = $query->toSql();
-//        dump($dateFrom);
-//        dump($dateTo);
-//        dump($sql);
-        $orders = $query->get();
-        return $orders;
-        // TODO: Implement search() method.
-    }
+        $modelName = get_class($this->model);
+        $cacheKey = $modelName.$dateFrom.$dateTo.$userId."Cache";
+        $data = Cache::get($cacheKey);
+        if (!$data) {
+            $query = DB::table('orders')
+                ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
+                ->leftjoin('users', 'vps.userId', '=', 'users.id')
+                ->select('orders.id', 'orders.orderNumber', 'orders.vpsId','orders.created_at',  DB::raw('users.id as userId'), 'users.userName');//Orders::query();
+            if ($dateFrom && $dateTo) {
+                $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+            } else if ($dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            } else if ($dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            }
+            if($userId>0)
+            {
+                $query->where('users.id', '=', $userId);
+            }
+            $query->where('users.statusId', '=', 3);
+            $data = $query->get();
 
-    public function searchByVps($dateFrom, $dateTo, $userId)
-    {
-        $query = DB::table('orders')
-            ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
-            ->leftjoin('users', 'vps.userId', '=', 'users.id')
-            ->select('orders.id', 'orders.orderNumber', 'orders.vpsId','orders.created_at',  DB::raw('users.id as userId'), 'users.userName');//Orders::query();
-        if ($dateFrom && $dateTo) {
-            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
-        } else if ($dateFrom) {
-            $query->whereDate('created_at', '>=', $dateFrom);
-        } else if ($dateTo) {
-            $query->whereDate('created_at', '<=', $dateTo);
+            Cache::remember($cacheKey, 5, function () use ($data) {
+                return $data;
+            });
         }
-        if($userId>0)
-        {
-            $query->where('users.id', '=', $userId);
-        }
-        $query->where('users.statusId', '=', 3);
-        $orders = $query->get();
-        return $orders;
+        return $data;
     }
 }
