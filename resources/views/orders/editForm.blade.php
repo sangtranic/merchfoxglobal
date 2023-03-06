@@ -259,7 +259,7 @@
                         <label for="slOrderType" class="col-sm-2 col-form-label">Ảnh mặt trước</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="urlImagePreviewOne"
-                                   name="urlImagePreviewOne" placeholder="Ảnh mặt trước">
+                                   name="urlImagePreviewOne" value="{{ $product ? $product->urlImagePreviewOne : ''}}" placeholder="Ảnh mặt trước">
                         </div>
                     </div>
 
@@ -267,7 +267,7 @@
                         <label for="slOrderType" class="col-sm-2 col-form-label">Ảnh mặt sau</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="urlImagePreviewTwo"
-                                   name="urlImagePreviewTwo" placeholder="Ảnh mặt sau">
+                                   name="urlImagePreviewTwo"  value="{{$product ? $product->urlImagePreviewTwo : ''}}"  placeholder="Ảnh mặt sau">
                         </div>
                     </div>
                     <div class="form-group row">
