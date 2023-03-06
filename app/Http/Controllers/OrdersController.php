@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\FileUploadHelper;
 use App\Helper\Helper;
+use App\Helper\OrderExport;
 use App\Models\Objectstatus;
 use App\Models\Orders;
 use App\Models\Productcategories;
@@ -19,6 +20,7 @@ use Illuminate\View\View;
 use League\Csv\Reader;
 use Illuminate\Http\Response;
 use League\Csv\Writer;
+use Maatwebsite\Excel\Facades\Excel;
 use const http\Client\Curl\AUTH_ANY;
 
 class OrdersController extends Controller
@@ -175,24 +177,24 @@ class OrdersController extends Controller
             });
         }
         if ($filter_trackStatusId > 0) {
-            $query->where('trackingStatusId',"=", $filter_trackStatusId == 2 ? 0 : $filter_trackStatusId);
+            $query->where('trackingStatusId', "=", $filter_trackStatusId == 2 ? 0 : $filter_trackStatusId);
         }
         if ($filter_carrieStatusId > 0) {
-            $query->where('carrierStatusId',"=", $filter_carrieStatusId == 2 ? 0 : $filter_carrieStatusId);
+            $query->where('carrierStatusId', "=", $filter_carrieStatusId == 2 ? 0 : $filter_carrieStatusId);
         }
         if ($filter_syncStoreStatusId > 0) {
-            $query->where('syncStoreStatusId',"=", $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
+            $query->where('syncStoreStatusId', "=", $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
         }
         if ($filter_isFB > 0) {
-            $query->where('isFB',"=", $filter_isFB == 2 ? 0 : $filter_isFB);
+            $query->where('isFB', "=", $filter_isFB == 2 ? 0 : $filter_isFB);
         }
 
 
         $counter = $query->count();
 
-        if ($isAll){
+        if ($isAll) {
             $orders = $query->get();
-        }else{
+        } else {
             $orders = $query->paginate($this->ROWAMOUNT);
         }
 
@@ -201,7 +203,7 @@ class OrdersController extends Controller
         if (!($orders->isEmpty())) {
             $productIds = $orders->pluck('productId')->toArray();
             $showProducts = Products::whereIn('id', $productIds)->get();
-            if ($filter_product > 0){
+            if ($filter_product > 0) {
                 $productSelect = $showProducts->where('id', $filter_product)->first();
             }
         }
@@ -275,13 +277,13 @@ class OrdersController extends Controller
                 $order = new Orders();
             } else {
                 $vpsItem = Vps::findOrFail($order->vpsId);
-                if ($order->productId && $order->productId > 0){
+                if ($order->productId && $order->productId > 0) {
 
                     $product = Products::findOrFail($order->productId);
                     $product->imageDesign1 = $product->url_img_design1;
                     $product->imageDesign2 = $product->url_img_design2;
                 }
-                if ($vpsItem){
+                if ($vpsItem) {
                     $vpses = Vps::where('userId', $vpsItem->userId)->get();
                     $sellers = Seller::where('userId', $vpsItem->userId)->get();
                 }
@@ -297,7 +299,7 @@ class OrdersController extends Controller
         if ($sellers == null) {
             $sellers = Seller::where('userId', Auth::id())->get();
         }
-         return view('orders.editForm', [
+        return view('orders.editForm', [
             'layoutName' => $layout_name,
             'order' => $order,
             'vpses' => $vpses,
@@ -321,18 +323,18 @@ class OrdersController extends Controller
             'sellerId' => 'required',
             'vpsId' => 'required',
             'orderNumber' => 'required|unique:orders,orderNumber',
-            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes,
-            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes
-        ],['orderNumber.unique' => 'Đơn hàng đã tồn tại',
-            'imageDesignOne.mimes'=>'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
-            'imageDesignTwo.mimes'=>'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
-            'imageDesignOne.max'=>'File ảnh thiết kế mặt trước cho phép tối đa '.$maxUploadSize,
-            'imageDesignTwo.max'=>'File ảnh thiết kế mặt sau cho phép tối đa '.$maxUploadSize]);
+            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes,
+            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes
+        ], ['orderNumber.unique' => 'Đơn hàng đã tồn tại',
+            'imageDesignOne.mimes' => 'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignTwo.mimes' => 'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignOne.max' => 'File ảnh thiết kế mặt trước cho phép tối đa ' . $maxUploadSize,
+            'imageDesignTwo.max' => 'File ảnh thiết kế mặt sau cho phép tối đa ' . $maxUploadSize]);
 
 
         $order = new Orders($request->all());
-        if (Orders::where('orderNumber',$request->input('orderNumber'))->get()->count() > 0){
-            return back()->withErrors(["Đơn hàng ".$request->input('orderNumber').' đã tồn tại.']);
+        if (Orders::where('orderNumber', $request->input('orderNumber'))->get()->count() > 0) {
+            return back()->withErrors(["Đơn hàng " . $request->input('orderNumber') . ' đã tồn tại.']);
         }
         if ($order->productId == 0) {
             if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
@@ -396,109 +398,109 @@ class OrdersController extends Controller
             'sellerId' => 'required',
             'vpsId' => 'required',
             'orderNumber' => 'required',
-            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes,
-            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes
-        ],['imageDesignOne.mimes'=>'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
-            'imageDesignTwo.mimes'=>'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
-            'imageDesignOne.max'=>'File ảnh thiết kế mặt trước cho phép tối đa '.$maxUploadSize,
-            'imageDesignTwo.max'=>'File ảnh thiết kế mặt sau cho phép tối đa '.$maxUploadSize]);
+            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes,
+            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes
+        ], ['imageDesignOne.mimes' => 'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignTwo.mimes' => 'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignOne.max' => 'File ảnh thiết kế mặt trước cho phép tối đa ' . $maxUploadSize,
+            'imageDesignTwo.max' => 'File ảnh thiết kế mặt sau cho phép tối đa ' . $maxUploadSize]);
         $order = Orders::findOrFail($id);
-        if ($request->has('orderNumber')){
+        if ($request->has('orderNumber')) {
             $order->orderNumber = $request->input('orderNumber');
         }
-        if ($request->has('vpsId')){
+        if ($request->has('vpsId')) {
             $order->vpsId = $request->integer('vpsId');
         }
-        if ($request->has('sellerId')){
+        if ($request->has('sellerId')) {
             $order->sellerId = $request->integer('sellerId');
         }
-        if ($request->has('shipToAddressID')){
+        if ($request->has('shipToAddressID')) {
             $order->shipToAddressID = $request->input('shipToAddressID');
         }
-        if ($request->has('shipToFirstName')){
+        if ($request->has('shipToFirstName')) {
             $order->shipToFirstName = $request->input('shipToFirstName');
         }
-        if ($request->has('shipToLastName')){
+        if ($request->has('shipToLastName')) {
             $order->shipToLastName = $request->input('shipToLastName');
         }
-        if ($request->has('shipToAddressPhone')){
+        if ($request->has('shipToAddressPhone')) {
             $order->shipToAddressPhone = $request->input('shipToAddressPhone');
         }
-        if ($request->has('shipToAddressLine1')){
+        if ($request->has('shipToAddressLine1')) {
             $order->shipToAddressLine1 = $request->input('shipToAddressLine1');
         }
-        if ($request->has('shipToAddressLine2')){
+        if ($request->has('shipToAddressLine2')) {
             $order->shipToAddressLine2 = $request->input('shipToAddressLine2');
         }
-        if ($request->has('shipToAddressCity')){
+        if ($request->has('shipToAddressCity')) {
             $order->shipToAddressCity = $request->input('shipToAddressCity');
         }
-        if ($request->has('shipToAddressCounty')){
+        if ($request->has('shipToAddressCounty')) {
             $order->shipToAddressCounty = $request->input('shipToAddressCounty');
         }
-        if ($request->has('shipToAddressStateOrProvince')){
+        if ($request->has('shipToAddressStateOrProvince')) {
             $order->shipToAddressStateOrProvince = $request->input('shipToAddressStateOrProvince');
         }
-        if ($request->has('shipToAddressPostalCode')){
+        if ($request->has('shipToAddressPostalCode')) {
             $order->shipToAddressPostalCode = $request->input('shipToAddressPostalCode');
         }
-        if ($request->has('shipToAddressCountry')){
+        if ($request->has('shipToAddressCountry')) {
             $order->shipToAddressCountry = $request->input('shipToAddressCountry');
         }
-        if ($request->has('statusId')){
+        if ($request->has('statusId')) {
             $order->statusId = $request->integer('statusId');
         }
-        if ($request->has('note')){
+        if ($request->has('note')) {
             $order->note = $request->input('note');
         }
-        if ($request->has('categoryId')){
+        if ($request->has('categoryId')) {
             $order->categoryId = $request->integer('categoryId');
         }
-        if ($request->has('productId')){
+        if ($request->has('productId')) {
             $order->productId = $request->integer('productId');
         }
-        if ($request->has('sku')){
+        if ($request->has('sku')) {
             $order->sku = $request->input('sku');
         }
-        if ($request->has('size')){
+        if ($request->has('size')) {
             $order->size = $request->input('size');
         }
-        if ($request->has('color')){
+        if ($request->has('color')) {
             $order->color = $request->input('color');
         }
 
-        if ($request->has('quantity')){
+        if ($request->has('quantity')) {
             $order->quantity = $request->integer('quantity');
         }
 
-        if ($request->has('price')){
+        if ($request->has('price')) {
             $order->price = $request->input('price');
         }
-        if ($request->has('ship')){
+        if ($request->has('ship')) {
             $order->ship = $request->input('ship');
         }
 
-        if ($request->has('cost')){
+        if ($request->has('cost')) {
             $order->cost = $request->input('cost');
         }
 
-        if ($request->has('profit')){
+        if ($request->has('profit')) {
             $order->profit = $request->input('profit');
         }
 
-        if ($request->has('fulfillCode')){
+        if ($request->has('fulfillCode')) {
             $order->fulfillCode = $request->input('fulfillCode');
         }
 
-        if ($request->has('trackingCode')){
+        if ($request->has('trackingCode')) {
             $order->trackingCode = $request->input('trackingCode');
         }
 
-        if ($request->has('carrier')){
+        if ($request->has('carrier')) {
             $order->carrier = $request->input('carrier');
         }
 
-        if ($request->has('itemId')){
+        if ($request->has('itemId')) {
             $order->itemId = $request->input('itemId');
         }
         if ($order->productId == 0) {
@@ -559,14 +561,14 @@ class OrdersController extends Controller
     public function orderRow(Request $request)
     {
         $index = 1;
-        if ($request->has('index')){
+        if ($request->has('index')) {
             $index = $request->integer('index');
         }
-        if ($request->has('id')){
+        if ($request->has('id')) {
             $id = $request->integer('id');
             $order = Orders::findOrFail($id);
             $product = null;
-            if($order->productId > 0){
+            if ($order->productId > 0) {
                 $product = Products::findOrFail($order->productId);
                 $product->imageDesign1 = $product->url_img_design1;
                 $product->imageDesign2 = $product->url_img_design2;
@@ -579,7 +581,7 @@ class OrdersController extends Controller
             $cate = Productcategories::where('id', $order->categoryId)->first();
             return view('orders.orderrow', [
                 'order' => $order,
-                'product'=>$product,
+                'product' => $product,
                 'index' => $index,
                 'userCr' => $userCr,
                 'userUp' => $userUp,
@@ -606,7 +608,7 @@ class OrdersController extends Controller
         });
         foreach ($listOrderPluck as $row) {
             $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
-            array_push($data, [$row['id'], $row['fulfillCode'], $row['trackingCode'], $row['carrier'],$row['syncStoreStatusId'],$row['note'] ]);
+            array_push($data, [$row['id'], $row['fulfillCode'], $row['trackingCode'], $row['carrier'], $row['syncStoreStatusId'], $row['note']]);
         }
 
         // Create a new CSV writer
@@ -625,9 +627,9 @@ class OrdersController extends Controller
     public function exportUpToEbay(Request $request)
     {
         $response = ["status" => false, "message" => "", 'data' => null];
-        try{
+        try {
             $model = $this->getIndexModel($request, true);
-            if ($model['ebay'] == 2 && $model['vps'] != 0 && count($model['orders']) > 0 ){
+            if ($model['ebay'] == 2 && $model['vps'] != 0 && count($model['orders']) > 0) {
                 $data = [
                     ['Order ID', 'Logistics Status', 'Shipment Carrier', 'Shipment Tracking']
                 ];
@@ -637,49 +639,80 @@ class OrdersController extends Controller
                         ->all();
                 });
                 foreach ($listOrderPluck as $row) {
-                    array_push($data, [$row['orderNumber'], 'SHIPPED', $row['carrier'], $row['trackingCode'] ]);
+                    array_push($data, [$row['orderNumber'], 'SHIPPED', $row['carrier'], $row['trackingCode']]);
                 }
-                $idOrders = $model['orders']-> pluck('id');
+                $idOrders = $model['orders']->pluck('id');
                 // Create a new CSV writer
                 $sellerName = '';
-                if ($model['sellers'] && count($model['sellers']) > 0 && $model['vpses'] && count($model['vpses']) > 0){
-                    $vpsItem =  $model['vpses']->where('id', $model['vps'])->first();
-                    if ($vpsItem){
+                if ($model['sellers'] && count($model['sellers']) > 0 && $model['vpses'] && count($model['vpses']) > 0) {
+                    $vpsItem = $model['vpses']->where('id', $model['vps'])->first();
+                    if ($vpsItem) {
                         $seller = $model['sellers']->where('userId', $vpsItem->userId)->first();
-                        if ($seller){
+                        if ($seller) {
                             $sellerName = $seller->sellerName;
                         }
                     }
                 }
-                $csv = Writer::createFromPath(storage_path('app/uptoebays/'.$sellerName.'.csv'), 'w+');
+                $csv = Writer::createFromPath(storage_path('app/uptoebays/' . $sellerName . '.csv'), 'w+');
                 // Insert the data into the CSV
                 $csv->insertAll($data);
-                DB::table('orders')-> whereIn('id', $idOrders)->update(['syncStoreStatusId'=>1]);
+                DB::table('orders')->whereIn('id', $idOrders)->update(['syncStoreStatusId' => 1]);
                 $response['status'] = true;
-                $response['message'] = 'Xuất thành công '.count($listOrderPluck).' đơn hàng.';
-            }else{
+                $response['message'] = 'Xuất thành công ' . count($listOrderPluck) . ' đơn hàng.';
+            } else {
                 $response['status'] = false;
                 $response['message'] = 'Kiểm tra lại thông tin trước khi xuất file, đảm bảo đã chọn seller, trạng thái chưa up ebay và có dữ liệu.';
             }
-        }catch (\Exception $ex){
+        } catch (\Exception $ex) {
             $response['status'] = false;
             $response['message'] = $ex->getMessage();
         }
         return response()->json($response);
-
-//        return response((string)$csv, 200, [
-//            'Content-Type' => 'text/plain; charset=UTF-8',
-//            'Content-Encoding' => 'UTF-8',
-//            'Content-Transfer-Encoding' => 'binary',
-//            'Content-Disposition' => 'attachment; filename="order-fulfilment-'. Carbon::parse(Carbon::now())->timezone('Asia/Ho_Chi_Minh')->format('dmY-Hi').'.csv"',
-//        ]);
     }
 
+    public function exportOrders(Request $request)
+    {
+        $model = $this->getIndexModel($request);
+        $heading = ['STT ID Order', 'Date', 'ID Order', 'Title', 'Link Products Front', 'Link Products Back', 'Link DS Front', 'Link DS Back',
+            'Size/Color', 'First Name', 'Last Name', 'Address 1', 'Address 2', 'City', 'Bang',
+            'Zipcode', 'Country', 'Phone', 'ID Fullfil', 'Note'];
+        $data = [
+
+        ];
+        foreach ($model['orders'] as $orderItem) {
+            $productItem = null;
+            if ($model['showProducts'] && count($model['showProducts']) > 0 && $orderItem->productId > 0) {
+                $productItem = $model['showProducts']->where('id', $orderItem->productId)->first();
+            }
+            array_push($data, [
+                $orderItem->id,
+                Carbon::parse($orderItem->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y'),
+                $orderItem->orderNumber,
+                $productItem != null ? $productItem->name:'',
+                $productItem != null ? $productItem->urlImagePreviewOne:'',
+                $productItem != null ? $productItem->urlImagePreviewTwo:'',
+                $productItem != null ? $productItem->url_img_original_design1:'',
+                $productItem != null ? $productItem->url_img_original_design2:'',
+                $orderItem->size.'/'.$orderItem->color,
+                $orderItem->shipToFirstName,
+                $orderItem->shipToLastName,
+                $orderItem->shipToAddressLine1,
+                $orderItem->shipToAddressLine2,
+                $orderItem->shipToAddressCity,
+                $orderItem->shipToAddressStateOrProvince,
+                $orderItem->shipToAddressPostalCode,
+                $orderItem->shipToAddressCountry,
+                $orderItem->shipToAddressPhone,
+                $orderItem->fulfillCode,
+                $orderItem->note
+                ]);
+        }
+        return Excel::download(new OrderExport($heading,$data), 'orders_'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.xlsx');
+    }
 
     public function importCsv(Request $request)
     {
         $request->validate([
-            //'file' => 'required|mimes:xlsx,xls,csv,ods'
             'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ]);
 

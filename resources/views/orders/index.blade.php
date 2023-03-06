@@ -161,6 +161,9 @@
                                 <button class="btn btn-sm btn-default" type="button" onclick="exprortCSV(this.form)">
                                     <i class="fas fa-file-export"></i> Xuất CSV
                                 </button>
+                                <button class="btn btn-sm btn-default" type="button" onclick="exprortOrders(this.form)">
+                                    <i class="fas fa-file-export"></i> Xuất Order
+                                </button>
                                 <a href="{{route('orders.editForm',['productCate'=>$productCate,'id'=>0])}}"
                                    title="Thêm mới đơn hàng">
                                     <div class="btn btn-sm btn-primary"><i class="fa fa-plus-square"></i> Thêm mới</div>
@@ -408,6 +411,49 @@
             }else{
                 $.ajax({
                     url: "{{route('export-csv')}}",
+                    type: "get",
+                    data: $(form).serialize(),xhr: function () {
+                        var xhr = new XMLHttpRequest();
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 2) {
+                                if (xhr.status == 200) {
+                                    xhr.responseType = "blob";
+                                } else {
+                                    xhr.responseType = "text";
+                                }
+                            }
+                        };
+                        return xhr;
+                    },
+                    success: function (data, status, xhr) {
+                        let filename = "";
+                        let disposition = xhr.getResponseHeader('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                            let matches = filenameRegex.exec(disposition);
+                            if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                        }
+                        let a = document.createElement('a');
+                        let url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.download = filename.replace('UTF-8', '');;
+                        document.body.append(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+        }
+        function exprortOrders(form) {
+            if($('tr[data-order]').length == 0){
+                alert('Không có đơn hàng nào, vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
+            }else{
+                $.ajax({
+                    url: "{{route('export-orders')}}",
                     type: "get",
                     data: $(form).serialize(),xhr: function () {
                         var xhr = new XMLHttpRequest();

@@ -93,5 +93,17 @@ class Products extends Model
         }
         return '';
     }
+    function getUrlImgOriginalDesign1Attribute(){
+        if(!Helper::IsNullOrEmptyString($this->urlImageDesignOne)){
+            return Helper::getImageUrlPath($this->urlImageDesignOne,'original', true);
+        }
+        return '';
+    }
+    function getUrlImgOriginalDesign2Attribute(){
+        if(!Helper::IsNullOrEmptyString($this->urlImageDesignTwo)){
+            return Helper::getImageUrlPath($this->urlImageDesignTwo,'original', true);
+        }
+        return '';
+    }
     // Relations ...
 }
