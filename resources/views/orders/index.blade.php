@@ -87,7 +87,7 @@
                                                 id="product"
                                                 name="product" onchange="this.form.submit()" >
                                             @if($productSelect)
-                                                <option value="{{$productSelect->id}}">{{$productSelect->name}}</option>
+                                                <option value="{{$productSelect->id}}" selected>{{$productSelect->name}}</option>
                                             @endif
                                         </select>
                                     </div>
@@ -282,6 +282,12 @@
                                     <p>Price: <b>{{$order->price}} $</b></p>
                                     <p>Fee Ship: <b>{{$order->ship}} $</b></p>
                                     <p>Total: <b>{{$order->cost}} $</b></p>
+
+                                    @if($order->syncStoreStatusId ==0)
+                                        <span class="badge badge-warning">Chưa Up Ebay</span>
+                                    @else
+                                        <span class="badge badge-success">Đã cập nhật lên Ebay</span>
+                                    @endif
                                 </td>
                                 <td class="project-actions text-center" rowspan="2">
                                     <a class="btn btn-default btn-sm text-info openPopup" data-width="100%"  title="Edit" href="javascript:void(0)  " data-href="{{route('orders.editForm',['productCate'=>$order->categoryId,'id'=>$order->id,'layout'=>'layouts.appblank','callBack'=>'callBackPopop'])}}">
@@ -440,44 +446,20 @@
             }
         }
         function exprortUpEbay(form) {
-            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '2'){
-                alert('Không có đơn hàng nào, hoặc các đơn hàng chưa phải là các đơn hàng chưa Up Ebay, vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
+            if($('tr[data-order]').length == 0 || $('#syncStoreStatus').val() != '2'|| $('#vps').val() == '' || parseInt($('#vps').val())  == 0){
+                alert('Không có đơn hàng nào, hoặc các đơn hàng chưa phải là các đơn hàng chưa Up Ebay, hoặc chưa chọn seller vui lòng tìm kiếm các đơn hàng trước khi xuất file.')
             }else{
                 $.ajax({
                     url: "{{route('export-up-ebay')}}",
                     type: "get",
-                    data: $(form).serialize(),xhr: function () {
-                        var xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function () {
-                            if (xhr.readyState == 2) {
-                                if (xhr.status == 200) {
-                                    xhr.responseType = "blob";
-                                } else {
-                                    xhr.responseType = "text";
-                                }
-                            }
-                        };
-                        return xhr;
-                    },
+                    data: $(form).serialize(),
                     success: function (data, status, xhr) {
-                        let filename = "";
-                        let disposition = xhr.getResponseHeader('Content-Disposition');
-                        if (disposition && disposition.indexOf('attachment') !== -1) {
-                            let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                            let matches = filenameRegex.exec(disposition);
-                            if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
-                        }
-                        let a = document.createElement('a');
-                        let url = window.URL.createObjectURL(data);
-                        a.href = url;
-                        a.download = filename.replace('UTF-8', '');;
-                        document.body.append(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
+                         if(data != null){
+                             alert(data.message);
+                         }
                     },
                     error: function (xhr) {
-                        console.log(xhr.responseText);
+                        alert('Đã có lỗi export file.')
                     }
                 });
             }

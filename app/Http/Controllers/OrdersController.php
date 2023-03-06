@@ -11,8 +11,10 @@ use App\Models\Products;
 use App\Models\Seller;
 use App\Models\Users;
 use App\Models\Vps;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use League\Csv\Reader;
 use Illuminate\Http\Response;
@@ -311,12 +313,23 @@ class OrdersController extends Controller
 
     public function store(Request $request)
     {
+        $maxUploadSize = ini_get('upload_max_filesize');
+        $maxUploadSizeInBytes = intval($maxUploadSize) * pow(1024, strpos('KMGTPEZY', strtoupper(substr($maxUploadSize, -1))) + 1);
+
         $request->validate([
             'categoryId' => 'required',
             'sellerId' => 'required',
             'vpsId' => 'required',
-            'orderNumber' => 'required|unique:orders,orderNumber'
-        ],['orderNumber.unique' => 'Đơn hàng đã tồn tại']);
+            'orderNumber' => 'required|unique:orders,orderNumber',
+            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes,
+            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes
+        ],['orderNumber.unique' => 'Đơn hàng đã tồn tại',
+            'imageDesignOne.mimes'=>'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignTwo.mimes'=>'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignOne.max'=>'File ảnh thiết kế mặt trước cho phép tối đa '.$maxUploadSize,
+            'imageDesignTwo.max'=>'File ảnh thiết kế mặt sau cho phép tối đa '.$maxUploadSize]);
+
+
         $order = new Orders($request->all());
         if (Orders::where('orderNumber',$request->input('orderNumber'))->get()->count() > 0){
             return back()->withErrors(["Đơn hàng ".$request->input('orderNumber').' đã tồn tại.']);
@@ -375,12 +388,20 @@ class OrdersController extends Controller
     public function update(Request $request, $id)
     {
 
+        $maxUploadSize = ini_get('upload_max_filesize');
+        $maxUploadSizeInBytes = intval($maxUploadSize) * pow(1024, strpos('KMGTPEZY', strtoupper(substr($maxUploadSize, -1))) + 1);
+
         $request->validate([
             'categoryId' => 'required',
             'sellerId' => 'required',
             'vpsId' => 'required',
-            'orderNumber' => 'required'
-        ]);
+            'orderNumber' => 'required',
+            'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes,
+            'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:'. $maxUploadSizeInBytes
+        ],['imageDesignOne.mimes'=>'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignTwo.mimes'=>'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
+            'imageDesignOne.max'=>'File ảnh thiết kế mặt trước cho phép tối đa '.$maxUploadSize,
+            'imageDesignTwo.max'=>'File ảnh thiết kế mặt sau cho phép tối đa '.$maxUploadSize]);
         $order = Orders::findOrFail($id);
         if ($request->has('orderNumber')){
             $order->orderNumber = $request->input('orderNumber');
@@ -580,12 +601,12 @@ class OrdersController extends Controller
         ];
         $listOrderPluck = $model['orders']->map(function ($user) {
             return collect($user->toArray())
-                ->only(['orderNumber', 'fulfillCode', 'trackingCode', 'carrier', 'syncStoreStatusId', 'note'])
+                ->only(['id', 'fulfillCode', 'trackingCode', 'carrier', 'syncStoreStatusId', 'note'])
                 ->all();
         });
         foreach ($listOrderPluck as $row) {
             $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
-            array_push($data, $row);
+            array_push($data, [$row['id'], $row['fulfillCode'], $row['trackingCode'], $row['carrier'],$row['syncStoreStatusId'],$row['note'] ]);
         }
 
         // Create a new CSV writer
@@ -603,31 +624,55 @@ class OrdersController extends Controller
 
     public function exportUpToEbay(Request $request)
     {
-        $model = $this->getIndexModel($request, true);
-        //dump($model);
-        $data = [
-            ['Order ID', 'Line Item ID', 'Logistics Status', 'Shipment Carrier', 'Shipment Tracking', 'Remove this column']
-        ];
-        $listOrderPluck = $model['orders']->map(function ($user) {
-            return collect($user->toArray())
-                ->only(['orderNumber', 'itemId', 'carrier', 'trackingCode'])
-                ->all();
-        });
-        foreach ($listOrderPluck as $row) {
-            array_push($data, [$row['orderNumber'], $row['itemId'], '', $row['carrier'], $row['trackingCode'],'' ]);
+        $response = ["status" => false, "message" => "", 'data' => null];
+        try{
+            $model = $this->getIndexModel($request, true);
+            if ($model['ebay'] == 2 && $model['vps'] != 0 && count($model['orders']) > 0 ){
+                $data = [
+                    ['Order ID', 'Logistics Status', 'Shipment Carrier', 'Shipment Tracking']
+                ];
+                $listOrderPluck = $model['orders']->map(function ($user) {
+                    return collect($user->toArray())
+                        ->only(['orderNumber', 'itemId', 'carrier', 'trackingCode'])
+                        ->all();
+                });
+                foreach ($listOrderPluck as $row) {
+                    array_push($data, [$row['orderNumber'], 'SHIPPED', $row['carrier'], $row['trackingCode'] ]);
+                }
+                $idOrders = $model['orders']-> pluck('id');
+                // Create a new CSV writer
+                $sellerName = '';
+                if ($model['sellers'] && count($model['sellers']) > 0 && $model['vpses'] && count($model['vpses']) > 0){
+                    $vpsItem =  $model['vpses']->where('id', $model['vps'])->first();
+                    if ($vpsItem){
+                        $seller = $model['sellers']->where('userId', $vpsItem->userId)->first();
+                        if ($seller){
+                            $sellerName = $seller->sellerName;
+                        }
+                    }
+                }
+                $csv = Writer::createFromPath(storage_path('app/uptoebays/'.$sellerName.'.csv'), 'w+');
+                // Insert the data into the CSV
+                $csv->insertAll($data);
+                DB::table('orders')-> whereIn('id', $idOrders)->update(['syncStoreStatusId'=>1]);
+                $response['status'] = true;
+                $response['message'] = 'Xuất thành công '.count($listOrderPluck).' đơn hàng.';
+            }else{
+                $response['status'] = false;
+                $response['message'] = 'Kiểm tra lại thông tin trước khi xuất file, đảm bảo đã chọn seller, trạng thái chưa up ebay và có dữ liệu.';
+            }
+        }catch (\Exception $ex){
+            $response['status'] = false;
+            $response['message'] = $ex->getMessage();
         }
-        DB::table('orders')-> whereIn('id', $model['orders']-> pluck('id'))->update(['syncStoreStatusId'=>1]);
-        // Create a new CSV writer
-        $csv = Writer::createFromFileObject(new \SplTempFileObject());
-        // Insert the data into the CSV
-        $csv->insertAll($data);
+        return response()->json($response);
 
-        return response((string)$csv, 200, [
-            'Content-Type' => 'text/plain; charset=UTF-8',
-            'Content-Encoding' => 'UTF-8',
-            'Content-Transfer-Encoding' => 'binary',
-            'Content-Disposition' => 'attachment; filename="order-fulfilment-'. Carbon::parse(Carbon::now())->timezone('Asia/Ho_Chi_Minh')->format('dmY-Hi').'.csv"',
-        ]);
+//        return response((string)$csv, 200, [
+//            'Content-Type' => 'text/plain; charset=UTF-8',
+//            'Content-Encoding' => 'UTF-8',
+//            'Content-Transfer-Encoding' => 'binary',
+//            'Content-Disposition' => 'attachment; filename="order-fulfilment-'. Carbon::parse(Carbon::now())->timezone('Asia/Ho_Chi_Minh')->format('dmY-Hi').'.csv"',
+//        ]);
     }
 
 
@@ -648,7 +693,7 @@ class OrdersController extends Controller
         if (count($header) == 6) {
             foreach ($results as $row) {
                 if ($index++ > 0) {
-                    $order = Orders::where('orderNumber', $row[0])->get()->first();
+                    $order = Orders::where('id', $row[0])->get()->first();
                     if ($order) {
                         $order->fulfillCode = $row[1];
                         $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 : 1;

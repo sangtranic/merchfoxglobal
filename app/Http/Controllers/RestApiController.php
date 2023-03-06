@@ -11,6 +11,7 @@ use App\Models\Vps;
 use http\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 use Nette\Utils\Html;
@@ -235,7 +236,19 @@ class RestApiController extends BaseController
                 'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'user' => 'required'
             ]);
+            $header = $request->header('Authorization');
+            if (!$header || strpos($header, 'Bearer ') !== 0) {
+                $response['status'] = false;
+                $response['message'] = 'Unauthorized.';
+                return response()->json($response, 401);
+            }
+            $accessToken = substr($header, 7);
 
+            if ($accessToken !== env('ACCEPT_TOKEN')) {
+                $response['status'] = false;
+                $response['message'] = 'Invalid access token.';
+                return response()->json($response, 401);
+            }
             if (!$validatedData) {
                 $response['status'] = false;
                 $response['message'] = 'Hãy kiểm tra lại thông tin user và file import.';
@@ -253,11 +266,23 @@ class RestApiController extends BaseController
                 $numberOrderUpdate = 0;
                 $orderNumberError = [];
                 if (count($header) >= 103) {
+                    $now = Carbon::now();
+                    $twoDaysAgo = Carbon::now()->subDays(2);
+                    $list_orders = DB::table('orders')->whereBetween('updated_at', [$twoDaysAgo, $now])->get();
+
                     foreach ($results as $row) {
                         if ($index++ > 0) {
                             if (strlen($row[0]) > 0 && strlen($row[19]) > 0) {
-                                if (DB::table('orders')->where('orderNumber', $row[0])->exists()) {
-                                    array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Đơn hàng đã tồn tại trong hệ thống.']);
+                                $exists_order = false;
+                                foreach ($list_orders as $order) {
+                                    if ($order->orderNumber == $row[0] && $order->itemId == $row[63]) {
+                                        $exists_order = true;
+                                        break;
+                                    }
+                                }
+                                //DB::table('orders')->where('orderNumber', $row[0])->exists()
+                                if ($exists_order) {
+                                    array_push($orderNumberError, ['orderNumber' =>  $row[0], 'message' => 'Đơn hàng đã tồn tại trong hệ thống, '.$row[63]]);
                                 } else {
                                     $seller = DB::table('seller')->where('sellerName', $row[19])->first();
                                     if ($seller && $seller->id > 0) {
