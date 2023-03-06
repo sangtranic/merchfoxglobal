@@ -21,10 +21,10 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
 
     public function search($dateFrom, $dateTo,$userId)
     {
-        $modelName = get_class($this->model);
-        $cacheKey = $modelName.$dateFrom.$dateTo.$userId."Cache";
-        $data = Cache::get($cacheKey);
-        if (!$data) {
+//        $modelName = get_class($this->model);
+//        $cacheKey = $modelName.$dateFrom.$dateTo.$userId."Cache";
+//        $data = Cache::get($cacheKey);
+//        if (!$data) {
             $query = DB::table('orders')
                 ->leftjoin('vps', 'orders.vpsId', '=', 'vps.id')
                 ->leftjoin('users', 'vps.userId', '=', 'users.id')
@@ -43,10 +43,10 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             $query->where('users.statusId', '=', 3);
             $data = $query->get();
 
-            Cache::remember($cacheKey, 5, function () use ($data) {
-                return $data;
-            });
-        }
+//            Cache::remember($cacheKey, 5, function () use ($data) {
+//                return $data;
+//            });
+//        }
         return $data;
     }
 }
