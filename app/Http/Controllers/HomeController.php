@@ -36,8 +36,8 @@ class HomeController extends Controller
         $dateFrom = Carbon::now()->addDays(-30);
 
         $listUser= $this->UserRepo->getAll();
-        $listUser = $listUser->where('statusId', '=', 3);
-        $listVps = $this->VpsRepo->getAll();
+        $listUser = $listUser->where('statusId', '=', 3)->sortBy("userName");;
+        $listVps = $this->VpsRepo->getAll()->sortBy("name");;
         if(Auth::user()->role != "admin")
         {
             $listUserAdd = $listUser->where('id', '=', Auth::user()->id);
