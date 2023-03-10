@@ -68,7 +68,7 @@ class ProductController extends Controller
             $filter_isFileDesign = true;
             $query->whereRaw('isFileDesign & b\'1\' = b\'1\'');
         }
-        $products = $query->paginate(1);
+        $products = $query->paginate(20);
 
         $users = $this->UsersRepo->getAll();
         $productCates = Productcategories::all();
