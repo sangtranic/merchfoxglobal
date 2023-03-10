@@ -103,6 +103,29 @@
                 {{ Form::checkbox('isFileDesign') }}
             </div>
         </div>
+        <div class="form-group row">
+            <div class="col-sm-3">
+                @if(\App\Helper\Helper::IsNullOrEmptyString($product->urlImagePreviewOne) == false)
+                    <img width="100%" src="{{$product->urlImagePreviewOne}}" style="padding: 15px;">
+                @endif
+            </div>
+            <div class="col-sm-3">
+                @if(\App\Helper\Helper::IsNullOrEmptyString($product->urlImagePreviewTwo) == false)
+                    <img width="100%" src="{{$product->urlImagePreviewTwo}}" style="padding: 15px;">
+                @endif
+            </div>
+            <div class="col-sm-3">
+                @if(\App\Helper\Helper::IsNullOrEmptyString($product->urlImageDesignOne) == false)
+                    <img width="100%" src="{{\App\Helper\Helper::getImageUrlPath($product->urlImageDesignOne,'thumbnail',true) }}" style="padding: 15px;">
+                @endif
+            </div>
+            <div class="col-sm-3">
+                @if(\App\Helper\Helper::IsNullOrEmptyString($product->urlImageDesignTwo) == false)
+                    <img width="100%" src="{{\App\Helper\Helper::getImageUrlPath($product->urlImageDesignTwo,'thumbnail',true) }}" style="padding: 15px;">
+                @endif
+            </div>
+        </div>
+        </div>
         <div class="form-group text-center">
             {{ Form::submit('Lưu', array('class' => 'btn btn-info')) }}
         </div>

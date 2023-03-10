@@ -25,6 +25,7 @@ class FileUploadHelper
             // Đặt tên file ảnh
             //$filename = time() . '.' . $image->getClientOriginalExtension();
             $filename = $image->getClientOriginalName();
+            $filename = str_replace($filename," ","_");
             // Lưu ảnh gốc vào thư mục 'images'
             //$path = public_path('upload/original/' . $filename);
 
