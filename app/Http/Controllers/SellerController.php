@@ -51,7 +51,16 @@ class SellerController extends Controller
 
         return view('seller.index', ['listUser'=>$listUser, 'listSeller' => $listSeller,'listUserPluck' =>$listUserPluck]);
     }
-
+    public function getByUserId()
+    {
+        $userId = request('userId');
+        if($userId>0)
+        {
+            $listSeller = $this->SellerRepo->getByUserId($userId);
+            return response()->json($listSeller);
+        }
+        return "";
+    }
     /**
      * Show the form for creating a new resource.
      *

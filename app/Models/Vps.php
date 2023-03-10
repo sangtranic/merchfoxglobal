@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $description
  * @property int $userId
+ * @property int $sellerId
  */
 class Vps extends Model
 {
@@ -31,7 +32,7 @@ class Vps extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'userId'
+        'name', 'description', 'userId', 'sellerId'
     ];
 
     /**
@@ -49,7 +50,7 @@ class Vps extends Model
      * @var array
      */
     protected $casts = [
-        'name' => 'string', 'description' => 'string', 'userId' => 'int'
+        'name' => 'string', 'description' => 'string', 'userId' => 'int' , 'sellerId' => 'int'
     ];
 
     /**

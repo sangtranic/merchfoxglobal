@@ -49,6 +49,7 @@
                             <th>Tên</th>
                             <th>Mô tả</th>
                             <th>Tài khoản</th>
+                            <th>Seller</th>
                             <th style="width: 10%" class="text-center">Action</th>
                         </tr>
                         </thead>
@@ -57,13 +58,15 @@
                             <?php
                             $user = $listUser->where('id', $vps->userId)->first();
                             $userName = $user ? $user['userName'] : '';
-
+                            $seller = $listSeller->where('id', $vps->sellerId)->first();
+                            $sellerName = $seller ? $seller['sellerName'] : '';
                             ?>
                             <tr>
                                 <td>{{ $vps->id }}</td>
                                 <td><span>{{ $vps->name }}</span></td>
                                 <td>{{ $vps->description }}</td>
                                 <td>{{ $userName }}</td>
+                                <td>{{ $sellerName }}</td>
                                 <td class="project-actions text-center">
 
                                     <a class="btn btn-default btn-sm text-info" title="Edit" href="{{ route('vps.edit', [$vps->id]) }}">

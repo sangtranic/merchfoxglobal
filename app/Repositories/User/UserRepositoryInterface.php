@@ -9,4 +9,5 @@ interface UserRepositoryInterface extends RepositoryInterface
     public function getByUserName($userName);
     public function getByUserNameAndStatus($userName,$statusId);
     public function getByEmail($email);
+    public function getVpsId($vpsId);
 }

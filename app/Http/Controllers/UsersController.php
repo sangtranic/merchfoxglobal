@@ -48,7 +48,16 @@ class UsersController extends Controller
         $listRolePluck = $listRoleAdd->pluck('name','id');
         return view('users.index', ['users'=>$users,'listStatus' => $listStatus,'listStatusPluck' =>$listStatusPluck,'listRole' => $listRole,'listRolePluck' =>$listRolePluck]);
     }
-
+    public function getByVpsId()
+    {
+        $userIdFilter = request('vpsId');
+        if($userIdFilter>0)
+        {
+            $listUser= $this->UserRepo->getVpsId($userIdFilter);
+            return response()->json($listUser);
+        }
+        return "";
+    }
     /**
      * Show the form for creating a new resource.
      *

@@ -60,14 +60,30 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function create($attributes = [])
     {
+        $modelName = get_class($this->model);
+        $cacheKey_All = $modelName."CacheAll";
+        if (Cache::has($cacheKey_All)) {
+            Cache::forget($cacheKey_All);
+        }
+
         return $this->model->create($attributes);
     }
 
     public function update($id, $attributes = [])
     {
+        $modelName = get_class($this->model);
         $result = $this->find($id);
         if ($result) {
             $result->update($attributes);
+            //xoa cache
+            $cacheKey_Find = $modelName."ById".$id;
+            $cacheKey_All = $modelName."CacheAll";
+            if (Cache::has($cacheKey_Find)) {
+                Cache::forget($cacheKey_Find);
+            }
+            if (Cache::has($cacheKey_All)) {
+                Cache::forget($cacheKey_All);
+            }
             return $result;
         }
 
@@ -76,10 +92,15 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function delete($id)
     {
+        $modelName = get_class($this->model);
         $result = $this->find($id);
         if ($result) {
             $result->delete();
-
+            //xoa cache
+            $cacheKey_All = $modelName."CacheAll";
+            if (Cache::has($cacheKey_All)) {
+                Cache::forget($cacheKey_All);
+            }
             return true;
         }
 

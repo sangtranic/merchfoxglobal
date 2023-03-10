@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VpsRequest;
 use App\Models\Users;
 use App\Models\Vps;
+use App\Repositories\Seller\SellerRepositoryInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Vps\VpsRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,9 @@ class VpsController extends Controller
 {
     protected $UserRepo;
     protected $VpsRepo;
-    public function __construct(UserRepositoryInterface $userRepo, VpsRepositoryInterface $vpsRepo)
+    protected $SellerRepo;
+    public function __construct(UserRepositoryInterface $userRepo, VpsRepositoryInterface $vpsRepo,
+                                SellerRepositoryInterface $sellerRepo)
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
@@ -24,6 +27,7 @@ class VpsController extends Controller
         });
         $this->UserRepo = $userRepo;
         $this->VpsRepo = $vpsRepo;
+        $this->SellerRepo = $sellerRepo;
     }
     /**
      * Display a listing of the resource.
@@ -34,6 +38,7 @@ class VpsController extends Controller
     {
         $listUser= $this->UserRepo->getAll();
         $listVps = $this->VpsRepo->getAll();
+        $listSeller = $this->SellerRepo->getAll();
         $userIdFilter = request('userId');
         if($userIdFilter>0)
         {
@@ -43,7 +48,8 @@ class VpsController extends Controller
         $listUserAdd = $listUser->prepend($newUser);
         $listUserPluck = $listUserAdd->pluck('userName','id');
 
-        return view('vps.index', ['listUser'=>$listUser, 'listVps' => $listVps,'listUserPluck' =>$listUserPluck]);
+        return view('vps.index', ['listUser'=>$listUser, 'listVps' => $listVps,
+            'listUserPluck' =>$listUserPluck,'listSeller' =>$listSeller]);
     }
 
     /**
@@ -53,8 +59,13 @@ class VpsController extends Controller
      */
     public function create()
     {
-        $listUser = $this->UserRepo->getAll()->pluck('userName','id');
-        return view('vps.create', ['listUser' => $listUser]);
+        $listUser = $this->UserRepo->getAll();
+        $userId = $listUser[0]->id;
+        $listUserPluck = $listUser->pluck('userName','id');
+        $listSeller = $this->SellerRepo->getAll();
+        $listSeller = $listSeller->where('userId', '=', $userId);
+        $listSellerPluck = $listSeller->pluck('sellerName','id');
+        return view('vps.create', ['listUser' => $listUserPluck,'listSeller' => $listSellerPluck]);
     }
 
     /**
@@ -68,7 +79,8 @@ class VpsController extends Controller
         $this->VpsRepo->create([
             'name' => $request->input('name'),
             'description' => $request->input('description'),
-            'userId' => $request->input('userId')
+            'userId' => $request->input('userId'),
+            'sellerId' => $request->input('sellerId')
         ]);
         return redirect()->route('vps.index');
     }
@@ -95,7 +107,13 @@ class VpsController extends Controller
     {
         $vps = $this->VpsRepo->find($id);
         $listUser = $this->UserRepo->getAll()->pluck('userName','id');
-        return view('vps.edit',['vps'=>$vps,'listUser' => $listUser]);
+        $listSeller = $this->SellerRepo->getAll();
+        if($vps->userId >0)
+        {
+            $listSeller = $listSeller->where('userId', '=', $vps->userId);
+        }
+        $listSellerPluck = $listSeller->pluck('sellerName','id');
+        return view('vps.edit',['vps'=>$vps,'listUser' => $listUser,'listSeller' => $listSellerPluck]);
     }
 
     /**
@@ -110,7 +128,8 @@ class VpsController extends Controller
         $this->VpsRepo->update($id,[
             'name' => $request->input('name'),
             'description' => $request->input('description'),
-            'userId' => $request->input('userId')
+            'userId' => $request->input('userId'),
+            'sellerId' => $request->input('sellerId')
         ]);
         return redirect()->route('vps.index');
     }

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Quyền')
+@section('title', 'VPS')
 @section('content')
 
 
@@ -24,8 +24,12 @@
                 {{ Form::text('description', null, array('class' => 'form-control')) }}
             </div>
             <div class="mb-3">
-                {{ Form::label('userId', 'Seller', ['class'=>'form-label']) }}
-                {{ Form::select('userId', $listUser, null, ['class' => 'form-control']) }}
+                {{ Form::label('userId', 'Tài khoản', ['class'=>'form-label']) }}
+                {{ Form::select('userId', $listUser, null, ['class' => 'form-control','id'=>'ddluser']) }}
+            </div>
+            <div class="mb-3">
+                {{ Form::label('sellerId', 'Seller', ['class'=>'form-label']) }}
+                {{ Form::select('sellerId', $listSeller, null, ['class' => 'form-control','id'=>'ddSeller']) }}
             </div>
             {{ Form::submit('Edit', array('class' => 'btn btn-primary')) }}
             <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
@@ -34,3 +38,28 @@
     </div>
 
 @stop
+@section('footer')
+    <script>
+        $(function () {
+            $('#ddluser').change(function () {
+                var userId = $(this).val();
+                $.ajax({
+                    url: '/getListSellerByUserId',
+                    data: {'userId': userId},
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data.length)
+                        {
+                            var sellerSelect = $('#ddSeller');
+                            sellerSelect.empty();
+                            $.each(data, function (index, seller) {
+                                sellerSelect.append('<option value="' + seller.id + '">' + seller.sellerName + '</option>');
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+@endsection
