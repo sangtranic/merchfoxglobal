@@ -28,4 +28,17 @@ class SellerRepository extends BaseRepository implements SellerRepositoryInterfa
         $data = $query->get();
         return $data;
     }
+
+    public function getByVpsId($vpsId)
+    {
+        $query = DB::table('seller')
+            ->leftjoin('vps', 'seller.id', '=', 'vps.sellerId')
+            ->select(DB::raw('seller.id as sellerId'), 'seller.sellerName');
+        if($vpsId>0)
+        {
+            $query->where('vps.id', '=', $vpsId);
+        }
+        $data = $query->get();
+        return $data;
+    }
 }

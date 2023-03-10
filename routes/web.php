@@ -36,12 +36,15 @@ Route::get('users/create', [Controllers\UsersController::class, 'create'] )->nam
 Route::post('users/store', [Controllers\UsersController::class, 'store'] )->name('users.store')->middleware('role:admin');
 Route::get('users/{id}/changepassword', [UsersController::class, 'changepassword'])->name('users.changepassword');
 Route::put('users/updatepassword', [UsersController::class, 'updatepassword'])->name('users.updatepassword');
+Route::get('/getUserByVpsId', [UsersController::class, 'getByVpsId'])->name('getUserByVpsId');
 //role
 Route::resource('roles', Controllers\RolesController::class );
 //VPS
 Route::resource('vps', Controllers\VpsController::class );
 //Seller
 Route::resource('seller', Controllers\SellerController::class );
+Route::get('/getListSellerByUserId', [Controllers\SellerController::class, 'getByUserId'])->name('getListSellerByUserId');
+Route::get('/getListSellerByVpsId', [Controllers\SellerController::class, 'getByVpsId'])->name('getListSellerByVpsId');
 //
 Route::get('/page/{page?}', [HomeController::class, 'Page']);
 //image

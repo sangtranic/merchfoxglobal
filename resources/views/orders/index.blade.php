@@ -183,7 +183,7 @@
                             <button class="btn btn-sm btn-default mr-2" type="button" onclick="$('[name=file]').click()">
                                 <i class="fas fa-upload"></i> Import CSV
                             </button>
-                            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,.ods,application/vnd.oasis.opendocument.spreadsheet" required style="display: none"/>
+                            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required style="display: none"/>
                         </form>
                     </div>
                 </div>

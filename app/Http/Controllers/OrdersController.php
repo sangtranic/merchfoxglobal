@@ -13,6 +13,7 @@ use App\Models\Products;
 use App\Models\Seller;
 use App\Models\Users;
 use App\Models\Vps;
+use App\Repositories\Seller\SellerRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,10 +27,11 @@ use const http\Client\Curl\AUTH_ANY;
 class OrdersController extends Controller
 {
     public $ROWAMOUNT = 20;
-
-    public function __construct()
+    protected $SellerRepo;
+    public function __construct(SellerRepositoryInterface $sellerRepo)
     {
         $this->middleware('auth');
+        $this->SellerRepo = $sellerRepo;
     }
 
     public function index()
@@ -293,7 +295,9 @@ class OrdersController extends Controller
                 }
                 if ($vpsItem) {
                     $vpses = Vps::where('userId', $vpsItem->userId)->get();
-                    $sellers = Seller::where('userId', $vpsItem->userId)->get();
+                    //$sellers = Seller::where('userId', $vpsItem->userId)->get();
+                    $sellers = Seller::where('userId', $vpsItem->userId)->where('id', $vpsItem->sellerId)->get();
+                    //$listSeller = $this->SellerRepo->getByVpsId($vpsId);
                 }
             }
         } else {
@@ -305,7 +309,14 @@ class OrdersController extends Controller
             $vpses = Vps::where('userId', Auth::id())->get();
         }
         if ($sellers == null) {
-            $sellers = Seller::where('userId', Auth::id())->get();
+            //$sellers = Seller::where('userId', Auth::id())->get();
+            if ($vpses != null)
+            {
+                $sellerId = $vpses[0]->sellerId;
+                $sellers = Seller::where('id', $sellerId)->get();
+            }else{
+                $sellers = Seller::where('userId', Auth::id())->get();
+            }
         }
         return view('orders.editForm', [
             'layoutName' => $layout_name,

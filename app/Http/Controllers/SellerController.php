@@ -61,6 +61,16 @@ class SellerController extends Controller
         }
         return "";
     }
+    public function getByVpsId()
+    {
+        $vpsId = request('vpsId');
+        if($vpsId>0)
+        {
+            $listSeller = $this->SellerRepo->getByVpsId($vpsId);
+            return response()->json($listSeller);
+        }
+        return "";
+    }
     /**
      * Show the form for creating a new resource.
      *

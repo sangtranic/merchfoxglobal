@@ -400,6 +400,23 @@
     <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
     <script>
         $(function () {
+            $('#vpsId').change(function() {
+                var vpsId = $(this).val();
+
+                $.ajax({
+                    url: '/getListSellerByVpsId',
+                    data: {'vpsId':vpsId},
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var sellerSelect = $('#sellerId');
+                        sellerSelect.empty();
+                        $.each(data, function(index, seller) {
+                            sellerSelect.append('<option value="' + seller.sellerId + '">' + seller.sellerName + '</option>');
+                        });
+                    }
+                });
+            });
             //Initialize Select2 Elements
             $('.select2').select2();
             if ($(".select2-auto").length) {
