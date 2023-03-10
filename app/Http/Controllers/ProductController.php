@@ -66,7 +66,7 @@ class ProductController extends Controller
         }
         if ($request->has('isFileDesign')) {
             $filter_isFileDesign = true;
-            $query->whereRaw('isFileDesign & b\'1\' = b\'1\'');
+            $query->whereRaw('isFileDesign & b\'1\' = b\'0\'');
         }
         $products = $query->paginate(20);
 

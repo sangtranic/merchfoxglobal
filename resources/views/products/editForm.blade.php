@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="form-group row">
-            {{ Form::label('url','Url',['class'=>'col-sm-3 col-form-label'])}}
+            {{ Form::label('url','Link',['class'=>'col-sm-3 col-form-label'])}}
             <div class="col-sm-9">
                 {{ Form::text('url', null, array('class' => 'form-control')) }}
             </div>

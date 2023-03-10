@@ -48,7 +48,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" name="isFileDesign" id="isFileDesign"  onchange="this.form.submit()"  {{ $isFileDesign ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="isFileDesign">Có File thiết kế</label>
+                                            <label class="form-check-label" for="isFileDesign">Chưa có File thiết kế</label>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
