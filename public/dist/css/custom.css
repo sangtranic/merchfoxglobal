@@ -3,7 +3,7 @@
    }
    .table-p2 td, .table-p2 td{
      padding: 2px !important;
-     font-size: 14px;
+     font-size: 18px;
     }
     .table-p5 td, .table-p5 td{
       padding: 5px !important;
@@ -21,14 +21,14 @@
    .table .form-control{
     padding: 5px;
     margin-bottom: 2px !important;
-    font-size: 13px;
+    font-size: 16px;
    }
    .table .form-group, .form-filter  .form-group {
     margin-bottom: 2px !important;
    }
    .table input.form-control , .table select.form-control , .table .form-group .btn  {
     height: 26px;
-    font-size: 13px;
+    font-size: 16px;
    }
    .form-filter input, .form-filter select, .form-filter .custom-file, .form-filter .custom-file-label{height: 28px;}
 .form-filter input[type="checkbox"], .form-filter input[type="radio"] {

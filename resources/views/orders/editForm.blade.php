@@ -145,6 +145,12 @@
                                     {{ Form::text('shipToAddressPostalCode', null, array('class' => 'form-control')) }}
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                {{ Form::label('shipToAddressCountry','Address Country',['class'=>'col-sm-4 col-form-label'])}}
+                                <div class="col-sm-8">
+                                    {{ Form::text('shipToAddressCountry', null, array('class' => 'form-control')) }}
+                                </div>
+                            </div>
                         </div>
                         <div class="col-sm-6">
                             {{ Form::label('note','Note')}}

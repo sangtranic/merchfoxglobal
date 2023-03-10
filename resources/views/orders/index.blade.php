@@ -238,16 +238,16 @@
                             ?>
                             <tr data-order="{{$order->id}}" data-index="{{$index}}" class="{{$index % 2 == 0 ?'odd':'even'}}">
                                 <td rowspan="2" class="text-center">
-                                    {{$index}}
+                                    {{$order->id}}
                                 </td>
                                 <td>
-                                    <p>{{$userSeller->fullName}}</p>
-                                    <p><span class="badge badge-secondary">{{$seller->sellerName}}</span></p>
-                                    <p>{{$vps->name}}</p>
+                                    <p>{{$userSeller ? $userSeller->fullName:''}}</p>
+                                    <p><span class="badge badge-info">{{$seller ? $seller->sellerName:''}}</span></p>
+                                    <p>{{$vps ? $vps->name : ''}}</p>
                                 </td>
                                 <td>
                                     <p><span class="badge badge-success">{{$order->orderNumber}}</span></p>
-                                    <p><small>{{  \Carbon\Carbon::parse($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d-m-y')}}</small></p>
+                                    <p><small>{{  \Carbon\Carbon::parse($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y')}}</small></p>
                                 </td>
                                 <td>
                                     <p>{{$order->shipToFirstName}} {{$order->shipToLastName}}<br>
@@ -350,7 +350,7 @@
                                         </span>
                                         <span class="col-sm-2">Style</span>
                                         <span class="col-sm-4">
-                                            <b>{{$cate->name}}</b>
+                                            <b>{{$cate ? $cate->name:''}}</b>
                                         </span>
                                     </div>
                                     <div class="form-group row">

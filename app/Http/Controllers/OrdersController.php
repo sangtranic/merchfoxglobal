@@ -16,11 +16,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 use League\Csv\Reader;
-use Illuminate\Http\Response;
 use League\Csv\Writer;
 use Maatwebsite\Excel\Facades\Excel;
+use function Symfony\Component\Yaml\dumpNull;
 use const http\Client\Curl\AUTH_ANY;
 
 class OrdersController extends Controller
@@ -158,14 +157,17 @@ class OrdersController extends Controller
             $query->where(function ($_query) use ($filter_keyword) {
                 $_query->where('fulfillCode', 'like', '%' . $filter_keyword . '%')
                     ->orWhere('trackingCode', 'like', '%' . $filter_keyword . '%')
-                    ->orWhere('carrier', 'like', '%' . $filter_keyword . '%');
+                    ->orWhere('carrier', 'like', '%' . $filter_keyword . '%')
+                    ->orWhere('note', 'like', '%' . $filter_keyword . '%');
             });
         }
 
         if (strlen($filter_customer)) {
             $query->where(function ($_query) use ($filter_customer) {
-                $_query->where('shipToAddressID', 'like', '%' . $filter_customer . '%')
-                    ->orWhere('shipToAddressName', 'like', '%' . $filter_customer . '%')
+                $_query->whereRaw("concat(shipToFirstName, ' ', shipToLastName) like '%" .$filter_customer. "%' ")
+                    ->orWhere('shipToAddressID', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToFirstName', 'like', '%' . $filter_customer . '%')
+                    ->orWhere('shipToLastName', 'like', '%' . $filter_customer . '%')
                     ->orWhere('shipToAddressPhone', 'like', '%' . $filter_customer . '%')
                     ->orWhere('shipToAddressLine1', 'like', '%' . $filter_customer . '%')
                     ->orWhere('shipToAddressLine2', 'like', '%' . $filter_customer . '%')
@@ -188,8 +190,11 @@ class OrdersController extends Controller
         if ($filter_isFB > 0) {
             $query->where('isFB', "=", $filter_isFB == 2 ? 0 : $filter_isFB);
         }
+        if ($filter_orderId > 0) {
+            $query->where('id', $filter_orderId);
+        }
 
-
+        $query->orderBy('id','desc');
         $counter = $query->count();
 
         if ($isAll) {
@@ -258,11 +263,13 @@ class OrdersController extends Controller
         if ($request->input('productCate')) {
             $productCate = $request->integer('productCate');
         }
-        if ($productCate == 0) {
-            $productCategory = $productCates->first();
-            $productCate = $productCategory->id;
-        } else {
-            $productCategory = $productCates->where('id', $productCate)->first();
+        if ($productCates){
+            if ($productCate == 0) {
+                $productCategory = $productCates->first();
+                $productCate = $productCategory->id;
+            } else {
+                $productCategory = $productCates->where('id', $productCate)->first();
+            }
         }
         if ($productCategory) {
             $productSizes = $productCategory->size_list;
@@ -272,14 +279,14 @@ class OrdersController extends Controller
             $id = $request->integer('id');
         }
         if ($id > 0) {
-            $order = Orders::findOrFail($id);
+            $order = Orders::find($id);
             if ($order == null) {
                 $order = new Orders();
             } else {
-                $vpsItem = Vps::findOrFail($order->vpsId);
+                $vpsItem = Vps::find($order->vpsId);
                 if ($order->productId && $order->productId > 0) {
 
-                    $product = Products::findOrFail($order->productId);
+                    $product = Products::find($order->productId);
                     $product->imageDesign1 = $product->url_img_design1;
                     $product->imageDesign2 = $product->url_img_design2;
                 }
@@ -337,7 +344,7 @@ class OrdersController extends Controller
             return back()->withErrors(["Đơn hàng " . $request->input('orderNumber') . ' đã tồn tại.']);
         }
         if ($order->productId == 0) {
-            if ($request->has('productName') && Helper::IsNullOrEmptyString($request->input('productName'))) {
+            if ($request->has('productName') && !Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
                 $product->name = $request->input('productName');
                 if ($request->has('imageDesignOne')) {
@@ -598,8 +605,9 @@ class OrdersController extends Controller
     {
         $model = $this->getIndexModel($request);
         //dump($model);
+        $heading = ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note'];
         $data = [
-            ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note']
+
         ];
         $listOrderPluck = $model['orders']->map(function ($user) {
             return collect($user->toArray())
@@ -610,18 +618,22 @@ class OrdersController extends Controller
             $row['syncStoreStatusId'] = $row['syncStoreStatusId'] == 1 ? "yes" : "no";
             array_push($data, [$row['id'], $row['fulfillCode'], $row['trackingCode'], $row['carrier'], $row['syncStoreStatusId'], $row['note']]);
         }
+//
+//        // Create a new CSV writer
+//        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+//        $csv->setOutputBOM(Writer::BOM_UTF8);
+//        // Insert the data into the CSV
+//        $csv->insertAll($data);
+//
+//        return response((string)$csv, 200, [
+//            'Content-Type' => 'text/plain; charset=UTF-8',
+//            'Content-Encoding' => 'UTF-8',
+//            'Content-Transfer-Encoding' => 'binary',
+//            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
+//        ]);
 
-        // Create a new CSV writer
-        $csv = Writer::createFromFileObject(new \SplTempFileObject());
-        // Insert the data into the CSV
-        $csv->insertAll($data);
+        return Excel::download(new OrderExport($heading,$data), 'proposed_file_name'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.ods');
 
-        return response((string)$csv, 200, [
-            'Content-Type' => 'text/plain; charset=UTF-8',
-            'Content-Encoding' => 'UTF-8',
-            'Content-Transfer-Encoding' => 'binary',
-            'Content-Disposition' => 'attachment; filename="proposed_file_name.csv"',
-        ]);
     }
 
     public function exportUpToEbay(Request $request)
@@ -654,6 +666,7 @@ class OrdersController extends Controller
                     }
                 }
                 $csv = Writer::createFromPath(storage_path('app/uptoebays/' . $sellerName . '.csv'), 'w+');
+                $csv->setOutputBOM(Writer::BOM_UTF8);
                 // Insert the data into the CSV
                 $csv->insertAll($data);
                 DB::table('orders')->whereIn('id', $idOrders)->update(['syncStoreStatusId' => 1]);
@@ -677,7 +690,9 @@ class OrdersController extends Controller
             'Size/Color', 'First Name', 'Last Name', 'Address 1', 'Address 2', 'City', 'Bang',
             'Zipcode', 'Country', 'Phone', 'ID Fullfil', 'Note'];
         $data = [
-
+//            ['STT ID Order', 'Date', 'ID Order', 'Title', 'Link Products Front', 'Link Products Back', 'Link DS Front', 'Link DS Back',
+//                'Size/Color', 'First Name', 'Last Name', 'Address 1', 'Address 2', 'City', 'Bang',
+//                'Zipcode', 'Country', 'Phone', 'ID Fullfil', 'Note']
         ];
         foreach ($model['orders'] as $orderItem) {
             $productItem = null;
@@ -693,7 +708,7 @@ class OrdersController extends Controller
                 $productItem != null ? $productItem->urlImagePreviewTwo:'',
                 $productItem != null ? $productItem->url_img_original_design1:'',
                 $productItem != null ? $productItem->url_img_original_design2:'',
-                $orderItem->size.'/'.$orderItem->color,
+                $orderItem->size.' / '.$orderItem->color,
                 $orderItem->shipToFirstName,
                 $orderItem->shipToLastName,
                 $orderItem->shipToAddressLine1,
@@ -707,16 +722,30 @@ class OrdersController extends Controller
                 $orderItem->note
                 ]);
         }
-        return Excel::download(new OrderExport($heading,$data), 'orders_'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.xlsx');
+//
+//        // Create a new CSV writer
+//        $csv = Writer::createFromFileObject(new \SplTempFileObject());
+//        $csv->setOutputBOM(Writer::BOM_UTF8);
+//        // Insert the data into the CSV
+//        $csv->insertAll($data);
+//
+//        return response((string)$csv, 200, [
+//            'Content-Type' => 'text/plain; charset=UTF-8',
+//            'Content-Encoding' => 'UTF-8',
+//            'Content-Transfer-Encoding' => 'binary',
+//            'Content-Disposition' => 'attachment; filename="orders_'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.csv"',
+//        ]);
+        return Excel::download(new OrderExport($heading,$data), 'orders_'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.ods');
     }
 
     public function importCsv(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet'
         ]);
 
         $file = $request->file('file');
+
         $csv = Reader::createFromPath($file->getRealPath(), 'r');
         $header = $csv->fetchOne();
         $results = $csv->getRecords();
