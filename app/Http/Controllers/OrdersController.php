@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helper\FileUploadHelper;
 use App\Helper\Helper;
 use App\Helper\OrderExport;
+use App\Helper\OrderImport;
 use App\Models\Objectstatus;
 use App\Models\Orders;
 use App\Models\Productcategories;
@@ -744,16 +745,12 @@ class OrdersController extends Controller
             'file' => 'required|mimetypes:text/plain,text/csv,text/tsv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet'
         ]);
 
-        $file = $request->file('file');
-
-        $csv = Reader::createFromPath($file->getRealPath(), 'r');
-        $header = $csv->fetchOne();
-        $results = $csv->getRecords();
+        $order_import =  Excel::toArray(new OrderImport(), request()->file('file'));
         $index = 0;
         $numberOrderUpdate = 0;
         $orderNumberError = [];
-        if (count($header) == 6) {
-            foreach ($results as $row) {
+        if (count($order_import) > 0 && count($order_import[0]) > 0 && count($order_import[0][0]) == 6){
+            foreach ($order_import[0] as $row) {
                 if ($index++ > 0) {
                     $order = Orders::where('id', $row[0])->get()->first();
                     if ($order) {
@@ -771,8 +768,38 @@ class OrdersController extends Controller
                         array_push($orderNumberError, $row[0]);
                     }
                 }
-            };
+            }
         }
+
+//        $file = $request->file('file');
+//        $csv = Reader::createFromPath($file->getRealPath(), 'r');
+//        $header = $csv->fetchOne();
+//        $results = $csv->getRecords();
+//        $index = 0;
+//        $numberOrderUpdate = 0;
+//        $orderNumberError = [];
+//        if (count($header) == 6) {
+//            foreach ($results as $row) {
+//                dump($row);
+//                if ($index++ > 0) {
+//                    $order = Orders::where('id', $row[0])->get()->first();
+//                    if ($order) {
+//                        $order->fulfillCode = $row[1];
+//                        $order->fulfillStatusId = Helper::IsNullOrEmptyString($order->fulfillCode) ? 0 : 1;
+//                        $order->trackingCode = $row[2];
+//                        $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 : 1;
+//                        $order->carrier = $row[3];
+//                        $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 : 1;
+//                        $order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4], 'yes') ? 1 : 0;
+//                        $order->note = $row[5];
+//                        $order->save();
+//                        $numberOrderUpdate++;
+//                    } else {
+//                        array_push($orderNumberError, $row[0]);
+//                    }
+//                }
+//            };
+//        }
         return back()->with('status', 'Successfully')->with('message', 'Cập nhật ' . $numberOrderUpdate . ' đơn hàng');
     }
 }
