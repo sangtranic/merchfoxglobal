@@ -306,7 +306,13 @@ class OrdersController extends Controller
             $order->statusId = $statusList->first()->statusId;
         }
         if ($vpses == null) {
-            $vpses = Vps::where('userId', Auth::id())->get();
+            if(Auth::user()->role != "admin")
+            {
+                $vpses = Vps::where('userId', Auth::id())->get();
+            }else
+            {
+                $vpses = Vps::all();
+            }
         }
         if ($sellers == null) {
             //$sellers = Seller::where('userId', Auth::id())->get();
