@@ -316,7 +316,7 @@ class OrdersController extends Controller
         }
         if ($sellers == null) {
             //$sellers = Seller::where('userId', Auth::id())->get();
-            if ($vpses != null)
+            if ($vpses != null && isset($vpses))
             {
                 $sellerId = $vpses[0]->sellerId;
                 $sellers = Seller::where('id', $sellerId)->get();
