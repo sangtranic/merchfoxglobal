@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\FileUploadHelper;
+use App\Helper\Helper;
 use App\Models\Productcategories;
 use App\Models\Products;
 use App\Repositories\Product\ProductRepository;
@@ -125,6 +126,12 @@ class ProductController extends Controller
         }
         $product->createBy = Auth::id();
         $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+        if($product->isFileDesign == 0 &&
+            (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
+        {
+            $product->isFileDesign = 1;
+        }
+
         $product->save();
 
         return back()->with('status', 'Successfully')->with('productId',$product->id);
@@ -159,6 +166,11 @@ class ProductController extends Controller
         }
         if ($request->has('imageDesignTwo')) {
             $product->urlImageDesignTwo = FileUploadHelper::saveImage($request->file('imageDesignTwo'));
+        }
+        if($product->isFileDesign == 0 &&
+            (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
+        {
+            $product->isFileDesign = 1;
         }
         $product->save();
 
