@@ -12,19 +12,19 @@
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <!-- Left navbar links -->
             <ul class="navbar-nav">
-                <li class="nav-item ">
-                    <a href="{{route('home')}}" title="Home" class="nav-link">Home</a>
-                </li>
+{{--                <li class="nav-item ">--}}
+{{--                    <a href="{{route('home')}}" title="Home" class="nav-link">Trang chủ</a>--}}
+{{--                </li>--}}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarUsersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Users
+                        Tài khoản
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
                         <?php if(Auth::user()->role == "admin"){ ?>
                             <a href="{{route('users.index')}}" class="dropdown-item">Danh sách người dùng</a>
-                            <a href="{{route('roles.index')}}" class="dropdown-item">Danh sách quyền</a>
+                            <a href="{{route('roles.index')}}" class="dropdown-item">Phân Quyền</a>
                         <?php } ?>
-                        <a href="{{route('seller.index')}}" class="dropdown-item">Danh sách Seller</a>
+                        <a href="{{route('seller.index')}}" class="dropdown-item">Tài Khoản (Seller)</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ route('users.edit', [Auth::user()->id]) }}">Thông tin tài khoản</a>
                         <a class="dropdown-item" href="{{ route('users.changepassword', [Auth::user()->id]) }}">Đổi mật khẩu</a>
@@ -41,16 +41,16 @@
                         Sản phẩm
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
-                        <a href="{{route('product-cates.index')}}" class="dropdown-item">Chuyên mục sản phẩm</a>
+                        <a href="{{route('product-cates.index')}}" class="dropdown-item">Loại sản phẩm</a>
                         <a href="{{route('products.index')}}" class="dropdown-item">Danh sách sản phẩm</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarOrdersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Orders
+                        Đơn hàng
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarOrdersDropdown">
-                        <a href="{{route('orders.index')}}" class="dropdown-item">Orders</a>
+                        <a href="{{route('orders.index')}}" class="dropdown-item">Tất cả</a>
                         @foreach ($productCates as $category)
                             <a href="{{route('orders.search', ['productCate' => $category->id])}}" class="dropdown-item">{{$category->name}}</a>
                         @endforeach

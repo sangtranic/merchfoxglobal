@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
 @endsection
 @section('content')
-    <?php $index = 0;?>
+    <?php use App\Helper\Helper;$index = 0;?>
     <div class="content-wrapper">
         <!-- Main content -->
         <section class="content mt-2">
@@ -176,7 +176,7 @@
                     </div>
                 </form>
                 <div class="card-header" style="padding-bottom: 10px; padding-top: 0px;">
-                    <h3 class="card-title">Orders</h3>&nbsp;<small><b>Tổng số {{$counter}} đơn</b></small>
+                    <h3 class="card-title">Tổng cộng: <b>{{$counter}}</b> đơn hàng</h3>&nbsp;
                     <div class="card-tools">
                         <form method="POST" action="{{ route('import-csv') }}" enctype="multipart/form-data">
                             @csrf
@@ -341,7 +341,15 @@
 
                                 <td colspan="3">
                                     @if($product)
-                                        <h5><a href="{{strlen($order->itemId) >0 ?'https://www.ebay.com/itm/'.$order->itemId:'#'}}"><b class="text-info">{{$product->name}}</b></a></h5>
+                                        <h5>
+                                            <?php if(!Helper::IsNullOrEmptyString($order->itemId)){?>
+                                                <a href="{{'https://www.ebay.com/itm/'.$order->itemId}}"><b class="text-info">{{$product->name}}</b></a>
+                                            <?php }else if(!Helper::IsNullOrEmptyString($product->url)){?>
+                                                <a href="{{$product->url}}"><b class="text-info">{{$product->name}}</b></a>
+                                            <?php }else{ ?>
+                                                <span><b class="text-info">{{$product->name}}</b></span>
+                                            <?php } ?>
+                                        </h5>
                                     @endif
                                     <div class="form-group row">
                                         <span class="col-sm-2">SKU</span>

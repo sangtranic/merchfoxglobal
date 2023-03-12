@@ -7,7 +7,7 @@
             <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <h1 class="m-0">Danh sách Seller</h1>
+                        <h1 class="m-0">Danh sách người dùng</h1>
                     </div><!-- /.col -->
 
                 </div><!-- /.row -->

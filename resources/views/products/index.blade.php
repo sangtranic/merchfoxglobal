@@ -11,8 +11,8 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group row">
-                                    <label for="productCate" class="col-sm-3 col-form-label">Chuyên mục</label>
-                                    <div class="col-sm-9">
+                                    <label for="productCate" class="col-sm-4 col-form-label">Chuyên mục</label>
+                                    <div class="col-sm-8">
                                         <select class="form-control" name="productCate" id="productCate"  onchange="this.form.submit()" >
                                             <option value="">Tất cả</option>
                                             @foreach ($productCates as $cate)
@@ -111,8 +111,8 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{$product->url}}" title="{{$product->name}}">{{$product->name}}</a>
-                                <p><b>{{$product->itemId}}</b></p>
+                                <a href="https://www.ebay.com/itm/{{$product->itemId}}" target="_blank" title="{{$product->name}}">{{$product->name}}</a>
+                                <p>{{$product->itemId}}</p>
                             </td>
                             <td>
                                 <p>{{$cate->name}}</b></p>

@@ -10,7 +10,7 @@
 		</div>
 	@endif
     <div class="bg-light p-4 rounded">
-        <h2>Sửa user "<strong>{{$user['userName']}}</strong>"</h2>
+        <h2>Thay đổi thông tin người dùng "<strong>{{$user['userName']}}</strong>"</h2>
         <div class="container mt-4">
             {{ Form::model($user, array('route' => array('users.update', $user->id), 'method' => 'PUT')) }}
             {{ Form::hidden('password', $user->password) }}
