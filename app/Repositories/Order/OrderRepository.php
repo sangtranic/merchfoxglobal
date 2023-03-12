@@ -19,7 +19,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
         return \App\Models\Orders::find($id);
     }
 
-    public function search($dateFrom, $dateTo,$userId)
+    public function search($dateFrom, $dateTo,$userId,$productCateId)
     {
 //        $modelName = get_class($this->model);
 //        $cacheKey = $modelName.$dateFrom.$dateTo.$userId."Cache";
@@ -40,6 +40,10 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             {
                 $query->where('users.id', '=', $userId);
             }
+//            if($productCateId>0)
+//            {
+//                $query->where('orders.categoryId', '=', $productCateId);
+//            }
             $query->where('users.statusId', '=', 3);
             $data = $query->get();
 

@@ -37,15 +37,16 @@ class HomeController extends Controller
 
         $listUser= $this->UserRepo->getAll();
         $listUser = $listUser->where('statusId', '=', 3)->sortBy("userName");;
-        $listVps = $this->VpsRepo->getAll()->sortBy("name");;
+        $listVps = $this->VpsRepo->getAll()->sortBy("name");
+        $productCateId = 1;
         if(Auth::user()->role != "admin")
         {
             $listUserAdd = $listUser->where('id', '=', Auth::user()->id);
-            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),Auth::user()->id);
+            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),Auth::user()->id,$productCateId);
             $listVps = $listVps->where('userId', '=', Auth::user()->id);
         }else{
             $listUserAdd = $listUser;
-            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),0);
+            $listOrder= $this->OrderRepo->search($dateFrom->format('Y-m-d H:i:s.u'),$dateTo->format('Y-m-d H:i:s.u'),0,$productCateId);
         }
 
         $dateOrders = collect([]);
