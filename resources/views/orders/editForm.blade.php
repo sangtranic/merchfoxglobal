@@ -346,7 +346,7 @@
                                 @if($productColors)
                                     @foreach($productColors as $item_productColor)
                                         <option
-                                            value="{{$item_productColor}}" {{$item_productColor == $order->color ? 'checked':''}}>{{$item_productColor}}</option>
+                                            value="{{$item_productColor}}" {{$item_productColor == $order->color ? 'selected':''}}>{{$item_productColor}}</option>
                                     @endforeach
                                 @endif
 
