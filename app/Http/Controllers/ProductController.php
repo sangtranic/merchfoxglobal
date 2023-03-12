@@ -130,6 +130,10 @@ class ProductController extends Controller
             (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
         {
             $product->isFileDesign = 1;
+        }else if($product->isFileDesign == 1 && Helper::IsNullOrEmptyString($product->urlImageDesignOne) &&
+            Helper::IsNullOrEmptyString($product->urlImageDesignTwo))
+        {
+            $product->isFileDesign = 0;
         }
 
         $product->save();
@@ -171,6 +175,10 @@ class ProductController extends Controller
             (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
         {
             $product->isFileDesign = 1;
+        }else if($product->isFileDesign == 1 && Helper::IsNullOrEmptyString($product->urlImageDesignOne) &&
+            Helper::IsNullOrEmptyString($product->urlImageDesignTwo))
+        {
+            $product->isFileDesign = 0;
         }
         $product->save();
 

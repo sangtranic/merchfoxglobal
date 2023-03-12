@@ -133,7 +133,7 @@
                                 </p>
                             </td>
                             <td class="project-actions text-right">
-                                <a class="btn btn-default btn-sm text-info openPopup" href="#"
+                                <a class="btn btn-default btn-sm text-info openPopup" href="javascript:void(0)"
                                    data-href="{{route('products.edit',['product'=>$product->id])}}"
                                    data-width="800px" title="Sửa sản phẩm">
                                     <i class="fas fa-pencil-alt">
