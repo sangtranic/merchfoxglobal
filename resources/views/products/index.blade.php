@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Danh sách sản phẩm')
 @section('content')
-    <?php $index = 1;?>
+    <?php use App\Helper\Helper;$index = 1;?>
     <div class="content-wrapper">
         <section class="content  mt-2">
             <!-- Default box -->
@@ -111,7 +111,13 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="https://www.ebay.com/itm/{{$product->itemId}}" target="_blank" title="{{$product->name}}">{{$product->name}}</a>
+                                <?php if(!Helper::IsNullOrEmptyString($product->itemId)){?>
+                                    <a href="https://www.ebay.com/itm/{{$product->itemId}}" target="_blank" title="{{$product->name}}">{{$product->name}}</a>
+                                <?php }else if(!Helper::IsNullOrEmptyString($product->url)){?>
+                                    <a href="{{$product->url}}" target="_blank" title="{{$product->name}}">{{$product->name}}</a>
+                                <?php }else{ ?>
+                                    <span>{{$product->name}}</span>
+                                <?php } ?>
                                 <p>{{$product->itemId}}</p>
                             </td>
                             <td>
