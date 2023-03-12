@@ -25,8 +25,10 @@ class FileUploadHelper
             // Đặt tên file ảnh
             //$filename = time() . '.' . $image->getClientOriginalExtension();
             $filename = $image->getClientOriginalName();
-            $filename = str_replace("  ","-",$filename);
-            $filename = str_replace(" ","-",$filename);
+            $filename = str_replace('  ', '-', $filename);
+            $filename = str_replace(' ', '-', $filename); // Replaces all spaces with hyphens.
+            $filename = preg_replace('/[^A-Za-z0-9\-.]/', '', $filename); // Removes special chars.
+
             // Lưu ảnh gốc vào thư mục 'images'
             //$path = public_path('upload/original/' . $filename);
 
