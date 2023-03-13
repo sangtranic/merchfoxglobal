@@ -373,6 +373,7 @@ class OrdersController extends Controller
                 }
                 $product->createBy = Auth::id();
                 $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+                $product->color =  $request->input('color');
                 $product->save();
                 $order->productId = $product->id;
             }
@@ -395,6 +396,7 @@ class OrdersController extends Controller
                 $new_product->urlImageDesignTwo = FileUploadHelper::saveImage($request->file('imageDesignTwo'));
             }
             $new_product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+            $new_product->color =  $request->input('color');
             $new_product->save();
         }
         $order->isFB = $request->has('isFB') ? 1 : 0;

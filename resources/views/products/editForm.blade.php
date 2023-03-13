@@ -99,8 +99,20 @@
 
         <div class="form-group row">
             {{ Form::label('isFileDesign','File Thiết kế',['class'=>'col-sm-3 col-form-label'])}}
-            <div class="col-sm-9">
+            <div class="col-sm-3">
                 {{ Form::checkbox('isFileDesign') }}
+            </div>
+            {{ Form::label('color','Color',['class'=>'col-sm-3 col-form-label'])}}
+            <div class="col-sm-3">
+                <select class="form-control" id="color" name="color" style="width: 100%;">
+                    @if($productColors)
+                        @foreach($productColors as $item_productColor)
+                            <option
+                                value="{{$item_productColor}}" {{$item_productColor == $product->color ? 'selected':''}}>{{$item_productColor}}</option>
+                        @endforeach
+                    @endif
+
+                </select>
             </div>
         </div>
         <div class="form-group row">

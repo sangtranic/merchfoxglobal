@@ -187,6 +187,9 @@ class RestApiController extends BaseController
                     $order->color = $productColor;
                     if ($product) {
                         $order->productId = $product->id;
+                        if (!Helper::IsNullOrEmptyString($product->color)){
+                            $order->color = $product->color;
+                        }
                     } else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0) {
                         $product = new Products();
                         $product->itemId = $order->itemId;

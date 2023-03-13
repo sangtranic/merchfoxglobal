@@ -98,10 +98,20 @@ class ProductController extends Controller
         if($request->has('callBack'))  {
           $callBack = $request->input('callBack');
         }
+        $productColors =[];
         $productCates = Productcategories::pluck('name', 'id');
+        if ($product->categoryId > 0){
+            $productCategory = Productcategories::where('id', $product->categoryId )->first();
+        }else{
+            $productCategory = Productcategories::first();
+        }
+        if ($productCategory){
+            $productColors = $productCategory->color_list;
+        }
         return view('products.editForm', [
             'product' => $product,
             'productCates' => $productCates,
+            'productColors' => $productColors,
             'callBack'=> $callBack]);
     }
 
@@ -115,7 +125,8 @@ class ProductController extends Controller
             'urlImagePreviewOne' => 'nullable|max:255',
             'urlImagePreviewTwo' => 'nullable|max:255',
             'urlImageDesignOne' => 'nullable|max:255',
-            'urlImageDesignTwo' => 'nullable|max:255'
+            'urlImageDesignTwo' => 'nullable|max:255',
+            'color' => 'nullable|max:50'
         ]);
         $product = new Products($request->all());
         if ($request->has('imageDesignOne')) {
@@ -151,7 +162,8 @@ class ProductController extends Controller
             'urlImagePreviewOne' => 'nullable|max:255',
             'urlImagePreviewTwo' => 'nullable|max:255',
             'urlImageDesignOne' => 'nullable|max:255',
-            'urlImageDesignTwo' => 'nullable|max:255'
+            'urlImageDesignTwo' => 'nullable|max:255',
+            'color' => 'nullable|max:50'
         ]);
         $product = Products::findOrFail($id);
         //$product->update($request->all());
@@ -164,6 +176,7 @@ class ProductController extends Controller
         $product->urlImageDesignOne = $request->input('urlImageDesignOne');
         $product->urlImageDesignTwo = $request->input('urlImageDesignTwo');
         $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+        $product->color = $request->input('color');
         $product->updateBy = Auth::id();
         if ($request->has('imageDesignOne')) {
             $product->urlImageDesignOne = FileUploadHelper::saveImage($request->file('imageDesignOne'));

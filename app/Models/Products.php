@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $urlImagePreviewTwo
  * @property string $urlImageDesignOne
  * @property string $urlImageDesignTwo
+ * @property string $color
  */
 class Products extends Model
 {
@@ -40,7 +41,7 @@ class Products extends Model
      * @var array
      */
     protected $fillable = [
-       'itemId', 'categoryId', 'name', 'description', 'url', 'urlImagePreviewOne', 'urlImagePreviewTwo', 'urlImageDesignOne', 'urlImageDesignTwo', 'isFileDesign', 'createDate', 'createBy', 'updateDate', 'updateBy'
+       'itemId', 'categoryId', 'name', 'description', 'url', 'urlImagePreviewOne', 'urlImagePreviewTwo', 'urlImageDesignOne', 'urlImageDesignTwo', 'isFileDesign', 'createDate', 'createBy', 'updateDate', 'updateBy','color'
     ];
 
     /**
@@ -58,7 +59,7 @@ class Products extends Model
      * @var array
      */
     protected $casts = [
-        'categoryId' => 'int', 'itemId' => 'string','name' => 'string', 'description' => 'string', 'url' => 'string', 'urlImagePreviewOne' => 'string', 'urlImagePreviewTwo' => 'string', 'urlImageDesignOne' => 'string', 'urlImageDesignTwo' => 'string','isFileDesign'=>'boolean', 'createDate' => 'timestamp', 'updateDate' => 'timestamp'
+        'categoryId' => 'int', 'itemId' => 'string','name' => 'string', 'description' => 'string', 'url' => 'string', 'urlImagePreviewOne' => 'string', 'urlImagePreviewTwo' => 'string', 'urlImageDesignOne' => 'string', 'urlImageDesignTwo' => 'string','isFileDesign'=>'boolean', 'createDate' => 'timestamp', 'updateDate' => 'timestamp','color'=>'string'
     ];
 
     /**

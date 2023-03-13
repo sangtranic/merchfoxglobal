@@ -101,13 +101,13 @@ class Productcategories extends Model
     }
     function getColorListAttribute(){
         if(!Helper::IsNullOrEmptyString($this->colors)){
-            return explode(",",$this->colors);
+            return array_map('trim', explode(",",$this->colors));
         }
         return [];
     }
     function getKeywordListAttribute(){
         if(!Helper::IsNullOrEmptyString($this->keyword)){
-            return explode(",",$this->keyword);
+            return array_map('trim', explode(",",$this->keyword));
         }
         return [];
     }

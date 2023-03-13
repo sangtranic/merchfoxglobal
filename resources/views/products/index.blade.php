@@ -87,6 +87,9 @@
                                 File Design
                             </th>
                             <th>
+                                Color
+                            </th>
+                            <th>
                                 Time
                             </th>
                             <th style="width: 20%">
@@ -125,6 +128,9 @@
                             </td>
                             <td>
                                 {!! Form::checkbox('isFileDesign'.$product->id, 1, $product->isFileDesign,["disabled"=>true]) !!}
+                            </td>
+                            <td>
+                                {{$product->color}}
                             </td>
                             <td>
                                 <p>Create:

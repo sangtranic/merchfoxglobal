@@ -137,7 +137,7 @@
                     <div class="form-group row">
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                
+
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -474,6 +474,7 @@
             $('#imgDesign1').attr('src', product.imageDesign1);
             $('#imgDesign2').attr('src', product.imageDesign2);
             $('#isFileDesign').prop('checked', product.isFileDesign);
+            $('#color').val(product.color);
         }
 
         function callBackPopop(productId) {
