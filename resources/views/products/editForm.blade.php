@@ -48,10 +48,10 @@
                 </div>
             </div>
         <div class="form-group row">
-            {{ Form::label('description','Mô tả',['class'=>'col-sm-3 col-form-label'])}}
+            <!--{{ Form::label('description','Mô tả',['class'=>'col-sm-3 col-form-label'])}}
             <div class="col-sm-9">
                 {{ Form::textarea('description', null, array('class' => 'form-control', 'rows' => 2)) }}
-            </div>
+            </div>-->
         </div>
         <div class="form-group row">
             {{ Form::label('url','Link',['class'=>'col-sm-3 col-form-label'])}}

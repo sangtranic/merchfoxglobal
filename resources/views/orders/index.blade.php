@@ -251,8 +251,7 @@
                                 </td>
                                 <td>
                                     <p>{{$order->shipToFirstName}} {{$order->shipToLastName}}<br>
-                                        {{$order->shipToAddressLine1}}<br>
-                                        {{$order->shipToAddressLine2}}<br>
+                                        {{$order->shipToAddressLine1}} {{$order->shipToAddressLine2}}<br>
                                         {{$order->shipToAddressCity}} - {{$order->shipToAddressStateOrProvince}} - {{$order->shipToAddressPostalCode}} - {{$order->shipToAddressCountry}}<br>
                                         {{$order->shipToAddressPhone}}</p>
                                 </td>
@@ -343,9 +342,9 @@
                                     @if($product)
                                         <h5>
                                             <?php if(!Helper::IsNullOrEmptyString($order->itemId)){?>
-                                                <a href="{{'https://www.ebay.com/itm/'.$order->itemId}}"><b class="text-info">{{$product->name}}</b></a>
+                                                <a href="{{'https://www.ebay.com/itm/'.$order->itemId}}" target="_blank><b class="text-info">{{$product->name}}</b></a>
                                             <?php }else if(!Helper::IsNullOrEmptyString($product->url)){?>
-                                                <a href="{{$product->url}}"><b class="text-info">{{$product->name}}</b></a>
+                                                <a href="{{$product->url}}" target="_blank"><b class="text-info">{{$product->name}}</b></a>
                                             <?php }else{ ?>
                                                 <span><b class="text-info">{{$product->name}}</b></span>
                                             <?php } ?>

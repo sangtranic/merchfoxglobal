@@ -86,70 +86,58 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-6 col-form-label">Thông tin ship</label>
+                        <label class="col-sm-6 col-form-label">Thông tin vận chuyển</label>
                         {{ Form::label('itemId','item Id',['class'=>'col-sm-2 col-form-label'])}}
                         <div class="col-sm-4">
                             {{ Form::text('itemId', null, array('class' => 'form-control')) }}
                         </div>
                     </div>
                     <div class="form-group row">
-                        {{ Form::label('shipToAddressID','Address ID',['class'=>'col-sm-2 col-form-label'])}}
+                        {{ Form::label('shipToFirstName','First name',['class'=>'col-sm-2 col-form-label'])}}
                         <div class="col-sm-4">
-                            {{ Form::text('shipToAddressID', null, array('class' => 'form-control')) }}
-                        </div>
-                        {{ Form::label('shipToFirstName','Address Name',['class'=>'col-sm-2 col-form-label'])}}
-                        <div class="col-sm-2">
                             {{ Form::text('shipToFirstName', null, array('class' => 'form-control')) }}
                         </div>
-                        <div class="col-sm-2">
+						{{ Form::label('shipToFirstName','Last name',['class'=>'col-sm-2 col-form-label'])}}
+                        <div class="col-sm-4">
                             {{ Form::text('shipToLastName', null, array('class' => 'form-control')) }}
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        {{ Form::label('shipToAddressPhone','Address Phone',['class'=>'col-sm-2 col-form-label'])}}
-                        <div class="col-sm-4">
-                            {{ Form::text('shipToAddressPhone', null, array('class' => 'form-control')) }}
-                        </div>
-                        {{ Form::label('shipToAddressLine1','Address Line 1',['class'=>'col-sm-2 col-form-label'])}}
+						 {{ Form::label('shipToAddressLine1','Address Ln 1',['class'=>'col-sm-2 col-form-label'])}}
                         <div class="col-sm-4">
                             {{ Form::text('shipToAddressLine1', null, array('class' => 'form-control')) }}
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        {{ Form::label('shipToAddressCity','Address City',['class'=>'col-sm-2 col-form-label'])}}
-                        <div class="col-sm-4">
-                            {{ Form::text('shipToAddressCity', null, array('class' => 'form-control')) }}
-                        </div>
-                        {{ Form::label('shipToAddressLine2','Address Line 2',['class'=>'col-sm-2 col-form-label'])}}
+						 {{ Form::label('shipToAddressLine2','Address Ln 2',['class'=>'col-sm-2 col-form-label'])}}
                         <div class="col-sm-4">
                             {{ Form::text('shipToAddressLine2', null, array('class' => 'form-control')) }}
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-sm-6">
-                            <div class="form-group row">
-                                {{ Form::label('shipToAddressCounty','Address County',['class'=>'col-sm-4 col-form-label'])}}
-                                <div class="col-sm-8">
-                                    {{ Form::text('shipToAddressCounty', null, array('class' => 'form-control')) }}
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                {{ Form::label('shipToAddressStateOrProvince','Address State',['class'=>'col-sm-4 col-form-label'])}}
-                                <div class="col-sm-8">
+                        {{ Form::label('shipToAddressCity','City',['class'=>'col-sm-2 col-form-label'])}}
+                        <div class="col-sm-4">
+                            {{ Form::text('shipToAddressCity', null, array('class' => 'form-control')) }}
+                        </div>
+                       {{ Form::label('shipToAddressStateOrProvince','State',['class'=>'col-sm-2 col-form-label'])}}
+                                <div class="col-sm-4">
                                     {{ Form::text('shipToAddressStateOrProvince', null, array('class' => 'form-control')) }}
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                {{ Form::label('shipToAddressPostalCode','Postal Code',['class'=>'col-sm-4 col-form-label'])}}
-                                <div class="col-sm-8">
+                    </div>
+                    <div class="form-group row">
+						{{ Form::label('shipToAddressPostalCode','ZipCode',['class'=>'col-sm-2 col-form-label'])}}
+                                <div class="col-sm-4">
                                     {{ Form::text('shipToAddressPostalCode', null, array('class' => 'form-control')) }}
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                {{ Form::label('shipToAddressCountry','Address Country',['class'=>'col-sm-4 col-form-label'])}}
-                                <div class="col-sm-8">
+								{{ Form::label('shipToAddressCountry','Country',['class'=>'col-sm-2 col-form-label'])}}
+                                <div class="col-sm-4">
                                     {{ Form::text('shipToAddressCountry', null, array('class' => 'form-control')) }}
                                 </div>
+						{{ Form::label('shipToAddressPhone','Phone',['class'=>'col-sm-2 col-form-label'])}}
+                        <div class="col-sm-4">
+                            {{ Form::text('shipToAddressPhone', null, array('class' => 'form-control')) }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                
                             </div>
                         </div>
                         <div class="col-sm-6">

@@ -166,20 +166,20 @@ class RestApiController extends BaseController
                                 }
                             }
                         }
-                        if (!Helper::IsNullOrEmptyString($category->colors)) {
-                            $colors = explode(',', $category->colors);
-                            if (count($colors) > 0) {
-                                foreach ($colors as $itemColor) {
-                                    if (str_contains(strtolower($productName), strtolower($itemColor))) {
-                                        $productColor = $itemColor;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
-                            break;
-                        }
+//                        if (!Helper::IsNullOrEmptyString($category->colors)) {
+//                            $colors = explode(',', $category->colors);
+//                            if (count($colors) > 0) {
+//                                foreach ($colors as $itemColor) {
+//                                    if (str_contains(strtolower($productName), strtolower($itemColor))) {
+//                                        $productColor = $itemColor;
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
+//                            break;
+//                        }
 
                     }
                     $order->categoryId = $categoryId;
