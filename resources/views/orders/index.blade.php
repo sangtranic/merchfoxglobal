@@ -124,14 +124,23 @@
                                                 <option value="1" {{ $carrie == 1 ? 'selected' : '' }}>Có</option>
                                             </select>
                                     </div>
-                                    <label for="isFB" class="col-sm-2 col-form-label">isFB</label>
+
+                                    <label for="fulfillStatus" class="col-sm-2 col-form-label">Fulfill</label>
                                     <div class="col-sm-2">
-                                            <select class="form-control" id="isFB" name="isFB" onchange="this.form.submit()" >
-                                                <option value="0">...</option>
-                                                <option value="2"{{ $isFB == 2 ? 'selected' : '' }}>Chưa có</option>
-                                                <option value="1"{{ $isFB == 1 ? 'selected' : '' }}>Đã có</option>
-                                            </select>
+                                        <select class="form-control" id="fulfillStatus" name="fulfillStatus" onchange="this.form.submit()" >
+                                            <option value="0">...</option>
+                                            <option value="2" {{ $fulfill == 2 ? 'selected' : '' }}>Chưa</option>
+                                            <option value="1" {{ $fulfill == 1 ? 'selected' : '' }}>Đã Fulfill</option>
+                                        </select>
                                     </div>
+{{--                                    <label for="isFB" class="col-sm-2 col-form-label">isFB</label>--}}
+{{--                                    <div class="col-sm-2">--}}
+{{--                                            <select class="form-control" id="isFB" name="isFB" onchange="this.form.submit()" >--}}
+{{--                                                <option value="0">...</option>--}}
+{{--                                                <option value="2"{{ $isFB == 2 ? 'selected' : '' }}>Chưa có</option>--}}
+{{--                                                <option value="1"{{ $isFB == 1 ? 'selected' : '' }}>Đã có</option>--}}
+{{--                                            </select>--}}
+{{--                                    </div>--}}
                                 </div>
                                 <div class="form-group row">
                                     <label for="orderId" class="col-sm-2 col-form-label">ID</label>

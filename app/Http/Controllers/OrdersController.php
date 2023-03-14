@@ -74,6 +74,7 @@ class OrdersController extends Controller
         $filter_orderId = 0;
         $filter_syncStoreStatusId = 0;
         $filter_isFB = 0;
+        $filter_fulfillStatusId = 0;
         $filter_sellerIds = [];
         $filter_vpsIds = [];
         if (Auth::user()->role == 'admin') {
@@ -127,6 +128,9 @@ class OrdersController extends Controller
             }
             if ($request->input('orderId')) {
                 $filter_orderId = $request->integer('orderId');
+            }
+            if ($request->input('fulfillStatus')) {
+                $filter_fulfillStatusId = $request->integer('fulfillStatus');
             }
         }
         if ($filter_dateFrom && $filter_dateTo) {
@@ -190,6 +194,16 @@ class OrdersController extends Controller
         if ($filter_syncStoreStatusId > 0) {
             $query->where('syncStoreStatusId', "=", $filter_syncStoreStatusId == 2 ? 0 : $filter_syncStoreStatusId);
         }
+        if ($filter_fulfillStatusId > 0) {
+            if ($filter_fulfillStatusId == 2){
+                $query->where(function ($query) {
+                    $query->where('fulfillStatusId', '=', 0)
+                        ->orWhereNull('fulfillStatusId');
+                });
+            }else{
+                $query->where('fulfillStatusId', "=", $filter_fulfillStatusId == 2 ? 0 : $filter_fulfillStatusId);
+            }
+        }
         if ($filter_isFB > 0) {
             $query->where('isFB', "=", $filter_isFB == 2 ? 0 : $filter_isFB);
         }
@@ -237,7 +251,8 @@ class OrdersController extends Controller
             'carrie' => $filter_carrieStatusId,
             'orderId' => $filter_orderId,
             'ebay' => $filter_syncStoreStatusId,
-            'isFB' => $filter_isFB
+            'isFB' => $filter_isFB,
+            'fulfill' => $filter_fulfillStatusId
         ];
     }
 
