@@ -381,20 +381,20 @@ class RestApiController extends BaseController
                                                     }
                                                 }
                                             }
-                                            if (!Helper::IsNullOrEmptyString($category->colors)) {
-                                                $colors = explode(',', $category->colors);
-                                                if (count($colors) > 0) {
-                                                    foreach ($colors as $itemColor) {
-                                                        if (str_contains(strtolower($productName), strtolower($itemColor))) {
-                                                            $productColor = $itemColor;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
-                                                break;
-                                            }
+//                                            if (!Helper::IsNullOrEmptyString($category->colors)) {
+//                                                $colors = explode(',', $category->colors);
+//                                                if (count($colors) > 0) {
+//                                                    foreach ($colors as $itemColor) {
+//                                                        if (str_contains(strtolower($productName), strtolower($itemColor))) {
+//                                                            $productColor = $itemColor;
+//                                                            break;
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                            if ($categoryId > 0 && !Helper::IsNullOrEmptyString($productColor)) {
+//                                                break;
+//                                            }
 
                                         }
                                         $order->categoryId = $categoryId;
@@ -402,6 +402,9 @@ class RestApiController extends BaseController
                                         $order->color = $productColor;
                                         if ($product) {
                                             $order->productId = $product->id;
+                                            if (!Helper::IsNullOrEmptyString($product->color)){
+                                                $order->color = $product->color;
+                                            }
                                         } else if (!Helper::IsNullOrEmptyString($order->itemId) && strlen($productName) && $categoryId > 0) {
                                             $product = new Products();
                                             $product->itemId = $order->itemId;

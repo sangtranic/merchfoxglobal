@@ -362,10 +362,10 @@ class OrdersController extends Controller
             'categoryId' => 'required',
             'sellerId' => 'required',
             'vpsId' => 'required',
-            'orderNumber' => 'required|unique:orders,orderNumber',
+            'orderNumber' => 'required',
             'imageDesignOne' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes,
             'imageDesignTwo' => 'nullable|mimes:jpg,jpeg,png,gif|max:' . $maxUploadSizeInBytes
-        ], ['orderNumber.unique' => 'Đơn hàng đã tồn tại',
+        ], [
             'imageDesignOne.mimes' => 'Tệp tin ảnh thiết kế mặt trước phải có định dạng: jpg, jpeg, png hoặc gif.',
             'imageDesignTwo.mimes' => 'Tệp tin ảnh thiết kế mặt sau phải có định dạng: jpg, jpeg, png hoặc gif.',
             'imageDesignOne.max' => 'File ảnh thiết kế mặt trước cho phép tối đa ' . $maxUploadSize,
@@ -373,9 +373,9 @@ class OrdersController extends Controller
 
 
         $order = new Orders($request->all());
-        if (Orders::where('orderNumber', $request->input('orderNumber'))->get()->count() > 0) {
-            return back()->withErrors(["Đơn hàng " . $request->input('orderNumber') . ' đã tồn tại.']);
-        }
+//        if (Orders::where('orderNumber', $request->input('orderNumber'))->get()->count() > 0) {
+//            return back()->withErrors(["Đơn hàng " . $request->input('orderNumber') . ' đã tồn tại.']);
+//        }
         if ($order->productId == 0) {
             if ($request->has('productName') && !Helper::IsNullOrEmptyString($request->input('productName'))) {
                 $product = new Products($request->all());
@@ -565,7 +565,7 @@ class OrdersController extends Controller
             //$new_product->update($request->all());
             $new_product->itemId = $request->input('itemId');
             $new_product->description = $request->input('description');
-            $new_product->url = $request->input('url');
+            //$new_product->url = $request->input('url');
             $new_product->urlImagePreviewOne = $request->input('urlImagePreviewOne');
             $new_product->urlImagePreviewTwo = $request->input('urlImagePreviewTwo');
             $new_product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;

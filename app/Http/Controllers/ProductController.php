@@ -69,6 +69,7 @@ class ProductController extends Controller
             $filter_isFileDesign = true;
             $query->whereRaw('isFileDesign & b\'1\' = b\'0\'');
         }
+        $query->orderBy('id','desc');
         $products = $query->paginate(20);
 
         $users = $this->UsersRepo->getAll();
