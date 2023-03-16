@@ -47,6 +47,15 @@
         <p>Price: <b>{{$order->price}} $</b></p>
         <p>Fee Ship: <b>{{$order->ship}} $</b></p>
         <p>Total: <b>{{$order->cost}} $</b></p>
+
+        @if($order->syncStoreStatusId ==0)
+            <span class="badge badge-warning">Chưa Up Ebay</span>
+            <button class="btn btn-sm btn-outline-info btn-xs" type="button" onclick="updateSyncStoreStatus({{$order->id}},'{{$order->trackingCode}}')">
+                <i class="fas fa-check"></i>
+            </button>
+        @else
+            <span class="badge badge-success">Đã cập nhật lên Ebay</span>
+        @endif
     </td>
     <td class="project-actions text-center" rowspan="2">
         <a class="btn btn-default btn-sm text-info openPopup" data-width="100%"  title="Edit" href="javascript:void(0)" data-href="{{route('orders.editForm',['productCate'=>$order->categoryId,'id'=>$order->id,'layout'=>'layouts.appblank','callBack'=>'callBackPopop'])}}">

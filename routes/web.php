@@ -68,6 +68,7 @@ Route::post('orders-index-post', [Controllers\OrdersController::class, 'indexPos
 Route::get('/export-csv', [OrdersController::class, 'exportCSV'])->name('export-csv');
 Route::get('/export-orders', [OrdersController::class, 'exportOrders'])->name('export-orders');
 Route::get('/export-up-ebay', [OrdersController::class, 'exportUpToEbay'])->name('export-up-ebay');
+Route::get('/update-status-up-ebay', [OrdersController::class, 'updateStatusUpToEbay'])->name('update-status-up-ebay');
 Route::post('/import-csv', [OrdersController::class, 'importCsv'])->name('import-csv');
 
 //api

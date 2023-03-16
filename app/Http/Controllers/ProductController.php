@@ -28,7 +28,9 @@ class ProductController extends Controller
     {
         $users = $this->UsersRepo->getAll();
         $productCates = Productcategories::all();
-        $products = Products::paginate(20);
+        $query = Products::query();
+        $query->orderBy('id','desc');
+        $products = $query->paginate(20);
         $filter_productCateId = 0;
         $filter_search = '';
         $filter_user = 0;

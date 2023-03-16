@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Maatwebsite\Excel\Facades\Excel;
@@ -387,7 +388,18 @@ class OrdersController extends Controller
                     $product->urlImageDesignTwo = FileUploadHelper::saveImage($request->file('imageDesignTwo'));
                 }
                 $product->createBy = Auth::id();
-                $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+                $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;//isFileDesign
+
+                if($product->isFileDesign == 0 &&
+                    (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
+                {
+                    $product->isFileDesign = 1;
+                }else if($product->isFileDesign == 1 && Helper::IsNullOrEmptyString($product->urlImageDesignOne) &&
+                    Helper::IsNullOrEmptyString($product->urlImageDesignTwo))
+                {
+                    $product->isFileDesign = 0;
+                }
+
                 $product->color =  $request->input('color');
                 $product->save();
                 $order->productId = $product->id;
@@ -401,7 +413,7 @@ class OrdersController extends Controller
                 $new_product->urlImagePreviewOne = $request->input('urlImagePreviewOne');
             }
             if ($request->has('urlImagePreviewTwo')) {
-                $new_product->urlImagePreviewOne = $request->input('urlImagePreviewTwo');
+                $new_product->urlImagePreviewTwo = $request->input('urlImagePreviewTwo');
             }
             $new_product->updateBy = Auth::id();
             if ($request->has('imageDesignOne')) {
@@ -411,6 +423,15 @@ class OrdersController extends Controller
                 $new_product->urlImageDesignTwo = FileUploadHelper::saveImage($request->file('imageDesignTwo'));
             }
             $new_product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+            if($new_product->isFileDesign == 0 &&
+                (!Helper::IsNullOrEmptyString($new_product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($new_product->urlImageDesignTwo)))
+            {
+                $new_product->isFileDesign = 1;
+            }else if($new_product->isFileDesign == 1 && Helper::IsNullOrEmptyString($new_product->urlImageDesignOne) &&
+                Helper::IsNullOrEmptyString($new_product->urlImageDesignTwo))
+            {
+                $new_product->isFileDesign = 0;
+            }
             $new_product->color =  $request->input('color');
             $new_product->save();
         }
@@ -557,6 +578,16 @@ class OrdersController extends Controller
                 }
                 $product->createBy = Auth::id();
                 $product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+
+                if($product->isFileDesign == 0 &&
+                    (!Helper::IsNullOrEmptyString($product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($product->urlImageDesignTwo)))
+                {
+                    $product->isFileDesign = 1;
+                }else if($product->isFileDesign == 1 && Helper::IsNullOrEmptyString($product->urlImageDesignOne) &&
+                    Helper::IsNullOrEmptyString($product->urlImageDesignTwo))
+                {
+                    $product->isFileDesign = 0;
+                }
                 $product->save();
                 $order->productId = $product->id;
             }
@@ -577,6 +608,16 @@ class OrdersController extends Controller
                 $new_product->urlImageDesignTwo = FileUploadHelper::saveImage($request->file('imageDesignTwo'));
             }
             $new_product->isFileDesign = $request->has('isFileDesign') ? 1 : 0;
+
+            if($new_product->isFileDesign == 0 &&
+                (!Helper::IsNullOrEmptyString($new_product->urlImageDesignOne) || !Helper::IsNullOrEmptyString($new_product->urlImageDesignTwo)))
+            {
+                $new_product->isFileDesign = 1;
+            }else if($new_product->isFileDesign == 1 && Helper::IsNullOrEmptyString($new_product->urlImageDesignOne) &&
+                Helper::IsNullOrEmptyString($new_product->urlImageDesignTwo))
+            {
+                $new_product->isFileDesign = 0;
+            }
             $new_product->save();
         }
         $order->updateBy = Auth::id();
@@ -670,7 +711,23 @@ class OrdersController extends Controller
         return Excel::download(new OrderExport($heading,$data), 'proposed_file_name'.Carbon::today()->timezone('Asia/Ho_Chi_Minh')->format('dmY_Hi').'.ods');
 
     }
+    public function updateStatusUpToEbay(Request $request){
 
+        $response = ["status" => false, "message" => "", 'data' => null];
+        if ($request->has('orderId')){
+            $order = Orders::where('id',$request->integer('orderId') )->first();
+            if ($order && !Helper::IsNullOrEmptyString($order->trackingCode)){
+                $order->syncStoreStatusId = 1;
+                $order->save();
+                $response['status']= true;
+                $response['message']= 'Cập nhật trạng thái Up Ebay thành công';
+                $response['data']= $order->trackingCode;
+            }else{
+                $response['message']= 'Không tìm thấy đơn hàng hoặc đơn hàng chưa có mã Tracking, hãy kiểm tra lại thông tin';
+            }
+        }
+        return response()->json($response);
+    }
     public function exportUpToEbay(Request $request)
     {
         $response = ["status" => false, "message" => "", 'data' => null];
@@ -794,7 +851,12 @@ class OrdersController extends Controller
                         $order->trackingStatusId = Helper::IsNullOrEmptyString($order->trackingCode) ? 0 : 1;
                         $order->carrier = $row[3];
                         $order->carrierStatusId = Helper::IsNullOrEmptyString($order->carrier) ? 0 : 1;
-                        $order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4], 'yes') ? 1 : 0;
+                        if ($row[4] != null && Str::lower(trim($row[4])) === 'yes' ){
+                            $order->syncStoreStatusId = 1;
+                        }else{
+                            $order->syncStoreStatusId = 0;
+                        }
+                        //$order->syncStoreStatusId = !Helper::IsNullOrEmptyString($row[4]) && strpos($row[4], 'yes') >= 0 ? 1 : 0;
                         $order->note = $row[5];
                         $order->save();
                         $numberOrderUpdate++;

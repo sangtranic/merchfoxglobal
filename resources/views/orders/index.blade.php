@@ -296,6 +296,9 @@
 
                                     @if($order->syncStoreStatusId ==0)
                                         <span class="badge badge-warning">Chưa Up Ebay</span>
+                                        <button class="btn btn-sm btn-outline-info btn-xs" type="button" onclick="updateSyncStoreStatus({{$order->id}},'{{$order->trackingCode}}')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
                                     @else
                                         <span class="badge badge-success">Đã cập nhật lên Ebay</span>
                                     @endif
@@ -393,7 +396,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    {{ $orders->links('pagination::bootstrap-4', ['link_limit' => 3]) }}</div>
+                    {{ $orders->appends(request()->query())->links('pagination::bootstrap-4', ['link_limit' => 3]) }}</div>
             </div>
             <!-- /.card -->
 
@@ -522,6 +525,38 @@
                     },
                     error: function (xhr) {
                         alert('Đã có lỗi export file.')
+                    }
+                });
+            }
+        }
+        function updateSyncStoreStatus(orderId, trackingCode) {
+            if(trackingCode == null || trackingCode.length == 0){
+                alert('Đơn hàng chưa Tracking hãy kiểm tra lại thông tin.')
+            } else{
+                $.ajax({
+                    url: "{{route('update-status-up-ebay')}}",
+                    type: "get",
+                    data: {'orderId':orderId},
+                    success: function (data, status, xhr) {
+                        if(data != null){
+                            if(!data.status){
+                                alert(data.message);
+                            }else{
+                                navigator.clipboard.writeText(data.data);
+                                $.get('{{route('api-order-row')}}?id=' + orderId+'&index='+$('tr[data-order='+orderId+']:first').attr('data-index'), function (data, status) {
+                                    if (data != null && data.indexOf('$$$')>0) {
+                                        var dataArrs = data.split('$$$');
+                                        $('tr[data-order='+orderId+']:first').focus();
+                                        $('tr[data-order='+orderId+']:first').replaceWith(dataArrs[0]);
+                                        $('tr[data-order='+orderId+']:last').replaceWith(dataArrs[1]);
+                                    }
+                                });
+
+                            }
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Đã có lỗi cập nhật trạng thái.')
                     }
                 });
             }

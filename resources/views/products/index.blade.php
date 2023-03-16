@@ -162,7 +162,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    {{ $products->links('pagination::bootstrap-4', ['link_limit' => 3]) }}</div>
+                    {{ $products->appends(request()->query())->links('pagination::bootstrap-4', ['link_limit' => 3]) }}</div>
             </div>
             <!-- /.card -->
 
