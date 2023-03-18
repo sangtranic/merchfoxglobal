@@ -135,11 +135,11 @@ class OrdersController extends Controller
             }
         }
         if ($filter_dateFrom && $filter_dateTo) {
-            $query->whereBetween('created_at', [$filter_dateFrom, $filter_dateTo]);
+            $query->whereBetween('created_at', [ Carbon::parse($filter_dateFrom)->startOfDay(),  Carbon::parse($filter_dateTo)->endOfDay()]);
         } else if ($filter_dateFrom) {
-            $query->whereDate('created_at', '>=', $filter_dateFrom);
+            $query->whereDate('created_at', '>=', Carbon::parse($filter_dateFrom)->startOfDay());
         } else if ($filter_dateTo) {
-            $query->whereDate('created_at', '<=', $filter_dateTo);
+            $query->whereDate('created_at', '<=', Carbon::parse($filter_dateTo)->endOfDay());
         }
         if ($filter_productCateId > 0) {
             $query->where('categoryId', $filter_productCateId);
