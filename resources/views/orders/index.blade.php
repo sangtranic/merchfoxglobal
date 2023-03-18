@@ -164,6 +164,10 @@
                                     <i class="fa fa-search"></i> Tìm kiếm
                                 </button>
 
+                                <a class="btn btn-sm btn-primary" href="{{route('orders.index')}}" title="Reset">
+                                    Reset
+                                </a>
+
                                 <button class="btn btn-sm btn-default" type="button" onclick="exprortUpEbay(this.form)">
                                     <i class="fas fa-file-export"></i> Up Track Ebay
                                 </button>
@@ -405,12 +409,30 @@
     </div>
 @stop
 @section('footer')
-
+    <style>
+        .backtotop {
+            position: fixed;
+            bottom: 35px;
+            right: 10px;
+            z-index: 9999;
+            background: #ff8551;
+            border-radius: 100%;
+            height: 48px;
+            width: 48px;
+            text-align: center;
+            box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
+        }
+        .backtotop i {
+            color: #fff;
+            font-size: 24px;
+            line-height: 46px;
+        }
+    </style>
+    <a id="backtotop" href="#" class="backtotop"><i class="fas fa-chevron-up"></i></a>
     <!-- Select2 -->
     <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
 
     <script>
-
         function callBackPopop(orderId) {
             if (orderId != null && orderId > 0) {
                 $.get('{{route('api-order-row')}}?id=' + orderId+'&index='+$('tr[data-order='+orderId+']:first').attr('data-index'), function (data, status) {
