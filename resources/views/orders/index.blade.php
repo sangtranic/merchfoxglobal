@@ -45,23 +45,38 @@
                                                 @endforeach
                                             </select>
                                     </div>
-                                    <label for="user" class="col-sm-2 col-form-label">Seller</label>
+                                    <label for="user" class="col-sm-2 col-form-label">Nhân viên</label>
                                     <div class="col-sm-4">
-                                            <select class="form-control select2" id="seller" name="seller" onchange="this.form.submit()" >
-                                                <option value="">Tất cả</option>
-                                                @foreach ($sellers as $itemSeller)
+                                            <select class="form-control select2" id="user" name="user" onchange="this.form.submit()" >
+                                                @if($isAdmin)
+                                                    <option value="">Tất cả</option>
+                                                @endif
+                                                @foreach ($users as $itemUser)
                                                     <option
-                                                        value="{{ $itemSeller->id }}" {{ $seller == $itemSeller->id ? 'selected' : '' }}>{{ $itemSeller->sellerName }}
+                                                        value="{{ $itemUser->id }}" {{ $user == $itemUser->id ? 'selected' : '' }}>{{ $itemUser->fullName }}({{$itemUser->userName}})
                                                     </option>
                                                 @endforeach
                                             </select>
                                     </div>
+{{--                                    <label for="user" class="col-sm-2 col-form-label">Seller</label>--}}
+{{--                                    <div class="col-sm-4">--}}
+{{--                                        <select class="form-control select2" id="seller" name="seller" onchange="this.form.submit()" >--}}
+{{--                                            <option value="">Tất cả</option>--}}
+{{--                                            @foreach ($sellers as $itemSeller)--}}
+{{--                                                <option--}}
+{{--                                                    value="{{ $itemSeller->id }}" {{ $seller == $itemSeller->id ? 'selected' : '' }}>{{ $itemSeller->sellerName }}--}}
+{{--                                                </option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+{{--                                    </div>--}}
                                 </div>
                                 <div class="form-group row">
                                     <label for="vps" class="col-sm-2 col-form-label">Vps</label>
                                     <div class="col-sm-10">
                                             <select class="form-control select2" id="vps" name="vps" onchange="this.form.submit()" >
-                                                <option value="">Tất cả</option>
+                                                @if($isAdmin)
+                                                    <option value="">Tất cả</option>
+                                                @endif
                                                 @foreach ($vpses as $itemVps)
                                                     <option
                                                         value="{{ $itemVps->id }}" {{ $vps == $itemVps->id ? 'selected' : '' }}>{{ $itemVps->name }}</option>

@@ -65,6 +65,7 @@ class OrdersController extends Controller
         $filter_dateTo = '';
         $filter_productCateId = 0;
         $filter_seller = 0;
+        $filter_userId = 0;
         $filter_vps = 0;
         $filter_orderNumber = '';
         $filter_product = '';
@@ -78,15 +79,7 @@ class OrdersController extends Controller
         $filter_fulfillStatusId = 0;
         $filter_sellerIds = [];
         $filter_vpsIds = [];
-        if (Auth::user()->role == 'admin') {
-            $sellers = Seller::all();
-            $vpses = Vps::all();
-        } else {
-            $sellers = Seller::where('userId', Auth::id())->get();
-            $vpses = Vps::where('userId', Auth::id())->get();
-            $filter_sellerIds = $sellers->pluck('id')->toArray();
-            $filter_vpsIds = $vpses->pluck('id')->toArray();
-        }
+
         if ($request != null) {
             if ($request->input('productCate')) {
                 $filter_productCateId = $request->integer('productCate');
@@ -102,6 +95,9 @@ class OrdersController extends Controller
             }
             if ($request->input('seller')) {
                 $filter_seller = $request->integer('seller');
+            }
+            if ($request->input('user')) {
+                $filter_userId = $request->integer('user');
             }
             if ($request->input('orderNumber')) {
                 $filter_orderNumber = $request->input('orderNumber');
@@ -133,6 +129,29 @@ class OrdersController extends Controller
             if ($request->input('fulfillStatus')) {
                 $filter_fulfillStatusId = $request->integer('fulfillStatus');
             }
+        }
+
+
+        if (Auth::user()->role == 'admin') {
+            $sellers = Seller::all();
+            $vpses = Vps::all();
+        } else {
+            //$sellers = Seller::where('userId', Auth::id())->get();
+            $vpses = Vps::where('userId', Auth::id())->get();
+            //$filter_sellerIds = $sellers->pluck('id')->toArray();
+            $filter_vpsIds = $vpses->pluck('id')->toArray();
+            $users = Users::where('id', Auth::id())->get();
+        }
+
+        if ($filter_userId > 0){
+            $sellers = Seller::where('userId',$filter_userId)->get();
+            $filter_sellerIds = $sellers->pluck('id')->toArray();
+            $vpses =  Vps::where('userId', $filter_userId)->get();
+            $filter_vpsIds = $vpses->pluck('id')->toArray();
+        }
+
+        if ($filter_vps > 0 && !in_array($filter_vps, $filter_vpsIds)){
+            $filter_vps = 0;
         }
         if ($filter_dateFrom && $filter_dateTo) {
             $query->whereBetween('created_at', [ Carbon::parse($filter_dateFrom)->startOfDay(),  Carbon::parse($filter_dateTo)->endOfDay()]);
@@ -234,6 +253,7 @@ class OrdersController extends Controller
             'orders' => $orders,
             'users' => $users,
             'vpses' => $vpses,
+            'isAdmin'=> (Auth::user()->role == 'admin'),
             'sellers' => $sellers,
             'counter' => $counter,
             'productCates' => $productCates,
@@ -243,6 +263,7 @@ class OrdersController extends Controller
             'dateTo' => $filter_dateTo,
             'productCate' => $filter_productCateId,
             'seller' => $filter_seller,
+            'user'=>$filter_userId,
             'vps' => $filter_vps,
             'orderNumber' => $filter_orderNumber,
             'product' => $filter_product,

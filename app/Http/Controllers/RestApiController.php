@@ -268,7 +268,7 @@ class RestApiController extends BaseController
                 $index = 0;
                 $numberOrderUpdate = 0;
                 $orderNumberError = [];
-                if (count($header) >= 103) {
+                if (count($header) > 92) {
                     $now = Carbon::now();
                     $twoDaysAgo = Carbon::now()->subDays(2);
                     $list_orders = DB::table('orders')->whereBetween('updated_at', [$twoDaysAgo, $now])->get();
@@ -293,12 +293,11 @@ class RestApiController extends BaseController
                                         $order->orderNumber = $row[0];
                                         $order->sellerId = $seller->id;
                                         $order->createBy = $userImport->id;
-                                        if ($seller->userId) {
-                                            $vps = Vps::where('userId', $seller->userId)->first();
-                                            if ($vps) {
-                                                $order->vpsId = $vps->id;
-                                            }
+                                        $vps = Vps::where('sellerId', $seller->id)->first();
+                                        if ($vps) {
+                                            $order->vpsId = $vps->id;
                                         }
+
                                         if (strlen($row[3]) > 0) {
                                             $order->created_at = strtotime($row[3]);
                                         }
