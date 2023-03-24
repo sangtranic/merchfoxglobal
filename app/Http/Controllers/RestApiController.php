@@ -299,7 +299,7 @@ class RestApiController extends BaseController
                                         }
 
                                         if (strlen($row[3]) > 0) {
-                                            $order->created_at = strtotime($row[3]);
+                                            $order->created_at = strtotime($row[3])->addHours(-7);
                                         }
                                         if (strlen($row[1]) > 0) {
                                             $order->channelId = $row[1];
@@ -395,6 +395,11 @@ class RestApiController extends BaseController
 //                                                break;
 //                                            }
 
+                                        }
+                                        //neu khong tim thay loai san pham thi gan mac dinh la 6 (chua xoc dinh)
+                                        if($categoryId==0)
+                                        {
+                                            $categoryId = 6;
                                         }
                                         $order->categoryId = $categoryId;
                                         $order->size = $productSize;
