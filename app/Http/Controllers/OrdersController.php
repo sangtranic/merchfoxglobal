@@ -325,10 +325,12 @@ class OrdersController extends Controller
             } else {
                 $vpsItem = Vps::find($order->vpsId);
                 if ($order->productId && $order->productId > 0) {
-
                     $product = Products::find($order->productId);
-                    $product->imageDesign1 = $product->url_img_design1;
-                    $product->imageDesign2 = $product->url_img_design2;
+                    if(!is_null($product))
+                    {
+                        $product->imageDesign1 = is_null($product->url_img_design1)?"":$product->url_img_design1;
+                        $product->imageDesign2 = is_null($product->url_img_design2)?"":$product->url_img_design2;
+                    }
                 }
                 if ($vpsItem) {
                     $vpses = Vps::where('userId', $vpsItem->userId)->get();
