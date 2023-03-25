@@ -135,8 +135,9 @@ class OrdersController extends Controller
         if (Auth::user()->role == 'admin') {
             $sellers = Seller::all();
             $vpses = Vps::all();
+            $filter_vpsIds = $vpses->pluck('id')->toArray();
         } else {
-            //$sellers = Seller::where('userId', Auth::id())->get();
+            $sellers = Seller::where('userId', Auth::id())->get();
             $vpses = Vps::where('userId', Auth::id())->get();
             //$filter_sellerIds = $sellers->pluck('id')->toArray();
             $filter_vpsIds = $vpses->pluck('id')->toArray();
@@ -146,13 +147,13 @@ class OrdersController extends Controller
         if ($filter_userId > 0){
             $sellers = Seller::where('userId',$filter_userId)->get();
             $filter_sellerIds = $sellers->pluck('id')->toArray();
-            $vpses =  Vps::where('userId', $filter_userId)->get();
-            $filter_vpsIds = $vpses->pluck('id')->toArray();
+            //$vpses =  Vps::where('userId', $filter_userId)->get();
+            //$filter_vpsIds = $vpses->pluck('id')->toArray();
         }
 
-        if ($filter_vps > 0 && !in_array($filter_vps, $filter_vpsIds)){
-            $filter_vps = 0;
-        }
+//        if ($filter_vps > 0 && !in_array($filter_vps, $filter_vpsIds)){
+//            $filter_vps = 0;
+//        }
         if ($filter_dateFrom && $filter_dateTo) {
             $query->whereBetween('created_at', [ Carbon::parse($filter_dateFrom)->startOfDay(),  Carbon::parse($filter_dateTo)->endOfDay()]);
         } else if ($filter_dateFrom) {
@@ -239,7 +240,6 @@ class OrdersController extends Controller
         } else {
             $orders = $query->paginate($this->ROWAMOUNT);
         }
-
         $productSelect = null;
         $showProducts = [];
         if (!($orders->isEmpty())) {
@@ -617,6 +617,7 @@ class OrdersController extends Controller
             //$new_product->update($request->all());
             $new_product->itemId = $request->input('itemId');
             $new_product->description = $request->input('description');
+            $new_product->color = $request->input('color');
             //$new_product->url = $request->input('url');
             $new_product->urlImagePreviewOne = $request->input('urlImagePreviewOne');
             $new_product->urlImagePreviewTwo = $request->input('urlImagePreviewTwo');
@@ -654,9 +655,15 @@ class OrdersController extends Controller
     {
         $orders = Orders::findOrFail($id);
         if ($orders) {
-            if (Auth::id() != $orders->createBy && strtolower(Auth::user()->role) == 'user') {
-                return back()->with('status', 'Error')->with('message', 'Bạn không có quyền xóa đơn hàng này.');
+            if(strtolower(Auth::user()->role) == 'user'){
+                $vps = Vps::findOrFail($orders->vpsId);
+                if($vps->userId != Auth::id()){
+                    return back()->with('status', 'Error')->with('message', 'Bạn không có quyền xóa đơn hàng này.');
+                }
             }
+//            if (Auth::id() != $orders->createBy && strtolower(Auth::user()->role) == 'user') {
+//                return back()->with('status', 'Error')->with('message', 'Bạn không có quyền xóa đơn hàng này.');
+//            }
         }
         $orders->delete();
         return back()->with('status', 'Successfully')->with('message', 'Xóa đơn hàng thành công.');
@@ -700,7 +707,7 @@ class OrdersController extends Controller
     //
     public function exportCSV(Request $request)
     {
-        $model = $this->getIndexModel($request);
+        $model = $this->getIndexModel($request, true);
         //dump($model);
         $heading = ['order_number', 'fullfi_number', 'track_code', 'carrier', 'update_ebay', 'note'];
         $data = [
@@ -768,11 +775,11 @@ class OrdersController extends Controller
                 }
                 $idOrders = $model['orders']->pluck('id');
                 // Create a new CSV writer
-                $sellerName = '';
+                $sellerName = date('Y-m-d');;
                 if ($model['sellers'] && count($model['sellers']) > 0 && $model['vpses'] && count($model['vpses']) > 0) {
                     $vpsItem = $model['vpses']->where('id', $model['vps'])->first();
                     if ($vpsItem) {
-                        $seller = $model['sellers']->where('userId', $vpsItem->userId)->first();
+                        $seller = $model['sellers']->where('id', $vpsItem->sellerId)->first();
                         if ($seller) {
                             $sellerName = $seller->sellerName;
                         }
@@ -798,7 +805,7 @@ class OrdersController extends Controller
 
     public function exportOrders(Request $request)
     {
-        $model = $this->getIndexModel($request);
+        $model = $this->getIndexModel($request, true);
         $heading = ['STT ID Order', 'Date', 'ID Order', 'Title', 'Link Products Front', 'Link Products Back', 'Link DS Front', 'Link DS Back',
             'Size/Color', 'First Name', 'Last Name', 'Address 1', 'Address 2', 'City', 'Bang',
             'Zipcode', 'Country', 'Phone', 'ID Fullfil', 'Note'];
